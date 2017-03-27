@@ -1,4 +1,5 @@
 --- Corona SDK game
+-- (CORONA lua)
 
 local game = {}
 
@@ -12,9 +13,6 @@ function game.start()
   
 end
 
---- Ends the game, exit app
-function game.over()
-  
-end
+
 
 return game

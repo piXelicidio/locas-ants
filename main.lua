@@ -1,4 +1,5 @@
 --- Locas Ants main module
+-- (MIXED lua, corona, loveapi)
 local game
 
 -- Dirty trick to detect if Corona SDK or Love ;)

@@ -1,31 +1,33 @@
 --- Löve game
+-- (LOVE Lua)
 
 local game = {}
+
+local sim = require('code.simulation')
 
 --- initializations, defaults, load
 function game.init()
   function love.load()
-    
+    sim.init()  
   end
+  
+  function sim.end()
+    print "Simulation ended on Löve"
+  end;  
 end
 
 --- Run the game
 function game.start()
-  -- 
+  --  
   function love.update(dt)
-    
+    sim.update()
   end
   --
   function love.draw()
-    
-    love.graphics.rectangle("fill", 0, 0, 12, 12)
+    sim.draw()    
   end
   
 end
 
---- Ends the game, exit app
-function game.over()
-  
-end
   
 return game
