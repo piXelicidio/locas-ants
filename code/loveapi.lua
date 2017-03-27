@@ -13,7 +13,8 @@ function love.load()
 end;
 
 function love.update(dt)
-  if api.update~=nil then api.update(dt) end
+  --will be fixed framerate we don't need the delta time every frame
+  if api.update~=nil then api.update() end
 end
 
 function love.draw()

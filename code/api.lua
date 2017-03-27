@@ -43,8 +43,8 @@ function api.load()
 end
 
 --- Called each frame to update game data, dt is delta time between frames
-function api.update(dt)
-  if api.onUpdate~=nil then api.onUpdate(dt) end
+function api.update()
+  if api.onUpdate~=nil then api.onUpdate() end
 end
 
 --- Called each frame to draw the visuals
@@ -53,7 +53,7 @@ function api.draw()
 end
 
 --- call this from main lua to inform apis things has started;
--- sdks like corona doesn't provide Load event like Löve so it need this;
+-- sdks like corona doesn't provide Load event like Löve so it need this to call api.load();
 function api.start()
   api.started()  
 end

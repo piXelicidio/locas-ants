@@ -1,5 +1,6 @@
 --- simulation 
 --(PURE Lua)
+local api=require('code.api')
 
 local sim = {}
 
@@ -12,8 +13,5 @@ end
 function sim.draw()
 end
 
----ABSTRACT (event) called when sim is ended. Implement this somewhere else.
-function sim.end() 
-end
 
 return sim

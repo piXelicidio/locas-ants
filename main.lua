@@ -1,19 +1,20 @@
 --- our main game stuff
 --(PURE Lua)
 local api=require('code.api')
-local circleTest
+local sim=require('code.simulation')
 
 --- We init the application defining the load event
 function api.onLoad()
-    circleTest = api.makeCircle(20,20,20)    
+  sim.init()
 end  
   
 function api.onUpdate(dt)
+  sim.update()  
 end
 
 function api.onDraw()
   --print 'drawing circle'
-  api.drawCircle(circleTest)  
+  sim.draw()
 end
 
 api.start()
