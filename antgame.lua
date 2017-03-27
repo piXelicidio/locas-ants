@@ -1,6 +1,7 @@
 --- our main game stuff
 --(PURE Lua)
 local api=require('code.api')
+local game={}
 local circleTest
 
 --- We init the application defining the load event
@@ -16,6 +17,8 @@ function api.onDraw()
   api.drawCircle(circleTest)  
 end
 
-api.start()
+function game.start()
+  
+end
 
 return game
