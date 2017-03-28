@@ -5,6 +5,7 @@
 
 g_isTesting = true
 -- We are going to play with isolated tests or runing the game?
+-- (why this? execution only start with main.lua)
 if not g_isTesting then
 
   local api=require('code.api')
@@ -15,7 +16,7 @@ if not g_isTesting then
     sim.init()
   end  
     
-  function api.onUpdate(dt)
+  function api.onUpdate()
     sim.update()  
   end
 

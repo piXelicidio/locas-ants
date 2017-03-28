@@ -33,7 +33,7 @@ function TActor.create()
   function actorObj.draw() 
   end
   
-  return antObj
+  return actorObj
 end
 
 return TActor
