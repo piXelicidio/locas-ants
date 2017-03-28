@@ -2,29 +2,30 @@
 -- and any game object inherits from TActor 
 -- (PURE Lua)
 
-TActor = { className='TAnt', 
-           classParent = nil )  }
+local TActor = { classParent = nil, className = 'TActor'  }
      
--- PRIVATE fields
-local fVisualObj = {
-  x=0, 
-  y=0
-}
+-- PRIVATE class fields
+local fSomething = 0
   
--- PRIVATE methods
+-- PRIVATE class methods
 local function doSomthing ()
   
 end
-  
+
+-- PUBLIC class methods
 
 --- Creating a new instance for TActor class
-function TActor.crate()
-  actorObj = {}
+function TActor.create()
+  local actorObj = {}
+  --PRIVATE instance fields
+  local fFooFoo = 0
   
   --PUBLIC properties
-  actorObj.someNumber = 0
+  actorObj.position = { x = 1, y = 1 }
   
   --PUBLIC functions
+  function actorObj.getClassType() return TActor end
+  
   function actorObj.init() 
   end
   function actorObj.update()  

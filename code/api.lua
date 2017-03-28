@@ -10,6 +10,11 @@
 -- you only need to implement a new api (like current loveapi.lua) with the basics defined on this interface,
 -- later you can continue exending it or just using direct calls to your sdk if you want.
 
+-- Graphics: Assuming all visual objects need two functions: "make" for initialization 
+-- and "draw" for drawing. This gerelalize better the way different SDKs works, like
+-- corona SDK and Love2D. 
+
+
 local api = {}
 
 -- Dirty trick to detect if Corona SDK or Love ;)
@@ -63,9 +68,9 @@ end
 -- starting with a formality, the name:
 if api.exitGame==nil then print "ERROR: api.exitGame() undefined" end
 if api.name==nil then print "ERROR: api.name string not defined" end
-if api.makeCircle==nil then print "ERROR: api.makeCircle(x,y,radious) undefined" end
 if api.started==nil then print 'ERROR: api.started() undefined' end
- 
+if api.newCircle==nil then print "ERROR: api.makeCircle(x,y,radious) undefined" end
+if api.drawCircle==nil then print "ERROR: api.drawCircle(circle) undefined" end
 --- call from main.lua some SDKs like corona doesn't have a begin event. 
 
 return api
