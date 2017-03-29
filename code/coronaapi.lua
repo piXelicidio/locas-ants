@@ -10,7 +10,7 @@ function api.exitGame()
 end
 
 --- Creates a circle shape
-function api.makeCircle(ax,ay, aRadious)
+function api.newCircle(ax,ay, aRadious)
   local circle = display.newCircle(ax,ay,aRadious)
   circle:setFillColor(0,0,0,0)
   circle.strokeWidth = 1

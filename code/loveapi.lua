@@ -1,5 +1,6 @@
 --- love api 
 --(LOVE Lua)
+
 local api = {}
 
 api.name = 'love'
@@ -13,7 +14,8 @@ function love.load()
 end;
 
 function love.update(dt)
-  if api.update~=nil then api.update(dt) end
+  --will be fixed framerate we don't need the delta time every frame
+  if api.update~=nil then api.update() end
 end
 
 function love.draw()
@@ -21,12 +23,12 @@ function love.draw()
 end
 
 --- Inits a circle, on love we just store the data on a table for later draw
-function api.makeCircle(ax,ay, aRadious)
+function api.newCircle(ax,ay, aRadious)
   return {x=ax, y=ay, radius=aRadious}
 end 
 
-function api.drawCircle( data )
-  love.graphics.circle("line", data.x, data.y, data.radius )  
+function api.drawCircle( circle )
+  love.graphics.circle("line", circle.x, circle.y, circle.radius )  
 end
 
 -- in case apis need to init something after being loaded and game starts, this will be called from main.lua 

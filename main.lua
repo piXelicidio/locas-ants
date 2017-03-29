@@ -1,21 +1,33 @@
---- our main game stuff
---(PURE Lua)
-local api=require('code.api')
-local circleTest
+--- Our main game stuff, 
+-- (PURE Lua)
+-- try to keep it simple
 
---- We init the application defining the load event
-function api.onLoad()
-    circleTest = api.makeCircle(20,20,20)    
-end  
-  
-function api.onUpdate(dt)
+
+g_isTesting = true
+-- We are going to play with isolated tests or runing the game?
+-- (why this? execution only start with main.lua)
+if not g_isTesting then
+
+  local api=require('code.api')
+  local sim=require('code.simulation')
+
+  --- We init the application defining the load event
+  function api.onLoad()
+    sim.init()
+  end  
+    
+  function api.onUpdate()
+    sim.update()  
+  end
+
+  function api.onDraw()
+    --print 'drawing circle'
+    sim.draw()
+  end
+
+  api.start()
+
+else
+-- This is not the game, we are testing stuff
+  dofile('test&dev/testing.lua')
 end
-
-function api.onDraw()
-  --print 'drawing circle'
-  api.drawCircle(circleTest)  
-end
-
-api.start()
-
-return game

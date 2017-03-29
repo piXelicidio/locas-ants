@@ -39,5 +39,5 @@ luac.out
 *.x86_64
 *.hex
 
-# directories to ignore
+# Folders starting with 'i_'
 i_*/
