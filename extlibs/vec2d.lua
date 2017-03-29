@@ -146,4 +146,10 @@ function vec.makeFromAngle( angle )
   }  
 end
 
+--- Modify vDest making its absolute rotation with given angle, makes it unitary length=1
+function vec.setAngle(vDest, angle)
+  vDest.x = math.cos(angle)
+  vDest.y = math.sin(angle)
+end
+
 return vec
