@@ -23,8 +23,8 @@ function love.draw()
 end
 
 --- Inits a circle, on love we just store the data on a table for later draw
-function api.newCircle(ax,ay, aRadious)
-  return {x=ax, y=ay, radius=aRadious}
+function api.newCircle(ax,ay, aRadius)
+  return {x=ax, y=ay, radius=aRadius}
 end 
 
 function api.drawCircle( circle )
