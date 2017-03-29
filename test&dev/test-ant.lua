@@ -24,7 +24,8 @@ end
 function api.onDraw()
   --print 'drawing circle'
   myAnt.draw()
-  --LOVE CODE  
+  --LOVE CODE
+  love.graphics.line(500,300, 1000,300)
 end
 
 api.start()
