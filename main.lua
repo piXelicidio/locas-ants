@@ -29,5 +29,5 @@ if not g_isTesting then
 
 else
 -- This is not the game, we are testing stuff
-  dofile('test&dev/testing.lua')
+  dofile('test&dev/_testing.lua')
 end
