@@ -1,4 +1,4 @@
-local TLinkedList = require('code.linkedlist')
+local TLinkedList = require('code.llist')
 
 local l1 = TLinkedList.create()
 local l2 = TLinkedList.create()
@@ -73,34 +73,39 @@ t2 = os.clock()
 print ('Average: '..sum/count)
 print ('calc time: '..(t2-t1)..'secs')
 
---print (':')
---print ('This time accessing array directly')
+print (':')
+print ('This time accessing nodes  directly')
 --swap a bit to make it differnt, then iterate to sum directly with in pairs this time
---sum=0
---count=0
---t1 = os.clock()
---for j=1,sumIterations do
---  for i=1,100 do
---      n = nodes[ math.random(maxnodes) ]
---      --swapping from lists
---      if n.refList==l1 then      
---        l1.remove(n);
---        l2.add(n);
---      else
---        l2.remove(n);
---        l1.add(n)
---      end    
---  end
---  for _,node in pairs(l1.array) do
---    sum = sum + node.obj
---    count = count + 1
---  end 
---  for _,node in pairs(l2.array) do
---    sum = sum + node.obj
---    count = count + 1
---  end    
---end;
---t2 = os.clock()
---print ('Average: '..sum/count)
---print ('calc time: '..(t2-t1)..'secs')
+sum=0
+count=0
+t1 = os.clock()
+for j=1,sumIterations do
+  for i=1,100 do
+      n = nodes[ math.random(maxnodes) ]
+      --swapping from lists
+      if n.refList==l1 then      
+        l1.remove(n);
+        l2.add(n);
+      else
+        l2.remove(n);
+        l1.add(n)
+      end    
+  end
+  
+  local anode = l1.head
+  while anode.nextNode~=l1.tail do
+    anode = anode.nextNode
+    sum = sum + anode.obj
+    count = count + 1
+  end; 
+  anode = l2.head
+  while anode.nextNode~=l2.tail do
+    anode = anode.nextNode
+    sum = sum + anode.obj
+    count = count + 1
+  end;   
+end;
+t2 = os.clock()
+print ('Average: '..sum/count)
+print ('calc time: '..(t2-t1)..'secs')
 

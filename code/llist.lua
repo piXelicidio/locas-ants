@@ -27,6 +27,10 @@ function TLinkedList.create()
     
   -- private fields
   local fIter = head
+  
+  -- public properties
+  qList.head = head   -- access with care
+  qList.tail = tail 
 
   --public funcitons
   
@@ -62,14 +66,6 @@ function TLinkedList.create()
   --- pass each element to doFunc,   
   function qList.forEachObj( doFunc )
     local anode = head
---    for i=1,qList.count do
---      anode = anode.nextNode
---      if anode then doFunc(anode.obj) 
---      else 
---        print ('i:'..i..' :'..qList.count) 
---        break 
---      end
---    end    
     while anode.nextNode~=tail do
       anode = anode.nextNode
       doFunc(anode.obj)            
@@ -98,7 +94,7 @@ function TLinkedList.create()
   end
 
   --- Return next item, move to next.
-  -- if reach end return nil 
+  -- if reach end return tail
   -- if you keep asking next without reset after nil, then poof! (avoiding validation here)
   function qList.iterNext()
     fIter = fIter.nextNode

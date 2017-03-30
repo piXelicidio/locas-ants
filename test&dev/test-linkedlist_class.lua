@@ -1,4 +1,4 @@
-local TLinkedList = require('code.linkedlist')
+local TLinkedList = require('code.llist')
 
 qList = TLinkedList.create()
 
@@ -33,7 +33,7 @@ print('Iterations')
 -- iterating using next
 qList.iterReset()
 local nodex = qList.iterNext()
-while nodex do
+while nodex~=qList.tail do
   print('iterating: '..nodex.obj)
   nodex = qList.iterNext()  
 end
