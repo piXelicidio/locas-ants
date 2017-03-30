@@ -5,11 +5,11 @@ qList = TQuickList.create()
 ----------------
 -- testing it
 --adding
-local n = qList.newListableNode("1juan")
+local n = qList.newNode("1juan")
 qList.add( n )
-local n2 = qList.newListableNode("2maria")
+local n2 = qList.newNode("2maria")
 qList.add( n2 )
-n = qList.newListableNode("3pedro")
+n = qList.newNode("3pedro")
 qList.add( n )
 
 -- print listing 

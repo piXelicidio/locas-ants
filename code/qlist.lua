@@ -1,5 +1,5 @@
 --- TQuickList; quick adding and removing collection. 
-local TQuickList = {classParent = nil, className = 'TQuickList'}
+local TQuickList = {}
 
 function TQuickList.create()  
   qList = {
@@ -17,8 +17,10 @@ function TQuickList.create()
   
   --- Returns a new node, usable for any TQuickList, not tied to this instance.
   -- This actually can be created anywhere as long as the table has the required fields.
+  -- Why this? Becasue we don't want to create a new node everytime we add an obj to the list,
+  -- we can reuse the same node to jump from list to list (this will be very useful in the grid map later)
   -- @param refObj the data you want to store in the node
-  function qList.newListableNode( refObj )
+  function qList.newNode( refObj )
     return {  refList = nil, 
               idx = 0, 
               obj = refObj }
@@ -61,6 +63,16 @@ function TQuickList.create()
   function qList.forEachObj( doFunc )
     for _,item in pairs(qList.array) do
       doFunc(item.obj)
+    end
+  end
+  
+  --- pass each element to doFunc acting on Nodes version, 
+  -- do it yourself with pairs(qList.array) to avoid this call
+  -- do not use iparis or for loop with qList.array[i], 
+  -- will not work well because of nil values present
+  function qList.forEachNode( doFunc )
+    for _,item in pairs(qList.array) do
+      doFunc(item)
     end
   end
 

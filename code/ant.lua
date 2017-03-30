@@ -6,7 +6,7 @@ local TActor = require('code.actor')
 local vec = require('extlibs.vec2d')
 
 -- Sorry of the Delphi-like class styles :P
-local TAnt = { classParent = TActor, className='TAnt'}
+local TAnt = {}
      
 -- PRIVATE class fields
 local fSomething
@@ -41,6 +41,7 @@ function TAnt.create()
   
   --PUBLIC functions
   function antObj.getClassType() return TAnt end
+  function antObj.getClassParent() return TActor end
   
   function antObj.init()
     fVisualObj = api.newCircle(antObj.position.x, antObj.position.y, 4)    
