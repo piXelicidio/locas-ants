@@ -7,5 +7,5 @@ local test = 2
 
     if test == 1 then dofile('test&dev/test-ant.lua') 
 elseif test == 2 then dofile('test&dev/test-qlist_class.lua') 
-elseif test == 3 then 
+elseif test == 3 then dofile('test&dev/benchmark_lists.lua')
 end

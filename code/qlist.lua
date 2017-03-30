@@ -2,14 +2,12 @@
 local TQuickList = {}
 
 function TQuickList.create()  
-  qList = {
+  local qList = {
       ---Public properties (for quick access) that you should "THINK" are read-only, so... behave.
       array = {},      -- store the list items, avoid using qList.array[index], some items may be nil
       emptyItems = {}, -- store the index of the removed items on array
       count = 0        -- keeps the item count updated
     }
-  print "qList test"
-  print (_VERSION)
   -- private fields
   local fIter = nil
 
