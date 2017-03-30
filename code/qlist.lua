@@ -26,6 +26,7 @@ function TQuickList.create()
 
   --- Adds a node to the list
   -- reuse empty items in the array if present
+  -- Warning: no validations, if you add the same node twice it gets duplicated
   function qList.add( node )
     local idx=0
     if #qList.emptyItems~=0 then

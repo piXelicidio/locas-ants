@@ -1,7 +1,7 @@
-TQuickList = require('code.qlist')
+local TQuickList = require('code.qlist')
 
-l1 = TQuickList.create()
-l2 = TQuickList.create()
+local l1 = TQuickList.create()
+local l2 = TQuickList.create()
 
 local maxnodes = 10000
 
