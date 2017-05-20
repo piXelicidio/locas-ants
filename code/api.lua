@@ -71,6 +71,7 @@ function api.start()
   end
 end
 
+--COMMON STUFF
 
 -- Check the "abstract" functions and properties, if they aren't implemented is a fatal error
 -- Checking if all abstract functions are implemented:

@@ -8,8 +8,11 @@ local sim = {}
 local actors = {}
 
 function sim.init()
+  local newAnt
   for i=1,10 do
-    local newAnt = TAnt.create()    
+    newAnt = TAnt.create() 
+    newAnt.init()
+    actors[i] = newAnt
   end
   print(newAnt.x, newAnt.y)
 end
