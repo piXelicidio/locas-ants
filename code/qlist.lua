@@ -47,7 +47,7 @@ function TQuickList.create()
 
   --- remove node quickly just setting it to nil, and saving the idex for reuse
   -- no validations for optimization:
-  -- but be carful is node.refList~=qList or node.idx==0 ploff!!
+  -- but be careful is node.refList~=qList or node.idx==0 ploff!!
   function qList.remove( node )
     qList.array[node.idx] = nil
     -- save for reuse

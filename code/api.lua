@@ -10,7 +10,7 @@
 -- you only need to implement a new api (like current loveapi.lua) with the basics defined on this interface,
 -- later you can continue exending it or just using direct calls to your sdk if you want.
 
--- Graphics: Assuming all visual objects need two functions: "make" for initialization 
+-- Graphics: Assuming all visual objects need two functions: "new" for initialization 
 -- and "draw" for drawing. This gerelalize better the way different SDKs works, like
 -- corona SDK and Love2D. 
 

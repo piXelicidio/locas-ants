@@ -103,4 +103,4 @@ end;
 t2 = os.clock()
 print ('Average: '..sum/count)
 print ('calc time: '..(t2-t1)..'secs')
-
+print ('End.')
