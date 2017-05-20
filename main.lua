@@ -3,7 +3,7 @@
 -- try to keep it simple
 
 
-g_isTesting = true
+g_isTesting = false
 -- We are going to play with isolated tests or runing the game?
 -- (why this? execution only start with main.lua)
 if not g_isTesting then
@@ -29,5 +29,5 @@ if not g_isTesting then
 
 else
 -- This is not the game, we are testing stuff
-  dofile('test&dev/testing.lua')
+  dofile('test&dev/_testing.lua')
 end

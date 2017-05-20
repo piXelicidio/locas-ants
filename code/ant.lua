@@ -6,7 +6,7 @@ local TActor = require('code.actor')
 local vec = require('extlibs.vec2d')
 
 -- Sorry of the Delphi-like class styles :P
-local TAnt = { classParent = TActor, className='TAnt'}
+local TAnt = {}
      
 -- PRIVATE class fields
 local fSomething
@@ -23,21 +23,32 @@ function TAnt.create()
   
   --private instance fields
   local fSomevar = 0
-  local fVisualObj 
+  local fVisualObj          
     
   --PUBLIC properties
   antObj.direction = { x = 1, y = 0 } --direction heading movement unitary vector
   antObj.speed = 1
   antObj.erratic = 0.1                --craziness
+  antObj.antPause = {
+      iterMin = 10,                   --Stop for puse every iterMin to iterMax iterations.
+      iterMax = 20,
+      timeMin = 5,                    --Stop time from timeMin to timeMax iterations.
+      timeMax = 15,
+      nextPause = -1                  --When is the next pause?
+    }
+  --PRIVATE functions
+  --TODO: local function checkFor
   
   --PUBLIC functions
   function antObj.getClassType() return TAnt end
+  function antObj.getClassParent() return TActor end
   
   function antObj.init()
-    fVisualObj = api.newCircle(antObj.x, antObj.y, 4)    
+    fVisualObj = api.newCircle(antObj.position.x, antObj.position.y, 4)    
   end
   
-  function antObj.update()  
+  function antObj.update()      
+    
     local velocity = vec.makeScale( antObj.direction, antObj.speed )
     vec.add( antObj.position, velocity )
     vec.setFrom( fVisualObj, antObj.position )    
