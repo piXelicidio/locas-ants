@@ -22,8 +22,7 @@ end
 function api.onUpdate()
   for _,myAnt in ipairs(myAnts) do
     myAnt.update()
-  end
-  api.pan(1,0)
+  end  
 end
 
 function api.onDraw()

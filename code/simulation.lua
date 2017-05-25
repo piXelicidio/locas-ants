@@ -2,19 +2,21 @@
 --(PURE Lua)
 local api=require('code.api')
 local TAnt = require('code.ant')
+local map = require('code.map')
 
 local sim = {}
 
 local actors = {}
 
-function sim.init()
+function sim.init()  
+  map.init()
   local newAnt
   for i=1,10 do
     newAnt = TAnt.create() 
     newAnt.init()
     actors[i] = newAnt
   end
-  print(newAnt.x, newAnt.y)
+  api.setPanning(600, 350)
 end
 
 function sim.update()
@@ -24,6 +26,7 @@ function sim.update()
 end
 
 function sim.draw()
+  map.draw()  
   for _,actor in ipairs(actors) do
     actor.draw()    
   end

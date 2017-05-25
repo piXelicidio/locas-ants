@@ -91,5 +91,14 @@ if api.newCircle==nil then print "ERROR: api.makeCircle(x,y,radius) undefined" e
 -- Draws the previous created circle.
 if api.drawCircle==nil then print "ERROR: api.drawCircle(circle) undefined" end
 
+-- Set the current pan, to update the view of the screen relative to x,y of the map
+if api.setPanning==nil then print "ERROR: api.setPanning(x,y) undefined" end
+
+-- Move the panning using deltaX and deltaY
+if api.pan==nil then print "ERROR: api.pan(deltaX, deltaY) undefined" end
+
+-- Get the current panning coords x,y as a table vector
+if api.getPanning==nil then print "ERROR: api.getPanning() undefined" end
+
 
 return api

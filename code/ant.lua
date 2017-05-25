@@ -4,6 +4,8 @@
 local api = require('code.api')
 local TActor = require('code.actor')
 local vec = require('extlibs.vec2d')
+local map = require('code.map')
+
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
@@ -47,13 +49,30 @@ function TAnt.create()
     fVisualObj = api.newCircle(antObj.position.x, antObj.position.y, 4)    
   end
   
-  function antObj.update()      
-    
+  function antObj.update()          
     local velocity = vec.makeScale( antObj.direction, antObj.speed )
     vec.add( antObj.position, velocity )
     vec.setFrom( fVisualObj, antObj.position )    
     -- direction variation for next update
     vec.rotate( antObj.direction, antObj.erratic * math.random() -(antObj.erratic*0.5) )
+    
+    --- checking for limits and bounce
+    if antObj.position.x < map.minX then
+      antObj.position.x = map.minX
+      if antObj.direction.x < 0 then antObj.direction.x = antObj.direction.x * -1 end
+    elseif antObj.position.x > map.maxX then
+      antObj.position.x = map.maxX
+      if antObj.direction.x > 0 then antObj.direction.x = antObj.direction.x * -1 end
+    end
+    
+    if antObj.position.y < map.minY then
+      antObj.position.y = map.minY
+      if antObj.direction.y < 0 then antObj.direction.y = antObj.direction.y *-1 end
+    elseif antObj.position.y > map.maxY then
+      antObj.position.y = map.maxY  
+      if antObj.direction.y > 0 then antObj.direction.y = antObj.direction.y *-1 end
+    end
+  
   end
   
   function antObj.draw()

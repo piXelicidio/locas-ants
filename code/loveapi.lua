@@ -7,7 +7,7 @@ local api = {}
 
 api.name = 'love'
 
-local panX, panY = 0,0              -- Wolrd panning
+local panX, panY = 0,0              -- World panning
 
 function api.exitGame()
   love.event.quit() -- i think.
@@ -34,6 +34,17 @@ end
 function api.drawCircle( circle )
   love.graphics.circle("line", circle.x + panX, circle.y + panY, circle.radius )  
 end
+
+--- Creating and drawing a rectangle object
+function api.newRectangle(ax, ay, aWidth, aHeight, aColor)
+  return {x=ax, y=ay, width = aWidth, height = aHeight, color = aColor }
+end
+
+function api.drawRectangle( rect )
+  love.graphics.setColor( rect.color )
+  love.graphics.rectangle('line', rect.x + panX, rect.y + panY, rect.width, rect.height )  
+end
+
 
 --- in case apis need to init something after being loaded and game starts, this will be called from main.lua 
 function api.started()
