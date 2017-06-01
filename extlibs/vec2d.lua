@@ -126,8 +126,9 @@ end
 
 ---Rotate vDist vector, given float angle in radiants
 function vec.rotate(vDest, angle)
+    local tempvDestx = vDest.x
     vDest.x = vDest.x * math.cos(angle) - vDest.y * math.sin(angle);
-    vDest.y = vDest.x * math.sin(angle) + vDest.y * math.cos(angle);    
+    vDest.y = tempvDestx * math.sin(angle) + vDest.y * math.cos(angle);    
 end
 
 ---Returns new vector from V rotated by float angle

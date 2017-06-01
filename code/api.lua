@@ -86,19 +86,22 @@ if api.name==nil then print "ERROR: api.name string not defined" end
 if api.started==nil then print 'ERROR: api.started() undefined' end
 
 -- Creates a circle, should returns table with at least (x,y)
-if api.newCircle==nil then print "ERROR: api.makeCircle(x,y,radius) undefined" end  
+if api.newCircle==nil then print "ERROR: api.makeCircle(x,y,radius) not implemented" end  
 
 -- Draws the previous created circle.
-if api.drawCircle==nil then print "ERROR: api.drawCircle(circle) undefined" end
+if api.drawCircle==nil then print "ERROR: api.drawCircle(circle) not implemented" end
 
 -- Set the current pan, to update the view of the screen relative to x,y of the map
-if api.setPanning==nil then print "ERROR: api.setPanning(x,y) undefined" end
+if api.setPanning==nil then print "ERROR: api.setPanning(x,y) not implemented" end
 
 -- Move the panning using deltaX and deltaY
-if api.pan==nil then print "ERROR: api.pan(deltaX, deltaY) undefined" end
+if api.pan==nil then print "ERROR: api.pan(deltaX, deltaY) not implemented" end
 
 -- Get the current panning coords x,y as a table vector
-if api.getPanning==nil then print "ERROR: api.getPanning() undefined" end
+if api.getPanning==nil then print "ERROR: api.getPanning() not implemented" end
 
+-- Creating and drawing a rectangle object 
+if api.newRectangle==nil then print "ERROR: api.newRectangle(ax, ay, aWidth, aHeight, aColor) not implemented" end
+if api.drawRectangle==nil then print  "ERROR: api.drawRectangle( rect ) not implemented" end
 
 return api

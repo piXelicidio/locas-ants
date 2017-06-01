@@ -27,11 +27,12 @@ function love.draw()
 end
 
 --- Inits a circle, on love we just store the data on a table for later draw
-function api.newCircle(ax,ay, aRadius )
-  return {x=ax, y=ay, radius=aRadius}
+function api.newCircle(ax,ay, aRadius, aColor )
+  return {x=ax, y=ay, radius=aRadius, color = aColor}
 end 
 
 function api.drawCircle( circle )
+  love.graphics.setColor( circle.color)
   love.graphics.circle("line", circle.x + panX, circle.y + panY, circle.radius )  
 end
 
@@ -45,6 +46,14 @@ function api.drawRectangle( rect )
   love.graphics.rectangle('line', rect.x + panX, rect.y + panY, rect.width, rect.height )  
 end
 
+--- creating and drawing a line
+function api.newLine( ax1, ay1, ax2, ay2, aColor )
+  return { x1 = ax1, y1 = ay1, x2 = ax2, y2 = ay2, color = aColor }
+end
+function api.drawLine( line )
+  love.graphics.setColor( line.color )
+  love.graphics.line(line.x1 + panX, line.y1 + panY, line.x2 + panX, line.y2 + panY )
+end
 
 --- in case apis need to init something after being loaded and game starts, this will be called from main.lua 
 function api.started()

@@ -25,10 +25,11 @@ function TAnt.create()
   
   --private instance fields
   local fSomevar = 0
-  local fVisualObj          
+  local fVisualObj     
+  local fDebugDir 
     
   --PUBLIC properties
-  antObj.direction = { x = 1, y = 0 } --direction heading movement unitary vector
+  antObj.direction = { x = 1.0, y = 0.0 } --direction heading movement unitary vector
   antObj.speed = 1
   antObj.erratic = 0.1                --craziness
   antObj.antPause = {
@@ -46,7 +47,8 @@ function TAnt.create()
   function antObj.getClassParent() return TActor end
   
   function antObj.init()
-    fVisualObj = api.newCircle(antObj.position.x, antObj.position.y, 4)    
+    fVisualObj = api.newCircle(antObj.position.x, antObj.position.y, 4, {255,255,0,255})    
+    fDebugDir = api.newLine( antObj.position.x, antObj.position.y, antObj.position.x + antObj.direction.x*10, antObj.position.y + antObj.direction.y*10, {0,255,255,255});
   end
   
   function antObj.update()          
@@ -55,14 +57,22 @@ function TAnt.create()
     vec.setFrom( fVisualObj, antObj.position )    
     -- direction variation for next update
     vec.rotate( antObj.direction, antObj.erratic * math.random() -(antObj.erratic*0.5) )
+    vec.rotate( antObj.direction, antObj.erratic * math.random() -(antObj.erratic*0.5) )
+    vec.rotate( antObj.direction, antObj.erratic * math.random() -(antObj.erratic*0.5) )
+    vec.rotate( antObj.direction, antObj.erratic * math.random() -(antObj.erratic*0.5) )
+    --debug direction line
+    fDebugDir.x1 = antObj.position.x
+    fDebugDir.y1 = antObj.position.y
+    fDebugDir.x2 = antObj.position.x + antObj.direction.x*50
+    fDebugDir.y2 = antObj.position.y + antObj.direction.y*50
     
     --- checking for limits and bounce
     if antObj.position.x < map.minX then
       antObj.position.x = map.minX
-      if antObj.direction.x < 0 then antObj.direction.x = antObj.direction.x * -1 end
+      if antObj.direction.x < 0 then antObj.direction.x = antObj.direction.x *-1 end
     elseif antObj.position.x > map.maxX then
       antObj.position.x = map.maxX
-      if antObj.direction.x > 0 then antObj.direction.x = antObj.direction.x * -1 end
+      if antObj.direction.x > 0 then antObj.direction.x = antObj.direction.x *-1 end
     end
     
     if antObj.position.y < map.minY then
@@ -77,6 +87,7 @@ function TAnt.create()
   
   function antObj.draw()
     api.drawCircle(fVisualObj)
+    api.drawLine(fDebugDir)
   end
   
   return antObj
