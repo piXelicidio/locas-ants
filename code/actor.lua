@@ -25,8 +25,8 @@ function TActor.create()
   obj.radius = 1
   
   --PUBLIC functions
-  function obj.getClassType() return TActor end
-  function obj.getClassParent() return nil end
+  obj.classType = TActor
+  obj.classParent = nil
   
   function obj.init() 
   end

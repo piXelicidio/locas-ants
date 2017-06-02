@@ -1,5 +1,5 @@
---- TMaterial class, 
--- TMaterial represent world objects, that can be rocks for obstacles, or water and food as resources
+--- TSurface class, 
+-- TSurface represent world objects, that can be rocks for obstacles, or water and food as resources
 -- (PURE Lua)
 
 local api = require('code.api')
@@ -9,10 +9,10 @@ local map = require('code.map')
 
 
 -- Sorry of the Delphi-like class styles :P
-local TMaterial = {}
+local TSurface = {}
 
---- Creating a new instance for TMaterial class
-function TMaterial.create()
+--- Creating a new instance for TSurface class
+function TSurface.create()
   local obj = TActor.create()
   --public fields
   obj.radius = 20  
@@ -22,7 +22,7 @@ function TMaterial.create()
   obj.storing = false              -- false store only equal, true store mutiple like caves   
   obj.storage = {}                 -- resource stores, keyName=number pairs.
   obj.resourceCount = 0            -- amount of resources units integer
-  obj.materialRatioMultiplier = 0  -- how much the visual ratio represent the material content, 0 = constant radius size
+  obj.surfaceRatioMultiplier = 0  -- how much the visual ratio represent the surface content, 0 = constant radius size
   obj.color = {100,100,100,100}  
   
   --private instance fields  
@@ -30,14 +30,14 @@ function TMaterial.create()
   -- private funcitons
   -- public functions
     --PUBLIC functions
-  function obj.getClassType() return TMaterial end
-  function obj.getClassParent() return TActor end
+  obj.classType = TSurface
+  obj.classParent = TActor
     
   function obj.init()
     fCircle = api.newCircle(obj.position.x, obj.position.y, obj.radius )  
   end
   function obj.update()  
-    if obj.materialRatioMultiplier ~= 0 then obj.radius = obj.materialCount * obj.materialRatioMultiplier end
+    if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end
   end
   function obj.draw() 
     api.drawCircle(fCircle)
@@ -46,12 +46,12 @@ function TMaterial.create()
   return obj
 end
 
-function TMaterial.createObstacle(x,y, size)
-  local mat = TMaterial.create()
-  mat.position.x = x
-  mat.position.y = y
-  mat.radius = size
-  return mat
+function TSurface.createObstacle(x,y, size)
+  local sur = TSurface.create()
+  sur.position.x = x
+  sur.position.y = y
+  sur.radius = size
+  return sur
 end
 
-return TMaterial
+return TSurface

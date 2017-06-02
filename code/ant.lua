@@ -42,13 +42,16 @@ function TAnt.create()
   --PRIVATE functions
   --TODO: local function checkFor
   
-  --PUBLIC functions
-  function obj.getClassType() return TAnt end
-  function obj.getClassParent() return TActor end
+  --PUBLIC 
+  obj.classType = TAnt 
+  obj.classParent = TActor 
   
   function obj.init()
     fVisualObj = api.newCircle(obj.position.x, obj.position.y, 4, {255,255,0,255} )    
     fDebugDir = api.newLine( obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10, {0,255,255,255});
+  end
+  
+  function obj.interactions()
   end
   
   function obj.update()          
@@ -80,7 +83,9 @@ function TAnt.create()
       obj.position.y = map.maxY  
       if obj.direction.y > 0 then obj.direction.y = obj.direction.y *-1 end
     end
-  
+    
+    --- interact with other ants and objects
+    obj.interactions()
   end
   
   function obj.draw()
