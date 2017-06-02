@@ -16,25 +16,26 @@ end
 
 --- Creating a new instance for TActor class
 function TActor.create()
-  local actorObj = {}
+  local obj = {}
   --PRIVATE instance fields
   local fFooFoo = 0
   
   --PUBLIC properties
-  actorObj.position = { x = 1, y = 1 }
+  obj.position = { x = 1, y = 1 }
+  obj.radius = 1
   
   --PUBLIC functions
-  function actorObj.getClassType() return TActor end
-  function actorObj.getClassParent() return nil end
+  function obj.getClassType() return TActor end
+  function obj.getClassParent() return nil end
   
-  function actorObj.init() 
+  function obj.init() 
   end
-  function actorObj.update()  
+  function obj.update()  
   end
-  function actorObj.draw() 
+  function obj.draw() 
   end
   
-  return actorObj
+  return obj
 end
 
 return TActor

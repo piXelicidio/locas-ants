@@ -44,6 +44,13 @@ function TQuickList.create()
     node.refList = qList
     qList.count = qList.count + 1
   end
+  
+  --- Creates a new node and adds it to the list, combines both .add and newNode, returns node
+  function qList.addNew( refObj )
+    local node = qList.newNode( refObj )
+    qList.add( node )
+    return node
+  end
 
   --- remove node quickly just setting it to nil, and saving the idex for reuse
   -- no validations for optimization:
