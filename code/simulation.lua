@@ -8,17 +8,13 @@ local TQuickList = require('code.qlist')
 
 local sim = {}
 
-local ants = {}
-local surs = {}
-
 function sim.init()  
   map.init()
   local newAnt
   for i=1,10 do
     newAnt = TAnt.create() 
     newAnt.init()
-    ants[i] = newAnt
-    map.actors.addNew( newAnt )
+    map.addAnt( newAnt )
   end
   api.setPanning(600, 350)
   
@@ -26,9 +22,8 @@ function sim.init()
   for i=1,3 do
     newSur = TSurface.createObstacle(60*i, 50*math.random(), 30)
     --newMat = TSurface.create()
-    newSur.init()
-    surs[i] = newSur
-    map.actors.addNew( newSur )
+    newSur.init()    
+    map.addSurface( newSur )
   end
   
   local numAnts, numSurs = 0,0;
@@ -40,6 +35,7 @@ function sim.init()
 end
 
 function sim.update()
+  map.update()
   for _,node in pairs(map.actors.array) do
     node.obj.update()    
   end

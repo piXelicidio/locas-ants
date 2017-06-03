@@ -23,6 +23,7 @@ function TActor.create()
   --PUBLIC properties
   obj.position = { x = 1, y = 1 }
   obj.radius = 1
+  obj.nodesOnLists = {}   --Array, store nodes of TQuickLists where the actor may be referenced.  To make a clean destruction of the actor.
   
   --PUBLIC functions
   obj.classType = TActor

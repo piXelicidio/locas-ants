@@ -3,7 +3,7 @@ local TQuickList = require('code.qlist')
 local l1 = TQuickList.create()
 local l2 = TQuickList.create()
 
-local maxnodes = 10000
+local maxnodes = 100
 
 nodes={}
 for i=1,maxnodes do
@@ -28,11 +28,11 @@ print('filling lists: '..(t2-t1)..'secs')
 -- randomly removing and adding
 t1 = os.clock()
 local n
-for i=1,10000000 do
+for i=1,1000 do
     n = nodes[ math.random(maxnodes) ]
     --swapping from lists
     if n.refList==l1 then      
-      l1.remove(n);
+      n.selfRemove();
       l2.add(n);
     else
       l2.remove(n);
