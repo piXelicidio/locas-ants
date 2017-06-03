@@ -3,6 +3,7 @@
 -- (PURE Lua)
 
 local TActor = {}
+local vec = require('extlibs.vec2d')
      
 -- PRIVATE class fields
 local fSomething = 0
@@ -34,6 +35,12 @@ function TActor.create()
   function obj.update()  
   end
   function obj.draw() 
+  end
+ 
+  function obj.collisionWith( actor )        
+    local d = vec.distance( obj.position, actor.position)    
+    
+    return ( d < (obj.radius + actor.radius) )
   end
   
   return obj

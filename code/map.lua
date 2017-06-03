@@ -51,9 +51,12 @@ function map.draw()
   api.drawRectangle( limitsRect )
 end
 
---- Currently return all actors, must be optimized later with map partition grid
-function map.getNearActors(x,y)
-     
+--- Currently return all actors near to given actor, must be optimized later with map partition grid
+function map.actorsNear( actor )
+  local result
+  --if not optimized, return all actors
+  result = map.actors 
+  return result
 end
 
 return map

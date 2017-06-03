@@ -103,6 +103,11 @@ function vec.length(v)
   return math.sqrt(v.x*v.x + v.y*v.y) 
 end
 
+--- Return the distance between two positions vectros
+function vec.distance( v1, v2 )
+  return vec.length({x = v2.x-v1.x, y = v2.y-v1.y}) 
+end
+
 ---Returns sqr( vec.length(v) ) float
 function vec.sqLength(v)
   return (v.x*v.x + v.y*v.y) 

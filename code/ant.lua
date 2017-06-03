@@ -3,6 +3,7 @@
 
 local api = require('code.api')
 local TActor = require('code.actor')
+local TSurface = require('code.surface')
 local vec = require('extlibs.vec2d')
 local map = require('code.map')
 
@@ -47,11 +48,26 @@ function TAnt.create()
   obj.classParent = TActor 
   
   function obj.init()
-    fVisualObj = api.newCircle(obj.position.x, obj.position.y, 4, {255,255,0,255} )    
+    obj.radius=4
+    fVisualObj = api.newCircle(obj.position.x, obj.position.y, obj.radius, {255,255,0,255} )    
     fDebugDir = api.newLine( obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10, {0,255,255,255});
   end
   
   function obj.interactions()
+    local actors = map.actorsNear(obj)    
+    for _,node in pairs(actors.array) do
+      --check if not myself -- i don't like this check
+      local a = node.obj      
+      if a ~= obj then
+        --        
+        if a.classType==TSurface then           
+          if obj.collisionWith(a)==true then
+            -- collision with surfaces 
+            obj.speed = 0.01
+          end else obj.speed = 1
+        end
+      end
+    end
   end
   
   function obj.update()          
