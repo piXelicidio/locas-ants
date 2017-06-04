@@ -23,7 +23,7 @@ function TSurface.create()
   obj.storage = {}                 -- resource stores, keyName=number pairs.
   obj.resourceCount = 0            -- amount of resources units integer
   obj.surfaceRatioMultiplier = 0  -- how much the visual ratio represent the surface content, 0 = constant radius size
-  obj.color = {100,100,100,100}  
+  obj.color = {100,100,100,255}  
   
   --private instance fields  
   local fCircle
@@ -34,7 +34,7 @@ function TSurface.create()
   obj.classParent = TActor
     
   function obj.init()
-    fCircle = api.newCircle(obj.position.x, obj.position.y, obj.radius )  
+    fCircle = api.newCircle(obj.position.x, obj.position.y, obj.radius, obj.color,"fill" )  
   end
   function obj.update()  
     if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end

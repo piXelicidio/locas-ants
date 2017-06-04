@@ -10,21 +10,24 @@ local sim = {}
 
 function sim.init()  
   map.init()
+  
+    
+  local newSur 
+  for i=1,4 do
+    newSur = TSurface.createObstacle(60*i, 400*(math.random()-0.5), 30)
+    --newMat = TSurface.create()
+    newSur.init()    
+    map.addSurface( newSur )
+  end
+  
   local newAnt
-  for i=1,10 do
+  for i=1,20 do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
   end
   api.setPanning(600, 350)
-  
-  local newSur 
-  for i=1,3 do
-    newSur = TSurface.createObstacle(60*i, 50*math.random(), 30)
-    --newMat = TSurface.create()
-    newSur.init()    
-    map.addSurface( newSur )
-  end
+
   
   local numAnts, numSurs = 0,0;
   for _,node in pairs(map.actors.array) do

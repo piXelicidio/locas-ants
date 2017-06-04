@@ -60,7 +60,7 @@ end
 
 --- Returns new vector = (v1-v2) 
 function vec.makeSub(v1, v2)
-  return { x = v1.x -v2.y, 
+  return { x = v1.x -v2.x, 
            y = v1.y -v2.y 
          }
 end  
