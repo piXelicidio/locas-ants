@@ -19,9 +19,19 @@ function TQuickList.create()
   -- we can reuse the same node to jump from list to list (this will be very useful in the grid map later)
   -- @param refObj the data you want to store in the node
   function qList.newNode( refObj )
-    return {  refList = nil, 
-              idx = 0, 
-              obj = refObj }
+    local node = 
+    {  refList = nil, 
+       idx = 0, 
+       obj = refObj 
+    }    
+    -- each node has the de capability to remove itself from the current list owner (refList)
+    function node.selfRemove()      
+      if node.refList ~= nil then
+        node.refList.remove( node )          
+      end
+    end
+    
+    return node
   end
 
   --- Adds a node to the list
@@ -32,9 +42,7 @@ function TQuickList.create()
     if #qList.emptyItems~=0 then
       -- reuse last removed position 
       idx = table.remove(qList.emptyItems)
-      qList.array[idx] = node
-      node.idx = idx
-      node.refList = qList
+      qList.array[idx] = node      
     else
       -- if no emptyItems (no arry[n]===nil ) to reuse then insert directly
       table.insert(qList.array, node )
@@ -44,13 +52,21 @@ function TQuickList.create()
     node.refList = qList
     qList.count = qList.count + 1
   end
+  
+  --- Creates a new node and adds it to the list, combines both .add and newNode, returns node
+  function qList.addNew( refObj )
+    local node = qList.newNode( refObj )
+    qList.add( node )
+    return node
+  end
 
   --- remove node quickly just setting it to nil, and saving the idex for reuse
   -- no validations for optimization:
   -- but be careful is node.refList~=qList or node.idx==0 ploff!!
   function qList.remove( node )
     qList.array[node.idx] = nil
-    -- save for reuse
+    node.refList = nil
+    -- save array spot for reuse (not the node, the node is free to move to other list)
     table.insert( qList.emptyItems, node.idx )
     qList.count = qList.count - 1
   end

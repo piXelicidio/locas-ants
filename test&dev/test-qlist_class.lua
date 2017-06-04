@@ -16,7 +16,8 @@ qList.add( n )
 qList.forEachObj( print )
 
 -- remove
-qList.remove(n2)
+--qList.remove(n2)
+n2.selfRemove()
 print ('removing: '..n2.obj)
 -- print listing 
 qList.forEachObj( print )

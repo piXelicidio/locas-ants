@@ -60,7 +60,7 @@ end
 
 --- Returns new vector = (v1-v2) 
 function vec.makeSub(v1, v2)
-  return { x = v1.x -v2.y, 
+  return { x = v1.x -v2.x, 
            y = v1.y -v2.y 
          }
 end  
@@ -103,6 +103,11 @@ function vec.length(v)
   return math.sqrt(v.x*v.x + v.y*v.y) 
 end
 
+--- Return the distance between two positions vectros
+function vec.distance( v1, v2 )
+  return vec.length({x = v2.x-v1.x, y = v2.y-v1.y}) 
+end
+
 ---Returns sqr( vec.length(v) ) float
 function vec.sqLength(v)
   return (v.x*v.x + v.y*v.y) 
@@ -126,8 +131,9 @@ end
 
 ---Rotate vDist vector, given float angle in radiants
 function vec.rotate(vDest, angle)
+    local tempvDestx = vDest.x
     vDest.x = vDest.x * math.cos(angle) - vDest.y * math.sin(angle);
-    vDest.y = vDest.x * math.sin(angle) + vDest.y * math.cos(angle);    
+    vDest.y = tempvDestx * math.sin(angle) + vDest.y * math.cos(angle);    
 end
 
 ---Returns new vector from V rotated by float angle

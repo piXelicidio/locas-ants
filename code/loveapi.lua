@@ -7,7 +7,7 @@ local api = {}
 
 api.name = 'love'
 
-local panX, panY = 0,0              -- Wolrd panning
+local panX, panY = 0,0              -- World panning
 
 function api.exitGame()
   love.event.quit() -- i think.
@@ -27,16 +27,38 @@ function love.draw()
 end
 
 --- Inits a circle, on love we just store the data on a table for later draw
-function api.newCircle(ax,ay, aRadius )
-  return {x=ax, y=ay, radius=aRadius}
+function api.newCircle(ax,ay, aRadius, aColor, aDrawMode )
+  return {x=ax, y=ay, radius=aRadius, color = aColor or {255,255,255,255}, drawMode = aDrawMode or "line"}
 end 
 
 function api.drawCircle( circle )
-  love.graphics.circle("line", circle.x + panX, circle.y + panY, circle.radius )  
+  love.graphics.setColor( circle.color)
+  love.graphics.circle(circle.drawMode, circle.x + panX, circle.y + panY, circle.radius )  
+end
+
+--- Creating and drawing a rectangle object
+function api.newRectangle(ax, ay, aWidth, aHeight, aColor)
+  return {x=ax, y=ay, width = aWidth, height = aHeight, color = aColor or {255,255,255,255} }
+end
+
+function api.drawRectangle( rect )
+  love.graphics.setColor( rect.color )
+  love.graphics.rectangle('line', rect.x + panX, rect.y + panY, rect.width, rect.height )  
+end
+
+--- creating and drawing a line
+function api.newLine( ax1, ay1, ax2, ay2, aColor )
+  return { x1 = ax1, y1 = ay1, x2 = ax2, y2 = ay2, color = aColor or {255,255,255,255} }
+end
+function api.drawLine( line )
+  love.graphics.setColor( line.color )
+  love.graphics.line(line.x1 + panX, line.y1 + panY, line.x2 + panX, line.y2 + panY )
 end
 
 --- in case apis need to init something after being loaded and game starts, this will be called from main.lua 
 function api.started()
+  love.graphics.setDefaultFilter("nearest", "nearest")
+  love.graphics.setLineStyle( 'rough' )
 end
 
 function api.setPanning(x,y)

@@ -3,6 +3,7 @@
 -- (PURE Lua)
 
 local TActor = {}
+local vec = require('extlibs.vec2d')
      
 -- PRIVATE class fields
 local fSomething = 0
@@ -16,25 +17,33 @@ end
 
 --- Creating a new instance for TActor class
 function TActor.create()
-  local actorObj = {}
+  local obj = {}
   --PRIVATE instance fields
   local fFooFoo = 0
   
   --PUBLIC properties
-  actorObj.position = { x = 1, y = 1 }
+  obj.position = { x = 1, y = 1 }
+  obj.radius = 1
+  obj.nodesOnLists = {}   --Array, store nodes of TQuickLists where the actor may be referenced.  To make a clean destruction of the actor.
   
   --PUBLIC functions
-  function actorObj.getClassType() return TActor end
-  function actorObj.getClassParent() return nil end
+  obj.classType = TActor
+  obj.classParent = nil
   
-  function actorObj.init() 
+  function obj.init() 
   end
-  function actorObj.update()  
+  function obj.update()  
   end
-  function actorObj.draw() 
+  function obj.draw() 
+  end
+ 
+  function obj.collisionWith( actor )        
+    local d = vec.distance( obj.position, actor.position)    
+    
+    return ( d < (obj.radius + actor.radius) )
   end
   
-  return actorObj
+  return obj
 end
 
 return TActor
