@@ -22,25 +22,23 @@ function TActor.create()
   local fFooFoo = 0
   
   --PUBLIC properties
-  obj.position = { x = 1, y = 1 }
+  obj.position = { x = 0, y = 0 }
   obj.radius = 1
-  obj.nodesOnLists = {}   --Array, store nodes of TQuickLists where the actor may be referenced.  To make a clean destruction of the actor.
+  obj.nodesOnLists = {}   --Array, store nodes of TQuickLists where the actor may be referenced.  To make a clean "destruction" of the actor.
   
   --PUBLIC functions
   obj.classType = TActor
   obj.classParent = nil
   
-  function obj.init() 
+  function obj.init()    --override this
   end
-  function obj.update()  
+  function obj.update()  --override this
   end
-  function obj.draw() 
+  function obj.draw()    --override this
   end
  
-  function obj.collisionWith( actor )        
-    local d = vec.distance( obj.position, actor.position)    
-    
-    return ( d < (obj.radius + actor.radius) )
+  function obj.collisionWith( actor )            
+    return ( vec.distance( obj.position, actor.position) < (obj.radius + actor.radius) )
   end
   
   return obj

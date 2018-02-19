@@ -1,5 +1,4 @@
 --- The global map where objects and actors and ants reside 
---(PURE Lua)
 local api=require('code.api')
 local TQuickList = require('code.qlist')
 

@@ -2,7 +2,6 @@
 -- TSurface represent world objects, that can be rocks for obstacles, or water and food as resources
 -- (PURE Lua)
 
-local api = require('code.api')
 local TActor = require('code.actor')
 local vec = require('extlibs.vec2d')
 local map = require('code.map')
@@ -34,13 +33,14 @@ function TSurface.create()
   obj.classParent = TActor
     
   function obj.init()
-    fCircle = api.newCircle(obj.position.x, obj.position.y, obj.radius, obj.color,"fill" )  
+    
   end
   function obj.update()  
     if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end
   end
   function obj.draw() 
-    api.drawCircle(fCircle)
+    love.graphics.setColor(obj.color)
+    love.graphics.circle("fill", obj.position.x, obj.position.y, obj.radius)
   end
   
   return obj
