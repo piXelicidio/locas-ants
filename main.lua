@@ -1,10 +1,5 @@
 --- Our main game stuff, 
--- try to keep it simple
-
---aliases
-local apiG = love.graphics
-local api = love
-
+-- try to keep it simple... oh well..
 
 g_isTesting = false
 
@@ -12,6 +7,9 @@ g_isTesting = false
 -- (why this? execution only start with main.lua)
 if not g_isTesting then
   
+  --aliases and modules
+  local apiG = love.graphics
+  local api = love
   local sim=require('code.simulation')
   local cam=require('code.camview')
 
