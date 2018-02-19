@@ -3,6 +3,9 @@ A modern Lua remake of my [Ant colony](https://www.youtube.com/watch?v=G5wb4f5n6
 
 This is not a translation, is a remake from scratch using free engine Löve2D with friendly and popular Lua language.
 
+Last screenshots:
+
+
 
  
 
