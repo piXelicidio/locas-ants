@@ -1,7 +1,6 @@
 --- TAnt class, 
--- (PURE Lua)
 
-local api = require('code.api')
+local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
 local vec = require('extlibs.vec2d')
@@ -26,9 +25,7 @@ function TAnt.create()
   local obj = TActor.create()
   
   --private instance fields
-  local fSomevar = 0
-  local fVisualObj     
-  local fDebugDir 
+  local fSomevar = 0  
     
   --PUBLIC properties
   obj.direction = { x = 1.0, y = 0.0 } --direction heading movement unitary vector
@@ -51,9 +48,7 @@ function TAnt.create()
   obj.classParent = TActor 
   
   function obj.init()
-    obj.radius=4
-    fVisualObj = api.newCircle(obj.position.x, obj.position.y, obj.radius, {255,255,0,255} )    
-    fDebugDir = api.newLine( obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10, {0,255,255,255});
+    obj.radius=4        
   end
   
   function obj.surfaceCollisionEvent( surf )
@@ -104,17 +99,10 @@ function TAnt.create()
     if obj.speed > ANT_MAXSPEED then obj.speed = ANT_MAXSPEED end
     
     local velocity = vec.makeScale( obj.direction, obj.speed )
-    vec.add( obj.position, velocity )
-    vec.setFrom( fVisualObj, obj.position )    
+    vec.add( obj.position, velocity )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
-    
-    --debug direction line
-    fDebugDir.x1 = obj.position.x
-    fDebugDir.y1 = obj.position.y
-    fDebugDir.x2 = obj.position.x + obj.direction.x*10
-    fDebugDir.y2 = obj.position.y + obj.direction.y*10
-    
+       
     --- checking for limits and bounce
     if obj.position.x < map.minX then
       obj.position.x = map.minX
@@ -140,9 +128,11 @@ function TAnt.create()
     obj.interactions()
   end
   
-  function obj.draw()
-    api.drawCircle(fVisualObj)
-    api.drawLine(fDebugDir)
+  function obj.draw()            
+    apiG.setColor(255,255,0,255);
+    apiG.circle( "line", obj.position.x, obj.position.y, obj.radius);
+    --debug direction line
+    apiG.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 
   end
   
   return obj

@@ -1,6 +1,5 @@
 --- simulation 
---(PURE Lua)
-local api=require('code.api')
+local cam = require('code.camview')
 local TAnt = require('code.ant')
 local map = require('code.map')
 local TSurface = require('code.surface')
@@ -21,12 +20,13 @@ function sim.init()
   end
   
   local newAnt
-  for i=1,20 do
+  for i=1,500 do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
   end
-  api.setPanning(600, 350)
+  cam.translation.x = 500
+  cam.translation.y = 300
 
   
   local numAnts, numSurs = 0,0;
@@ -48,7 +48,7 @@ function sim.draw()
   map.draw()  
   for _,node in pairs(map.actors.array) do
     node.obj.draw()    
-  end
+  end   
 end
 
 
