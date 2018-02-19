@@ -1,6 +1,6 @@
 --- TAnt class, 
--- (PURE Lua)
 
+local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
 local vec = require('extlibs.vec2d')
@@ -129,10 +129,10 @@ function TAnt.create()
   end
   
   function obj.draw()            
-    love.graphics.setColor(255,255,0,255);
-    love.graphics.circle( "line", obj.position.x, obj.position.y, obj.radius);
+    apiG.setColor(255,255,0,255);
+    apiG.circle( "line", obj.position.x, obj.position.y, obj.radius);
     --debug direction line
-    love.graphics.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 
+    apiG.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 
   end
   
   return obj

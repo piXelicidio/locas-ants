@@ -1,8 +1,0 @@
-settings =
-{
-    orientation =
-    {
-        default = "landscapeRight",    -- Initial launch orientation
-        supported = {"landscapeRight","landscapeLeft"},  -- Table of allowed options for auto-orientation
-    },
-}

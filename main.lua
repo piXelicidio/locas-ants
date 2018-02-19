@@ -1,36 +1,43 @@
 --- Our main game stuff, 
 -- try to keep it simple
 
+--aliases
+local apiG = love.graphics
+local api = love
+
 
 g_isTesting = false
+
 -- We are going to play with isolated tests or runing the game?
 -- (why this? execution only start with main.lua)
 if not g_isTesting then
   
   local sim=require('code.simulation')
-  local loveme=require('code.loveme')
+  local cam=require('code.camview')
 
   --- We init the application defining the load event
-  function love.load()
-    sim.init()
+  function api.load()
+    sim.init()    
   end  
     
-  function love.update()
+  function api.update()
     sim.update()  
   end
 
-  function love.draw()        
-    --gameworld
-    love.graphics.push()
-    love.graphics.translate( loveme.camera.x, loveme.camera.y )
+  function api.draw()        
+    --gameworld  
+    
+        
+    apiG.push()
+    apiG.translate( cam.translation.x, cam.translation.y )
     sim.draw()
     --ui stuff
-    love.graphics.pop()
-    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    apiG.pop()
+    apiG.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
   end
 
-  love.graphics.setDefaultFilter("nearest", "nearest")
-  love.graphics.setLineStyle( 'rough' )
+  apiG.setDefaultFilter("nearest", "nearest")
+  apiG.setLineStyle( 'rough' )
 
 else
 -- This is not the game, we are testing stuff

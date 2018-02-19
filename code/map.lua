@@ -1,6 +1,8 @@
 --- The global map where objects and actors and ants reside 
-local api=require('code.api')
+
+-- modules and aliases
 local TQuickList = require('code.qlist')
+local apiG = love.graphics
 
 local map = {}
 
@@ -15,7 +17,7 @@ map.actors = TQuickList.create()   --All actors including ants and surfaces
 map.ants = TQuickList.create()     --All ants
 map.surfs = TQuickList.create()    --All surfaces (obstacles, caves, food... )
 
-limitsColor = {255,0,0,255}
+map.limitsColor = {255,0,0,255}
 
 local limitsRect = {}
 
@@ -40,14 +42,15 @@ function map.addSurface( surf )
 end
 
 function map.init()
-  limitsRect = api.newRectangle( map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY, limitsColor )
+  
 end
 
 function map.update()
 end
 
-function map.draw()
-  api.drawRectangle( limitsRect )
+function map.draw()      
+  apiG.setColor( map.limitsColor )
+  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
 end
 
 --- Currently return all actors near to given actor, must be optimized later with map partition grid

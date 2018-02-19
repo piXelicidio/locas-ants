@@ -25,7 +25,8 @@ function TQuickList.create()
        obj = refObj 
     }    
     -- each node has the de capability to remove itself from the current list owner (refList)
-    function node.selfRemove()      
+    function node.selfRemove()   
+      -- TODO: think if we can remove this condition.
       if node.refList ~= nil then
         node.refList.remove( node )          
       end
@@ -63,6 +64,7 @@ function TQuickList.create()
   --- remove node quickly just setting it to nil, and saving the idex for reuse
   -- no validations for optimization:
   -- but be careful is node.refList~=qList or node.idx==0 ploff!!
+  -- TODO: think how to make it less prone to problems
   function qList.remove( node )
     qList.array[node.idx] = nil
     node.refList = nil

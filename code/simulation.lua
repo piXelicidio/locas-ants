@@ -1,5 +1,5 @@
 --- simulation 
-local loveme = require('code.loveme')
+local cam = require('code.camview')
 local TAnt = require('code.ant')
 local map = require('code.map')
 local TSurface = require('code.surface')
@@ -25,8 +25,8 @@ function sim.init()
     newAnt.init()
     map.addAnt( newAnt )
   end
-  loveme.camera.x = 500
-  loveme.camera.y = 300
+  cam.translation.x = 500
+  cam.translation.y = 300
 
   
   local numAnts, numSurs = 0,0;
