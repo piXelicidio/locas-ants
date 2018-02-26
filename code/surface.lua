@@ -3,8 +3,7 @@
 -- (PURE Lua)
 
 local TActor = require('code.actor')
-local vec = require('extlibs.vec2d')
-local map = require('code.map')
+local vec = require('libs.vec2d')
 
 
 -- Sorry of the Delphi-like class styles :P
@@ -36,6 +35,7 @@ function TSurface.create()
     
   end
   function obj.update()  
+    --TODO: Why this line bellow???????
     if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end
   end
   function obj.draw() 

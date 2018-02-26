@@ -3,8 +3,7 @@
 local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
-local vec = require('extlibs.vec2d')
-local map = require('code.map')
+local vec = require('libs.vec2d')
 
 local ANT_MAXSPEED = 1.2
 
@@ -40,6 +39,7 @@ function TAnt.create()
       timeMax = 15,
       nextPause = -1                  --When is the next pause?
     }
+  obj.comRadius = 20                  -- Distance of comunication Ant-to-Ant. obj.radius is body radius
   --PRIVATE functions
   --TODO: local function checkFor
   
@@ -73,23 +73,6 @@ function TAnt.create()
     end
   end
   
-  function obj.interactions()
-    local actors = map.actorsNear(obj)    
-    for _,node in pairs(actors.array) do
-      --check if not myself -- i don't like this check
-      local a = node.obj      
-      if a ~= obj then
-        --        
-        if a.classType==TSurface then           
-          if obj.collisionWith(a)==true then
-            -- collision with surfaces             
-            obj.surfaceCollisionEvent(a)
-          end 
-        end
-      end
-    end
-  end
-  
   function obj.update()   
     
     obj.oldPosition.x = obj.position.x
@@ -102,30 +85,7 @@ function TAnt.create()
     vec.add( obj.position, velocity )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
-       
-    --- checking for limits and bounce
-    if obj.position.x < map.minX then
-      obj.position.x = map.minX
-      obj.speed=0.1
-      if obj.direction.x < 0 then obj.direction.x = obj.direction.x *-1 end
-    elseif obj.position.x > map.maxX then
-      obj.position.x = map.maxX
-       obj.speed=0.1
-      if obj.direction.x > 0 then obj.direction.x = obj.direction.x *-1 end
-    end
-    
-    if obj.position.y < map.minY then
-      obj.position.y = map.minY
-      obj.speed=0.1
-      if obj.direction.y < 0 then obj.direction.y = obj.direction.y *-1 end
-    elseif obj.position.y > map.maxY then
-      obj.position.y = map.maxY  
-      obj.speed=0.1
-      if obj.direction.y > 0 then obj.direction.y = obj.direction.y *-1 end
-    end
-    
-    --- interact with other ants and objects
-    obj.interactions()
+        
   end
   
   function obj.draw()            

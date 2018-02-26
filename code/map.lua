@@ -2,6 +2,7 @@
 
 -- modules and aliases
 local TQuickList = require('code.qlist')
+local TSurface = require('code.surface') 
 local apiG = love.graphics
 
 local map = {}
@@ -15,29 +16,30 @@ map.maxY = 200
 --
 map.actors = TQuickList.create()   --All actors including ants and surfaces
 map.ants = TQuickList.create()     --All ants
-map.surfs = TQuickList.create()    --All surfaces (obstacles, caves, food... )
+map.surfs = TQuickList.create()    --All static surfaces (obstacles, caves, food... )
 
 map.limitsColor = {255,0,0,255}
 
 local limitsRect = {}
 
+--TODO: discard AddActor OR (AddAnt and addSurface) ... think... 
 function map.addActor( a )
   local node = map.actors.addNew( a )
   -- remember you are referenced on the actors list
-  table.insert( a.nodesOnLists, node )  
+  a.nodeRefs.actorsList = node
 end
 
 function map.addAnt( ant )
   local node = map.ants.addNew( ant )
   -- remember you are referenced on the ants list
-  table.insert( ant.nodesOnLists, node )  
+  ant.nodeRefs.antsList = node   
   map.addActor(ant)
 end
 
 function map.addSurface( surf )
   local node = map.surfs.addNew( surf )
-  -- remember you are referenced on the surfs list
-  table.insert( surf.nodesOnLists, node )    
+  -- remember you are referenced on the surfs list, knowYourNode.com for quick remove 'couse node know index
+  surf.nodeRefs.surfsList = node
   map.addActor(surf)
 end
 
@@ -45,7 +47,54 @@ function map.init()
   
 end
 
+function map.collisionDetection()
+  local obj
+  for _,node in pairs(map.ants.array) do
+    
+    --ant bounces with limits
+    obj = node.obj
+    if obj.position.x < map.minX then
+      obj.position.x = map.minX
+      obj.speed=0.1
+      if obj.direction.x < 0 then obj.direction.x = obj.direction.x *-1 end
+    elseif obj.position.x > map.maxX then
+      obj.position.x = map.maxX
+       obj.speed=0.1
+      if obj.direction.x > 0 then obj.direction.x = obj.direction.x *-1 end
+    end
+    
+    if obj.position.y < map.minY then
+      obj.position.y = map.minY
+      obj.speed=0.1
+      if obj.direction.y < 0 then obj.direction.y = obj.direction.y *-1 end
+    elseif obj.position.y > map.maxY then
+      obj.position.y = map.maxY  
+      obj.speed=0.1
+      if obj.direction.y > 0 then obj.direction.y = obj.direction.y *-1 end
+    end 
+    
+    --ants with everthing else
+    local others = map.actorsNear(obj)    
+    local a
+    for _,node2 in pairs(others.array) do
+      --check if not myself -- i don't like this check
+      a = node2.obj      
+      if a ~= obj then
+        --           
+        if a.classType==TSurface then                     
+          if obj.collisionWith(a)==true then
+            -- collision with surfaces             
+            
+            obj.surfaceCollisionEvent(a)
+          end 
+        end
+      end --if
+    end --for
+  end --for 
+end;
+
 function map.update()
+  map.collisionDetection()
 end
 
 function map.draw()      

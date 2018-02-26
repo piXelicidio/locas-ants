@@ -3,7 +3,7 @@
 -- (PURE Lua)
 
 local TActor = {}
-local vec = require('extlibs.vec2d')
+local vec = require('libs.vec2d')
      
 -- PRIVATE class fields
 local fSomething = 0
@@ -24,7 +24,7 @@ function TActor.create()
   --PUBLIC properties
   obj.position = { x = 0, y = 0 }
   obj.radius = 1
-  obj.nodesOnLists = {}   --Array, store nodes of TQuickLists where the actor may be referenced.  To make a clean "destruction" of the actor.
+  obj.nodeRefs = {}   --keys=values, store nodes of TQuickLists where the actor may be referenced.  To make a clean "destruction" of the actor.
   
   --PUBLIC functions
   obj.classType = TActor

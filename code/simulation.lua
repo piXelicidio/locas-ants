@@ -1,4 +1,5 @@
 --- simulation 
+local cfg = require('code.simconfig')
 local cam = require('code.camview')
 local TAnt = require('code.ant')
 local map = require('code.map')
@@ -20,7 +21,7 @@ function sim.init()
   end
   
   local newAnt
-  for i=1,500 do
+  for i=1,cfg.numAnts do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
