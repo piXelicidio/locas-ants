@@ -1,7 +1,7 @@
 --- Our main game stuff, 
 -- try to keep it simple... oh well..
 
-g_isTesting = false
+g_isTesting = true
 
 -- We are going to play with isolated tests or runing the game?
 -- (why this? execution only start with main.lua)
