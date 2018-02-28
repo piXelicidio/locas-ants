@@ -3,7 +3,7 @@
 -- (PURE Lua)
 
 local TActor = require('code.actor')
-local vec = require('libs.vec2d')
+local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig') 
 
 
@@ -41,7 +41,7 @@ function TSurface.create()
   end
   function obj.draw() 
     love.graphics.setColor(obj.color)
-    love.graphics.circle("fill", obj.position.x, obj.position.y, obj.radius)
+    love.graphics.circle("fill", obj.position[1], obj.position[2], obj.radius)
   end
   
   return obj
@@ -49,16 +49,14 @@ end
 
 function TSurface.createObstacle(x,y, size)
   local sur = TSurface.create()
-  sur.position.x = x
-  sur.position.y = y
+  sur.position = {x, y}
   sur.radius = size
   return sur
 end
 
 function TSurface.createFood(x,y, size)
   local sur = TSurface.create()
-  sur.position.x = x
-  sur.position.y = y
+  sur.position = {x, y}
   sur.radius = size
   sur.name = "food"
   sur.passable = true

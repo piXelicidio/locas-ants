@@ -72,7 +72,7 @@ function vec.scale(vDest, num)
 end
 
 --- Returns a new vector from V*m; where V is vector and m is a number
-function vec.makeScale(v, num)
+function vec.makeScale(v, num)  
   return { v[1] * num,
            v[2] * num }
 end

@@ -31,7 +31,7 @@ function sim.init()
     newAnt.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
-    newAnt.direction = {x = math.cos(ang), y = math.sin(ang)}
+    newAnt.direction = {math.cos(ang), math.sin(ang)}
   end
   cam.translation.x = 500
   cam.translation.y = 300

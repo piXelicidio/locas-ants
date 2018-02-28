@@ -1,7 +1,7 @@
 ---All constants, all defaults, all predefined stuff
 simconfig = {
   
-  numAnts = 500,
+  numAnts = 12500,
   antMaxSpeed = 1.2,
   
   mapMinX = -300,

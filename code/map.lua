@@ -54,27 +54,27 @@ function map.collisionDetection()
     
     --ant bounces with limits
     obj = node.obj
-    if obj.position.x < map.minX then
-      obj.position.x = map.minX
+    if obj.position[1] < map.minX then
+      obj.position[1] = map.minX
       obj.speed=0.1
-      if obj.direction.x < 0 then obj.direction.x = obj.direction.x *-1 end
-    elseif obj.position.x > map.maxX then
-      obj.position.x = map.maxX
+      if obj.direction[1] < 0 then obj.direction[1] = obj.direction[1] *-1 end
+    elseif obj.position[1] > map.maxX then
+      obj.position[1] = map.maxX
        obj.speed=0.1
-      if obj.direction.x > 0 then obj.direction.x = obj.direction.x *-1 end
+      if obj.direction[1] > 0 then obj.direction[1] = obj.direction[1] *-1 end
     end
     
-    if obj.position.y < map.minY then
-      obj.position.y = map.minY
+    if obj.position[2] < map.minY then
+      obj.position[2] = map.minY
       obj.speed=0.1
-      if obj.direction.y < 0 then obj.direction.y = obj.direction.y *-1 end
-    elseif obj.position.y > map.maxY then
-      obj.position.y = map.maxY  
+      if obj.direction[2] < 0 then obj.direction[2] = obj.direction[2] *-1 end
+    elseif obj.position[2] > map.maxY then
+      obj.position[2] = map.maxY  
       obj.speed=0.1
-      if obj.direction.y > 0 then obj.direction.y = obj.direction.y *-1 end
+      if obj.direction[2] > 0 then obj.direction[2] = obj.direction[2] *-1 end
     end 
     
-    --ants with everthing else
+    --[[ants with everthing else
     local others = map.actorsNear(obj)    
     local a
     for _,node2 in pairs(others.array) do
@@ -90,7 +90,7 @@ function map.collisionDetection()
           end 
         end
       end --if
-    end --for
+    end --for ]]
   end --for 
 end;
 

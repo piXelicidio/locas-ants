@@ -3,11 +3,12 @@
 local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
-local vec = require('libs.vec2d')
+local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig')
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
+
      
 -- PRIVATE class fields
 local fSomething
@@ -26,8 +27,8 @@ function TAnt.create()
   local fSomevar = 0  
     
   --PUBLIC properties
-  obj.direction = { x = 1.0, y = 0.0 } --direction heading movement unitary vector
-  obj.oldPosition = {x=0, y=0}
+  obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
+  obj.oldPosition = {0, 0}
   obj.speed = 0.1
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
@@ -80,8 +81,7 @@ function TAnt.create()
   
   function obj.update()   
     
-    obj.oldPosition.x = obj.position.x
-    obj.oldPosition.y = obj.position.y
+    vec.setFrom( obj.oldPosition, obj.position )
     
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
@@ -99,9 +99,9 @@ function TAnt.create()
   
   function obj.draw()            
     apiG.setColor(cfg.colorAnts)
-    apiG.circle( "line", obj.position.x, obj.position.y, obj.radius);
-    --debug direction line
-    apiG.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 
+    -- apiG.circle( "line", obj.position[1], obj.position[2], obj.radius);    
+    apiG.line(obj.position[1], obj.position[2], obj.position[1] + obj.direction[1]*5, obj.position[2] + obj.direction[2]*5 ) 
+    
   end
   
   return obj
