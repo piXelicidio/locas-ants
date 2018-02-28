@@ -12,10 +12,12 @@ if not g_isTesting then
   local api = love
   local sim=require('code.simulation')
   local cam=require('code.camview')
+  local cfg=require('code.simconfig')
 
   --- We init the application defining the load event
   function api.load()
-    sim.init()    
+    sim.init()  
+    apiG.setBackgroundColor(cfg.colorBk)
   end  
     
   function api.update()

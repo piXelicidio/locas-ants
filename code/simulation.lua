@@ -9,22 +9,29 @@ local TQuickList = require('code.qlist')
 local sim = {}
 
 function sim.init()  
+  math.randomseed(os.time())
   map.init()
   
     
-  local newSur 
-  for i=1,4 do
-    newSur = TSurface.createObstacle(60*i, 400*(math.random()-0.5), 30)
-    --newMat = TSurface.create()
+  local newSur  
+  for i=1,3 do
+    newSur = TSurface.createFood(500*(math.random()-0.5), 300*(math.random()-0.5), 80)
     newSur.init()    
     map.addSurface( newSur )
   end
+  for i=1,5 do
+    newSur = TSurface.createObstacle(60*i, 400*(math.random()-0.5), 30)    
+    newSur.init()    
+    map.addSurface( newSur )
+  end 
   
   local newAnt
   for i=1,cfg.numAnts do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
+    local ang = math.random()*6.28
+    newAnt.direction = {x = math.cos(ang), y = math.sin(ang)}
   end
   cam.translation.x = 500
   cam.translation.y = 300

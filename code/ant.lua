@@ -4,8 +4,7 @@ local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
 local vec = require('libs.vec2d')
-
-local ANT_MAXSPEED = 1.2
+local cfg = require('code.simconfig')
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
@@ -30,8 +29,11 @@ function TAnt.create()
   obj.direction = { x = 1.0, y = 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {x=0, y=0}
   obj.speed = 0.1
-  obj.acceleration = 0.05
-  obj.erratic = 0.2                --craziness
+  obj.friction = 1
+  obj.acceleration = 0.04  + math.random()*0.05
+  obj.erratic = 0.2                   --crazyness
+  obj.maxSpeed = cfg.antMaxSpeed 
+  obj.task = {collect = 'food', bringTo = 'cave'}
   obj.antPause = {
       iterMin = 10,                   --Stop for puse every iterMin to iterMax iterations.
       iterMax = 20,
@@ -51,8 +53,9 @@ function TAnt.create()
     obj.radius=4        
   end
   
+  
   function obj.surfaceCollisionEvent( surf )
-    if surf.obstacle then
+    if not surf.passable then
       local dv = vec.makeSub(surf.position, obj.position)
       local z = vec.crossProd( dv, obj.direction )      
       if vec.length(dv)>0 then
@@ -70,6 +73,8 @@ function TAnt.create()
         obj.direction = dv
       end  
       obj.speed = 0.1
+    else
+      obj.friction = surf.friction
     end
   end
   
@@ -79,17 +84,21 @@ function TAnt.create()
     obj.oldPosition.y = obj.position.y
     
     obj.speed = obj.speed + obj.acceleration
-    if obj.speed > ANT_MAXSPEED then obj.speed = ANT_MAXSPEED end
+    obj.speed = obj.speed * obj.friction
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end
     
     local velocity = vec.makeScale( obj.direction, obj.speed )
     vec.add( obj.position, velocity )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
-        
+      
+    --reset friction: 
+    --TODO: i don't like this
+    obj.friction = 1    
   end
   
   function obj.draw()            
-    apiG.setColor(255,255,0,255);
+    apiG.setColor(cfg.colorAnts)
     apiG.circle( "line", obj.position.x, obj.position.y, obj.radius);
     --debug direction line
     apiG.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 

@@ -4,6 +4,7 @@
 
 local TActor = require('code.actor')
 local vec = require('libs.vec2d')
+local cfg = require('code.simconfig') 
 
 
 -- Sorry of the Delphi-like class styles :P
@@ -15,13 +16,13 @@ function TSurface.create()
   --public fields
   obj.radius = 20  
   obj.name = "obstacle"
-  obj.obstacle = true              -- true, you shall not pass 
-  obj.friction = 0
+  obj.passable = false              -- you shall not pass 
+  obj.friction = 1                  -- this is actually a multiplier of speed; 1 = no friction. 0.5 = high friction
   obj.storing = false              -- false store only equal, true store mutiple like caves   
   obj.storage = {}                 -- resource stores, keyName=number pairs.
   obj.resourceCount = 0            -- amount of resources units integer
   obj.surfaceRatioMultiplier = 0  -- how much the visual ratio represent the surface content, 0 = constant radius size
-  obj.color = {100,100,100,255}  
+  obj.color = cfg.colorObstacle
   
   --private instance fields  
   local fCircle
@@ -53,5 +54,18 @@ function TSurface.createObstacle(x,y, size)
   sur.radius = size
   return sur
 end
+
+function TSurface.createFood(x,y, size)
+  local sur = TSurface.create()
+  sur.position.x = x
+  sur.position.y = y
+  sur.radius = size
+  sur.name = "food"
+  sur.passable = true
+  sur.friction = 0.9
+  sur.color = cfg.colorFood
+  return sur
+end
+
 
 return TSurface

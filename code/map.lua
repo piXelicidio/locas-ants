@@ -3,22 +3,23 @@
 -- modules and aliases
 local TQuickList = require('code.qlist')
 local TSurface = require('code.surface') 
+local cfg = require('code.simconfig')
 local apiG = love.graphics
 
 local map = {}
 
 -- Map limits
-map.minX = -300
-map.minY = -200
-map.maxX = 300
-map.maxY = 200
+map.minX = cfg.mapMinX
+map.minY = cfg.mapMinY
+map.maxX = cfg.mapMaxX
+map.maxY = cfg.mapMaxY
 
 --
 map.actors = TQuickList.create()   --All actors including ants and surfaces
 map.ants = TQuickList.create()     --All ants
 map.surfs = TQuickList.create()    --All static surfaces (obstacles, caves, food... )
 
-map.limitsColor = {255,0,0,255}
+map.limitsColor = cfg.colorBkLimits
 
 local limitsRect = {}
 
