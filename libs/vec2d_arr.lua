@@ -19,136 +19,136 @@ local vec = {}
 -- @param v Vector 
 -- @return a new vector cloned
 function vec.makeFrom(v)
-  return {x=v.x, y=v.y}
+  return {v[1], v[2]}
 end
 
 ---Sets x,y values to vDest vector
 function vec.set(vDest, x, y)
-  vDest.x = x
-  vDest.y = y
+  vDest[1] = x
+  vDest[2] = y
 end
 
 --- Copy vector v to vDest
 function vec.setFrom(vDest, v)
-  vDest.x = v.x
-  vDest.y = v.y
+  vDest[1] = v[1]
+  vDest[2] = v[2]
 end
 
 ---Adds v to vDest, result in vDest
 function vec.add(vDest, v)
-  vDest.x = vDest.x + v.x
-  vDest.y = vDest.y + v.y
+  vDest[1] = vDest[1] + v[1]
+  vDest[2] = vDest[2] + v[2]
 end
 
 ---Sums v1+v2, result in vDest
 function vec.sum(vDest, v1, v2)
-  vDest.x = v1.x + v2.x
-  vDest.y = v1.y + v2.y
+  vDest[1] = v1[1] + v2[1]
+  vDest[2] = v1[2] + v2[2]
 end
 
 --- Sum v1+v2, return a new vector with the sum
 function vec.makeSum(v1, v2)
-  return {x = v1.x + v2.x, 
-          y = v1.y + v2.y }
+  return {v1[1] + v2[1], 
+          v1[2] + v2[2] }
 end
 
 --- Substract V from vDest, result in vDest
 function vec.sub(vDest, v) 
-  vDest.x = vDest.x - v.x
-  vDest.y = vDest.y - v.y
+  vDest[1] = vDest[1] - v[1]
+  vDest[2] = vDest[2] - v[2]
 end  
 
 --- Returns new vector = (v1-v2) 
 function vec.makeSub(v1, v2)
-  return { x = v1.x -v2.x, 
-           y = v1.y -v2.y 
+  return { v1[1] -v2[1], 
+           v1[2] -v2[2] 
          }
 end  
 
 --- Scale vDest multiplying by num number
 function vec.scale(vDest, num)
-  vDest.x = vDest.x * num
-  vDest.y = vDest.y * num
+  vDest[1] = vDest[1] * num
+  vDest[2] = vDest[2] * num
 end
 
 --- Returns a new vector from V*m; where V is vector and m is a number
 function vec.makeScale(v, num)
-  return { x = v.x * num,
-           y = v.y * num }
+  return { v[1] * num,
+           v[2] * num }
 end
 
 ---Returns only Z float value from vector cross product v1 X v2
 function vec.crossProd(v1, v2)
-  return (v1.x* v2.y- v1.y* v2.x)
+  return (v1[1]* v2[2]- v1[2]* v2[1])
 end
 
 ---returns number vectors dot product v1 * v2
 function vec.dotProd(v1, v2)  
-  return (v1.x* v2.x+ v1.y* v2.y)
+  return (v1[1]* v2[1]+ v1[2]* v2[2])
 end
 
 ---Multiply vDist by v, result in vDist
 function vec.multiply(vDest, v)
-  vDest.x = vDest.x * v.x
-  vDest.y = vDest.y * v.y
+  vDest[1] = vDest[1] * v[1]
+  vDest[2] = vDest[2] * v[2]
 end
 
 ---Returns new vector multiplied v1*v2
 function vec.makeMultiply(v1, v2) 
-  return {v1.x*v2.x, v1.y*v2.y}
+  return {v1[1]*v2[1], v1[2]*v2[2]}
 end
 
 ---Returns vector length float
 function vec.length(v)
-  return math.sqrt(v.x*v.x + v.y*v.y) 
+  return math.sqrt(v[1]*v[1] + v[2]*v[2]) 
 end
 
---- Return the distance between two positions vectros
+--- Return the distance between two positions vectors
 function vec.distance( v1, v2 )
-  return vec.length({x = v2.x-v1.x, y = v2.y-v1.y}) 
+  return vec.length({v2[1]-v1[1], v2[2]-v1[2]}) 
 end
 
 ---Returns sqr( vec.length(v) ) float
 function vec.sqLength(v)
-  return (v.x*v.x + v.y*v.y) 
+  return (v[1]*v[1] + v[2]*v[2]) 
 end
 
 ---Normalizing vDest vector
 function vec.normalize(vDest)
   local tmp = 1 / vec.length(vDest)
-  vDest.x = vDest.x * tmp
-  vDest.y = vDest.y * tmp
+  vDest[1] = vDest[1] * tmp
+  vDest[2] = vDest[2] * tmp
 end
 
 ---Returns new normalized vector from V
 function vec.makeNormalized(v)
   local tmp = 1 / vec.length(v)
   return {
-            v.x * tmp,
-            v.y * tmp  
+            v[1] * tmp,
+            v[2] * tmp  
           }
 end
 
 ---Rotate vDist vector, given float angle in radiants
 function vec.rotate(vDest, angle)
-    local tempvDestx = vDest.x
-    vDest.x = vDest.x * math.cos(angle) - vDest.y * math.sin(angle);
-    vDest.y = tempvDestx * math.sin(angle) + vDest.y * math.cos(angle);    
+    local tempvDestx = vDest[1]
+    vDest[1] = vDest[1] * math.cos(angle) - vDest[2] * math.sin(angle);
+    vDest[2] = tempvDestx * math.sin(angle) + vDest[2] * math.cos(angle);    
 end
 
 ---Returns new vector from V rotated by float angle
 function vec.makeRotated(v, angle)
     return {
-      x = v.x * math.cos(angle) - v.y * math.sin(angle),
-      y = v.x * math.sin(angle) + v.y * math.cos(angle)    
+      v[1] * math.cos(angle) - v[2] * math.sin(angle),
+      v[1] * math.sin(angle) + v[2] * math.cos(angle)    
     }
 end
 
 ---Returns a normalized vector with float angle in radians
 function vec.makeFromAngle( angle )
   return {
-    x = math.cos(angle),
-    y = math.sin(angle)
+    math.cos(angle),
+    math.sin(angle)
   }  
 end
 

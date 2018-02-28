@@ -1,10 +1,11 @@
 vec = require("libs.vec2d")
+vecarr = require("libs.vec2d_arr")
 
 local v = {x = 1.2, y = 1.3 }
 local v2
 
 local t = os.clock()
-local iterations = 10^7 *  10
+local iterations = 10^9 
 
 print ('-------------- calling vec2d.lua funcitons  --- ')
 for i=0,iterations do
@@ -47,6 +48,33 @@ print("v.x = ", v.x )
 print("v.y = ", v.y )
 print("delay = "..(t2-t).."secs")
 
+
+
+print ('-------------- with vector arrays module vec2d_arr  --- ')
+v = {1.2, 1.3}
+t = os.clock()
+
+for i=0,iterations do
+    v2 = vecarr.makeFrom(v)
+    v[1] = v[1] + 0.01 
+    v[2] = v[2] * 1.5 
+    vecarr.add(v2, v)
+    if v2[1] > 0 then v2[1] = v2[1] * v2[1] end
+    if v2[2] > 0 then v2[2] = v2[2] * v2[2] * 0.05 end
+    vecarr.scale(v, 2)
+    vecarr.sub(v, v2)
+end
+
+
+t2 = os.clock()
+
+print("v[1] = ", v[1] )
+print("v[2] = ", v[2] )
+print("delay = "..(t2-t).."secs")
+
+
+
+
 print ('-------------- doing direct calculations on vector array {x, y}  --- ')
 v = {1.2, 1.3}
 t = os.clock()
@@ -55,7 +83,7 @@ for i=0,iterations do
     v2 = {v[1], v[2]}
     v[1] = v[1] + 0.01 
     v[2] = v[2] * 1.5 
-    v2[1], v2[2] = v2[1]+v[1], v2[1]+v[1] 
+    v2[1], v2[2] = v2[1]+v[1], v2[2]+v[2] 
     if v2[1] > 0 then v2[1] = v2[1] * v2[1] end
     if v2[1] > 0 then v2[2] = v2[2] * v2[2] * 0.05 end
     v[1], v[2] = v[1] * 2, v[2] * 2
