@@ -65,5 +65,16 @@ function TSurface.createFood(x,y, size)
   return sur
 end
 
+function TSurface.createCave(x,y, size)
+  local sur = TSurface.create()
+  sur.position = {x,y}
+  sur.radius = size
+  sur.name = 'cave'
+  sur.passable = true
+  sur.friction = 1
+  sur.color = cfg.colorCave
+  return sur
+end
+
 
 return TSurface

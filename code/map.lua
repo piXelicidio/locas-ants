@@ -3,7 +3,9 @@
 -- modules and aliases
 local TQuickList = require('code.qlist')
 local TSurface = require('code.surface') 
+local TAnt = require('code.ant')
 local cfg = require('code.simconfig')
+local vec = require('libs.vec2d_arr')
 local apiG = love.graphics
 
 local map = {}
@@ -81,14 +83,19 @@ function map.collisionDetection()
       --check if not myself -- i don't like this check
       a = node2.obj      
       if a ~= obj then
-        --           
+        --            
         if a.classType==TSurface then                     
           if obj.collisionWith(a)==true then
             -- collision with surfaces             
             
-            obj.surfaceCollisionEvent(a)
-          end 
+            obj.onSurfaceCollision(a)
+          end           
+        elseif a.classType==TAnt then          
+          if vec.distanceInSteps( a.position, obj.position ) < cfg.antComRadius then
+            obj.communicateWith( a )
+          end
         end
+      
       end --if
     end --for ]]
   end --for 
@@ -107,7 +114,7 @@ end
 function map.actorsNear( actor )
   local result
   --if not optimized, return all actors
-  result = map.actors 
+  result = map.actors
   return result
 end
 

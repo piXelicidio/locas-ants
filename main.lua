@@ -33,7 +33,7 @@ if not g_isTesting then
     sim.draw()
     --ui stuff
     apiG.pop()
-    apiG.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
   end
 
   apiG.setDefaultFilter("nearest", "nearest")

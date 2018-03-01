@@ -108,6 +108,11 @@ function vec.distance( v1, v2 )
   return vec.length({x = v2.x-v1.x, y = v2.y-v1.y}) 
 end
 
+--- Returns the distance between to points in chess King steps
+function vec.distanceInSteps()
+  return math.abs(v2.x-v1.x) + math.abs(v2.y-v1.y)
+end
+
 ---Returns sqr( vec.length(v) ) float
 function vec.sqLength(v)
   return (v.x*v.x + v.y*v.y) 
