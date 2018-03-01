@@ -1,10 +1,10 @@
 ---"Constants", defaults, globals
 simconfig = {
   
-  numAnts = 420,
+  numAnts = 520,
   antMaxSpeed = 1.2,
-  antComRadius = 50,            -- Ants communications radious
-  antPositionMemorySize = 20,    -- How many past position they can remember
+  antComRadius = 20,            -- Ants communications radious
+  antPositionMemorySize = 50,    -- How many past position they can remember (should be > than antComRadius )
   
   mapMinX = -300,
   mapMinY = -200,

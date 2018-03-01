@@ -30,8 +30,7 @@ end
 
 --- Copy vector v to vDest
 function vec.setFrom(vDest, v)
-  vDest[1] = v[1]
-  vDest[2] = v[2]
+  vDest[1], vDest[2]= v[1], v[2]
 end
 
 ---Adds v to vDest, result in vDest

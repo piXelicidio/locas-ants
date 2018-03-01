@@ -38,7 +38,7 @@ function sim.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
     newAnt.direction = {math.cos(ang), math.sin(ang)}
-    if math.random()>0.9 then newAnt.setDrawMode("debug") end
+    if i<20 then newAnt.setDrawMode("debug") end
   end
   cam.translation.x = 500
   cam.translation.y = 300

@@ -33,8 +33,7 @@ function TAnt.create()
           comingFromAtTime = 0
         }
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
-  local fOldestPositionIndex = 0
-  local fOldestPositionRemembered = {0,0}  --vector 2D arr
+  local fOldestPositionIndex = 0  
   
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
@@ -50,7 +49,7 @@ function TAnt.create()
   obj.lastTimeSeenCave = -1
   obj.comingFromAtTime = 0
   obj.cargo = { material = '', count = 0 } 
-    
+  obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   
   
   obj.antPause = {
@@ -70,7 +69,12 @@ function TAnt.create()
   
     
   function obj.init()
-    obj.radius=1            
+    obj.radius=1  
+    for i=1,cfg.antPositionMemorySize do
+      fPastPositions[i] = vec.makeFrom( obj.position )
+    end
+    fOldestPositionIndex = 1
+    obj.oldestPositionRemembered = fPastPositions[1]
   end
   
   
@@ -122,9 +126,16 @@ function TAnt.create()
   
   end
   
-  function obj.update()   
+  function obj.storePosition( posi )
+     vec.setFrom( fPastPositions[fOldestPositionIndex], posi )
+     fOldestPositionIndex = fOldestPositionIndex + 1
+     if fOldestPositionIndex > cfg.antPositionMemorySize then fOldestPositionIndex = 1 end     
+     obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
+  end
+  
+  function obj.update() 
     
-    vec.setFrom( obj.oldPosition, obj.position )
+    obj.storePosition( obj.position )
     
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
@@ -143,11 +154,11 @@ function TAnt.create()
 
   function obj.drawNormal()            
     apiG.setColor(cfg.colorAnts)
-    --apiG.circle( "line", obj.position[1], obj.position[2], 2);    
+        
     apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
     if obj.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      apiG.points( obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2)
+      apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1)
     end
     -- debug    
   end
@@ -156,14 +167,36 @@ function TAnt.create()
   
   function obj.drawDebug()
     obj.drawNormal()
-    local vdir = vec.makeScale( fLastTrustable.comingFromDir, 10)
+    local vdir = vec.makeScale( fLastTrustable.comingFromDir, 20)
     apiG.setColor(100,100,10)
     apiG.line(obj.position[1], obj.position[2], obj.position[1] + vdir[1], obj.position[2] + vdir[2] ) 
+    --apiG.circle( "line", obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2], 5);
+    apiG.setColor(10,100,250)
+    apiG.points( obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2]);
+    --comunication radius
+    apiG.setColor(130,130,130)
+    apiG.line( obj.position[1] , obj.position[2] - cfg.antComRadius, 
+               obj.position[1] + cfg.antComRadius, obj.position[2], 
+               obj.position[1] , obj.position[2] + cfg.antComRadius, 
+               obj.position[1] - cfg.antComRadius , obj.position[2],
+               obj.position[1] , obj.position[2] - cfg.antComRadius)
   end
   
   function obj.setDrawMode( mode )
     if mode=="debug" then obj.draw = obj.drawDebug
     else obj.draw = obj.drawNormal
+    end
+  end
+     
+  -- TODO: maybe inline this later? Influence from 0..1
+  function obj.headTo( posi )         
+    local v = vec.makeSub(posi, obj.position)
+    local l = vec.length( v )    
+    if l>0 then
+      -- normalizing, setting new dir 
+      v[1] = v[1] / l
+      v[2] = v[2] / l
+      vec.setFrom(obj.direction, v)
     end
   end
      
@@ -175,8 +208,10 @@ function TAnt.create()
           fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeenFood
           fLastTrustable.antObj = otherAnt
           -- In that case I will go on the oposite direction of your movement
-          fLastTrustable.comingFromDir = vec.makeScale( otherAnt.direction, -1)
-          obj.direction = fLastTrustable.comingFromDir          
+         
+          --obj.direction = fLastTrustable.comingFromDir  
+          obj.headTo( otherAnt.oldestPositionRemembered )
+          fLastTrustable.comingFromDir = vec.makeFrom( obj.direction)
         end
       elseif obj.lookingFor == "cave" then
         --Ok, but how long from when you visit there? After the last one I trusted in, so I can trust you better?        
@@ -184,8 +219,10 @@ function TAnt.create()
           fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeenCave
           fLastTrustable.antObj = otherAnt
           -- In that case I will go on the oposite direction of your movement
-          fLastTrustable.comingFromDir = vec.makeScale( otherAnt.direction, -1)
-          obj.direction = fLastTrustable.comingFromDir          
+          
+          --obj.direction = fLastTrustable.comingFromDir          
+          obj.headTo( otherAnt.oldestPositionRemembered )
+          fLastTrustable.comingFromDir = vec.makeFrom( obj.direction)
         end
       end
   end
