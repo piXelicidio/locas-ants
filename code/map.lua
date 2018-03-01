@@ -74,7 +74,7 @@ function map.collisionDetection()
       if obj.direction[2] > 0 then obj.direction[2] = obj.direction[2] *-1 end
     end 
     
-    --[[ants with everthing else
+    --ants with everthing else
     local others = map.actorsNear(obj)    
     local a
     for _,node2 in pairs(others.array) do

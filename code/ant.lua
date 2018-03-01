@@ -34,7 +34,10 @@ function TAnt.create()
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = 0.2                   --crazyness
   obj.maxSpeed = cfg.antMaxSpeed 
-  obj.task = {collect = 'food', bringTo = 'cave'}
+  obj.lookingFor = 'food'
+  obj.comingFrom = ''
+  obj.cargo = { material = '', count = 0 }  
+  
   obj.antPause = {
       iterMin = 10,                   --Stop for puse every iterMin to iterMax iterations.
       iterMax = 20,
