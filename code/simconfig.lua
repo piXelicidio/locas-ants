@@ -1,15 +1,16 @@
 ---"Constants", defaults, globals
 simconfig = {
   
-  numAnts = 520,
+  numAnts = 450,
   antMaxSpeed = 1.2,
-  antComRadius = 20,            -- Ants communications radious
-  antPositionMemorySize = 50,    -- How many past position they can remember (should be > than antComRadius )
+  antComRadius = 100,             -- Ants communications radious,
+  antSightDistance  = 60,       -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
+  antPositionMemorySize = 20,    -- How many past position they can remember (should be > than antComRadius )
   
-  mapMinX = -300,
-  mapMinY = -200,
-  mapMaxX = 400,
-  mapMaxY = 300,
+  mapMinX = -350,
+  mapMinY = -250,
+  mapMaxX = 450,
+  mapMaxY = 350,
   
   colorAnts = {20,10,0},
   colorObstacle = {200,200,200},

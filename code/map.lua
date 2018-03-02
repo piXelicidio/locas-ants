@@ -51,51 +51,48 @@ function map.init()
 end
 
 function map.collisionDetection()
-  local obj
+  local ant
   for _,node in pairs(map.ants.array) do
     
     --ant bounces with limits
-    obj = node.obj
-    if obj.position[1] < map.minX then
-      obj.position[1] = map.minX
-      obj.speed=0.1
-      if obj.direction[1] < 0 then obj.direction[1] = obj.direction[1] *-1 end
-    elseif obj.position[1] > map.maxX then
-      obj.position[1] = map.maxX
-       obj.speed=0.1
-      if obj.direction[1] > 0 then obj.direction[1] = obj.direction[1] *-1 end
+    ant = node.obj 
+    if ant.position[1] < map.minX then
+      ant.position[1] = map.minX
+      ant.speed=0.1
+      if ant.direction[1] < 0 then ant.direction[1] = ant.direction[1] *-1 end
+    elseif ant.position[1] > map.maxX then
+      ant.position[1] = map.maxX
+       ant.speed=0.1
+      if ant.direction[1] > 0 then ant.direction[1] = ant.direction[1] *-1 end
     end
     
-    if obj.position[2] < map.minY then
-      obj.position[2] = map.minY
-      obj.speed=0.1
-      if obj.direction[2] < 0 then obj.direction[2] = obj.direction[2] *-1 end
-    elseif obj.position[2] > map.maxY then
-      obj.position[2] = map.maxY  
-      obj.speed=0.1
-      if obj.direction[2] > 0 then obj.direction[2] = obj.direction[2] *-1 end
+    if ant.position[2] < map.minY then
+      ant.position[2] = map.minY
+      ant.speed=0.1
+      if ant.direction[2] < 0 then ant.direction[2] = ant.direction[2] *-1 end
+    elseif ant.position[2] > map.maxY then
+      ant.position[2] = map.maxY  
+      ant.speed=0.1
+      if ant.direction[2] > 0 then ant.direction[2] = ant.direction[2] *-1 end
     end 
     
-    --ants with everthing else
-    local others = map.actorsNear(obj)    
-    local a
-    for _,node2 in pairs(others.array) do
+    --ants with surfaces
+    local surf
+    for _,surfNode in pairs(map.surfs.array) do
+        surf = surfNode.obj
+        ant.collisionTestSurface(surf)
+    end
+    
+    
+    local otherAnt    
+    --TODO: this of course is not final, space partition grid optimization goes here
+    for _,node2 in pairs(map.ants.array) do
       --check if not myself -- i don't like this check
-      a = node2.obj      
-      if a ~= obj then
-        --            
-        if a.classType==TSurface then                     
-          if obj.collisionWith(a)==true then
-            -- collision with surfaces             
-            
-            obj.onSurfaceCollision(a)
-          end           
-        elseif a.classType==TAnt then          
-          if vec.distanceInSteps( a.position, obj.position ) < cfg.antComRadius then
-            obj.communicateWith( a )
-          end
-        end
-      
+      otherAnt = node2.obj      
+      if otherAnt ~= ant then
+                    
+        if vec.distanceInSteps( otherAnt.position, ant.position ) < cfg.antComRadius 
+        then ant.communicateWith( otherAnt )     end      
       end --if
     end --for ]]
   end --for 

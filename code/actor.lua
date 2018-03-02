@@ -36,10 +36,7 @@ function TActor.create()
   end
   function obj.draw()    --override this
   end
- 
-  function obj.collisionWith( actor )            
-    return ( vec.distance( obj.position, actor.position) < (obj.radius + actor.radius) )
-  end
+
   
   return obj
 end

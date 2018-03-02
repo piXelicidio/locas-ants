@@ -25,8 +25,8 @@ function sim.init()
     newSur.init()    
     map.addSurface( newSur )
   end
-  for i=1,5 do
-    newSur = TSurface.createObstacle(60*i, 400*(math.random()-0.5), 30)    
+  for i=1,10 do
+    newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )
   end 
@@ -38,7 +38,7 @@ function sim.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
     newAnt.direction = {math.cos(ang), math.sin(ang)}
-    if i<20 then newAnt.setDrawMode("debug") end
+    if i<2 then newAnt.setDrawMode("debug") end
   end
   cam.translation.x = 500
   cam.translation.y = 300

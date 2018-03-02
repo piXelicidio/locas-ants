@@ -33,7 +33,9 @@ function TAnt.create()
           comingFromAtTime = 0
         }
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
-  local fOldestPositionIndex = 0  
+  local fOldestPositionIndex = 0
+  local fTargetInSight = false
+  local fTargetLocated = {0,0}
   
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
@@ -41,7 +43,7 @@ function TAnt.create()
   obj.speed = 0.1
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
-  obj.erratic = 0.02                   --crazyness
+  obj.erratic = 0.12                  --crazyness
   obj.maxSpeed = cfg.antMaxSpeed 
   obj.lookingFor = 'food'
   obj.comingFrom = ''
@@ -77,6 +79,20 @@ function TAnt.create()
     obj.oldestPositionRemembered = fPastPositions[1]
   end
   
+  function obj.collisionTestSurface( surf )
+    local dist = vec.distance( surf.position, obj.position )    
+    --sight view? 
+    if dist < surf.radius + cfg.antSightDistance then
+      if obj.lookingFor == surf.name then
+        fTargetInSight = true
+        fTargetLocated = vec.makeFrom(surf.position)
+      end
+      if dist < surf.radius + obj.radius then
+        fTargetInSight = false
+        obj.onSurfaceCollision( surf )
+      end
+    end
+  end
   
   function obj.onSurfaceCollision( surf )
     if not surf.passable then
@@ -141,6 +157,12 @@ function TAnt.create()
     obj.speed = obj.speed * obj.friction
     if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end
     
+    --priority target    
+    if fTargetInSight then
+      obj.headTo( fTargetLocated )      
+      fTargetInSight = false         
+    end
+    
     local velocity = vec.makeScale( obj.direction, obj.speed )
     vec.add( obj.position, velocity )   
     -- direction variation for next update
@@ -170,11 +192,11 @@ function TAnt.create()
     local vdir = vec.makeScale( fLastTrustable.comingFromDir, 20)
     apiG.setColor(100,100,10)
     apiG.line(obj.position[1], obj.position[2], obj.position[1] + vdir[1], obj.position[2] + vdir[2] ) 
-    --apiG.circle( "line", obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2], 5);
-    apiG.setColor(10,100,250)
-    apiG.points( obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2]);
-    --comunication radius
+        apiG.setColor(10,100,250)
+    apiG.circle("line",obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2],1);
+    --sight and comunication radius
     apiG.setColor(130,130,130)
+    apiG.circle( "line", obj.position[1], obj.position[2], cfg.antSightDistance );
     apiG.line( obj.position[1] , obj.position[2] - cfg.antComRadius, 
                obj.position[1] + cfg.antComRadius, obj.position[2], 
                obj.position[1] , obj.position[2] + cfg.antComRadius, 
