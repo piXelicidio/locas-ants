@@ -10,3 +10,12 @@ Last screenshots:
 (Btw, I'm learning Git/Github so beware of weird things with this my first Open Source"?" project) 
  
 
+To run&edit the project 
+- Download or clone.
+- install love2d: https://love2d.org/
+- install ZeroBrane Studio: https://studio.zerobrane.com/download?not-this-time
+
+Then open the Main.Lua with ZeroBrane.
+On ZeroBrane go to menu : Project -> Lua Interpreter -> LÖVE.
+And execute with F6 :) ready!
+
