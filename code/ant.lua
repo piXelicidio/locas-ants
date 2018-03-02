@@ -27,7 +27,7 @@ function TAnt.create()
   
   --private instance fields
   local fSomevar = 0  
-  local fLastTrustable =  {          
+  local fLastTrustable =  {
           comingFromAtTime = 0
         }
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
@@ -194,9 +194,8 @@ function TAnt.create()
   
   function obj.drawDebug()
     obj.drawNormal()
-    local vdir = vec.makeScale( fLastTrustable.comingFromDir, 20)
-    apiG.setColor(100,100,10)
-    apiG.line(obj.position[1], obj.position[2], obj.position[1] + vdir[1], obj.position[2] + vdir[2] ) 
+    
+    
         apiG.setColor(10,100,250)
     apiG.circle("line",obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2],1);
     --sight and comunication radius
