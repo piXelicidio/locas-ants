@@ -3,13 +3,14 @@ simconfig = {
   
   numAnts = 450,
   antMaxSpeed = 1.2,
-  antComRadius = 100,             -- Ants communications radious,
-  antSightDistance  = 60,       -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
-  antPositionMemorySize = 20,    -- How many past position they can remember (should be > than antComRadius )
+  antComRadius = 80,             -- Ants communications radious,
+  antSightDistance  = 50,       -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
+  antPositionMemorySize = 15,    -- How many past position they can remember 
+  antErratic = 0.05,
   
   mapMinX = -350,
   mapMinY = -250,
-  mapMaxX = 450,
+  mapMaxX = 550,
   mapMaxY = 350,
   
   colorAnts = {20,10,0},

@@ -27,9 +27,7 @@ function TAnt.create()
   
   --private instance fields
   local fSomevar = 0  
-  local fLastTrustable =  {
-          antObj = nil,          
-          comingFromDir = {1,0},
+  local fLastTrustable =  {          
           comingFromAtTime = 0
         }
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
@@ -43,12 +41,16 @@ function TAnt.create()
   obj.speed = 0.1
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
-  obj.erratic = 0.12                  --crazyness
+  obj.erratic = cfg.antErratic                  --crazyness
   obj.maxSpeed = cfg.antMaxSpeed 
+  obj.tasks = {'food','cave'}
+  obj.lookingForTask = 1  
+  obj.comingFromTask = 0
   obj.lookingFor = 'food'
   obj.comingFrom = ''
   obj.lastTimeSeenFood = -1
   obj.lastTimeSeenCave = -1
+  obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
   obj.comingFromAtTime = 0
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
@@ -72,6 +74,7 @@ function TAnt.create()
     
   function obj.init()
     obj.radius=1  
+    --preallocating  array
     for i=1,cfg.antPositionMemorySize do
       fPastPositions[i] = vec.makeFrom( obj.position )
     end
@@ -83,7 +86,7 @@ function TAnt.create()
     local dist = vec.distance( surf.position, obj.position )    
     --sight view? 
     if dist < surf.radius + cfg.antSightDistance then
-      if obj.lookingFor == surf.name then
+      if obj.tasks[obj.lookingForTask] == surf.name then
         fTargetInSight = true
         fTargetLocated = vec.makeFrom(surf.position)
       end
@@ -118,27 +121,29 @@ function TAnt.create()
     end
     
     --i'm looking for you?
-    --TODO: this is mess, FIX
-    if obj.lookingFor == surf.name then
-      if surf.name == 'food' then
-        if obj.cargo.count == 0 then
+    
+    myNeed = obj.tasks[obj.lookingForTask]
+    if myNeed == surf.name then      
+      if surf.name == 'food' then        
           obj.cargo.count = 1
-          obj.cargo.material = surf.name
-          obj.lookingFor = 'cave'
-          obj.comingFrom = 'food'
-        end
+          obj.cargo.material = surf.name                          
       elseif surf.name == 'cave' then
-        obj.cargo.count = 0
-        obj.lookingFor = 'food'
-        obj.comingFrom = 'cave'
-      end
+        obj.cargo.count = 0      
+      end      
+      fLastTrustable.comingFromAtTime = 0
+      obj.comingFromTask = obj.lookingForTask
+      obj.lookingForTask = obj.lookingForTask + 1          
+      if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
+      
       obj.comingFromAtTime = cfg.simFrameNumber
-      vec.scale( obj.direction, -1) --go oposite
+      vec.scale( obj.direction, -1) --go oposite 
+      obj.speed = 0
       --debug        
     end 
-    
-    if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
-    elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
+      
+    --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
+    --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
+    obj.lastTimeSeen[surf.name] = cfg.simFrameNumber
   
   end
   
@@ -224,29 +229,12 @@ function TAnt.create()
      
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?
-      if obj.lookingFor == "food" then
-        --Ok, but how long from when you visit there? After the last one I trusted in, so I can trust you better?        
-        if otherAnt.lastTimeSeenFood > fLastTrustable.comingFromAtTime then
-          fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeenFood
-          fLastTrustable.antObj = otherAnt
-          -- In that case I will go on the oposite direction of your movement
-         
-          --obj.direction = fLastTrustable.comingFromDir  
-          obj.headTo( otherAnt.oldestPositionRemembered )
-          fLastTrustable.comingFromDir = vec.makeFrom( obj.direction)
-        end
-      elseif obj.lookingFor == "cave" then
-        --Ok, but how long from when you visit there? After the last one I trusted in, so I can trust you better?        
-        if otherAnt.lastTimeSeenCave > fLastTrustable.comingFromAtTime then
-          fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeenCave
-          fLastTrustable.antObj = otherAnt
-          -- In that case I will go on the oposite direction of your movement
-          
-          --obj.direction = fLastTrustable.comingFromDir          
-          obj.headTo( otherAnt.oldestPositionRemembered )
-          fLastTrustable.comingFromDir = vec.makeFrom( obj.direction)
-        end
-      end
+      local myNeed = obj.tasks[obj.lookingForTask]
+      if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
+        fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+        -- In that case I will go on the direction of last position you remember you are coming        
+        obj.headTo( otherAnt.oldestPositionRemembered )        
+      end     
   end
   
   return obj

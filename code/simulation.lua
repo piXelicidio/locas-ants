@@ -15,13 +15,13 @@ function sim.init()
     
   local newSur  
   for i=1,2 do
-    newSur = TSurface.createCave(-200+200*(math.random()-0.5), 300*(math.random()-0.5), 20)
+    newSur = TSurface.createCave(-250+200*(math.random()-0.5), 300*(math.random()-0.5), 20)
     newSur.init()    
     map.addSurface( newSur )
   end
   
   for i=1,3 do
-    newSur = TSurface.createFood(300+200*(math.random()-0.5), 300*(math.random()-0.5), 30)
+    newSur = TSurface.createFood(400+200*(math.random()-0.5), 300*(math.random()-0.5), 30)
     newSur.init()    
     map.addSurface( newSur )
   end
@@ -38,7 +38,7 @@ function sim.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
     newAnt.direction = {math.cos(ang), math.sin(ang)}
-    if i<2 then newAnt.setDrawMode("debug") end
+    if i<4 then newAnt.setDrawMode("debug") end
   end
   cam.translation.x = 500
   cam.translation.y = 300
