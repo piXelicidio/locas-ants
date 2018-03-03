@@ -1,12 +1,15 @@
 ---"Constants", defaults, globals
 simconfig = {
   
-  numAnts = 450,
+  numAnts = 2000,
   antMaxSpeed = 1.2,
-  antComRadius = 80,             -- Ants communications radious,
-  antSightDistance  = 50,       -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
+  antComRadius = 40,             -- Ants communications radious,
+  antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
+  antComNeedFrameStep = {5,15},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.
+  antComMaxBetterPaths = 10,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?  
+  antSightDistance  = 50,        -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
   antPositionMemorySize = 15,    -- How many past position they can remember 
-  antErratic = 0.05,
+  antErratic = 0.1,  
   
   mapMinX = -350,
   mapMinY = -250,

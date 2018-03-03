@@ -20,12 +20,12 @@ function sim.init()
     map.addSurface( newSur )
   end
   
-  for i=1,3 do
+  for i=1,2 do
     newSur = TSurface.createFood(400+200*(math.random()-0.5), 300*(math.random()-0.5), 30)
     newSur.init()    
     map.addSurface( newSur )
   end
-  for i=1,10 do
+  for i=1,6 do
     newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )

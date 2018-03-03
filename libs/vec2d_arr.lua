@@ -112,9 +112,12 @@ function vec.sqLength(v)
   return (v[1]*v[1] + v[2]*v[2]) 
 end
 
---- Returns the distance between to points in chess King steps
-function vec.distanceInSteps(v1, v2)
+--- Returns the distance between to points in chess King steps  = Manhattan distance = Taxicab geometry
+function vec.manhattanDistance(v1, v2)
   return math.abs(v2[1]-v1[1]) + math.abs(v2[2]-v1[2])
+end
+function vec.manhattanLength(v)
+  return math.abs(v[1]+v[2])
 end
 
 ---Normalizing vDest vector

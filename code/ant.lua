@@ -32,11 +32,9 @@ function TAnt.create()
         }
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
   local fOldestPositionIndex = 0
-  local fTargetInSight = false
-  local fTargetLocated = {0,0}
-  local fDirectionChange = { byCollision = nil, byTargetInSight = nil, byOtherAntAdvice = nil }
-  local fDirectionAffected = false
-  
+  local fComEvery = math.random(unpack(cfg.antComNeedFrameStep))
+  local fComEveryOffset =math.random(cfg.antComNeedFrameStep[2]) 
+    
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
@@ -56,6 +54,8 @@ function TAnt.create()
   obj.comingFromAtTime = 0
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
+  obj.betterPathCount = 0
+  
   
   
   obj.antPause = {
@@ -96,77 +96,73 @@ function TAnt.create()
     return tempVec
   end
   
+  --return True if bounced with not passable object
   function obj.collisionTestSurface( surf )
+    
     local dist = vec.distance( surf.position, obj.position )    
-    --sight view? 
-    if (dist < surf.radius + cfg.antSightDistance)  then
-      if obj.tasks[obj.lookingForTask] == surf.name then
-        fTargetInSight = true
-        fTargetLocated = vec.makeFrom(surf.position)
-        fDirectionChange.byTargetInSight =  obj.getDirectionTo( surf.position )
-        fDirectionAffected = true
-      end
-      if dist < surf.radius + obj.radius then 
-        
-        fTargetInSight = false
-        obj.onSurfaceCollision( surf )
-      end
-    end
-  end
-  
-  function obj.onSurfaceCollision( surf )
-    if not surf.passable then
-      local dv = vec.makeSub(surf.position, obj.position)
-      local z = vec.crossProd( dv, obj.direction )      
-      if vec.length(dv)>0 then
-        vec.normalize(dv)        
-        -- push out
-        pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
-        vec.setFrom( obj.position, surf.position )
-        vec.add( obj.position, pushed )
-        -- rotate direction to circle tanget
-        if z < 0 then
-          vec.rotate(dv, -(math.pi)/2)          
-        else
-          vec.rotate(dv, (math.pi)/2 )
-        end            
-        --obj.direction = dv
-        fDirectionChange.byCollision = dv
-        fDirectionAffected = true
-      end  
-      --obj.speed = 0.1
-    else
-      obj.friction = surf.friction
-    end
     
-    --i'm looking for you?
-    
-    myNeed = obj.tasks[obj.lookingForTask]
-    if myNeed == surf.name then      
-      if surf.name == 'food' then        
+    if dist < surf.radius + obj.radius then                 
+      --obj.onSurfaceCollision( surf )
+      if not surf.passable then
+        local dv = vec.makeSub(surf.position, obj.position)
+        local z = vec.crossProd( dv, obj.direction )      
+        if vec.length(dv)>0 then
+          vec.normalize(dv)        
+          -- push out
+          pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
+          vec.setFrom( obj.position, surf.position )
+          vec.add( obj.position, pushed )
+          -- rotate direction to circle tanget
+          if z < 0 then
+            vec.rotate(dv, -(math.pi)/2)          
+          else
+            vec.rotate(dv, (math.pi)/2 )
+          end            
+          obj.direction = dv  
+          --priority direction change, must return
+          return true
+        end  
+        --obj.speed = 0.1
+      else
+        obj.friction = surf.friction
+      end
+
+      --i'm looking for you?
+
+      myNeed = obj.tasks[obj.lookingForTask]
+      if myNeed == surf.name then      
+        if surf.name == 'food' then        
           obj.cargo.count = 1
           obj.cargo.material = surf.name                          
-      elseif surf.name == 'cave' then
-        obj.cargo.count = 0      
-      end      
-      fLastTrustable.comingFromAtTime = 0
-      obj.comingFromTask = obj.lookingForTask
-      obj.lookingForTask = obj.lookingForTask + 1          
-      if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
-      
-      obj.comingFromAtTime = cfg.simFrameNumber
-      dv = vec.makeScale( obj.direction, -1) --go oposite 
-      fDirectionChange.byCollision = dv
-      fDirectionAffected = true
-      obj.speed = 0
-      --debug        
+        elseif surf.name == 'cave' then
+          obj.cargo.count = 0      
+        end      
+        fLastTrustable.comingFromAtTime = 0
+        obj.comingFromTask = obj.lookingForTask
+        obj.lookingForTask = obj.lookingForTask + 1          
+        if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
+
+        obj.comingFromAtTime = cfg.simFrameNumber
+        dv = vec.makeScale( obj.direction, -1) --go oposite 
+        obj.direction = dv      
+        obj.speed = 0
+        --debug        
+      end 
+
+      --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
+      --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
+      obj.lastTimeSeen[surf.name] = cfg.simFrameNumber   
+
+    elseif (dist < surf.radius + cfg.antSightDistance)  then
+      if obj.tasks[obj.lookingForTask] == surf.name then
+        --fTargetInSight = true
+        --fTargetLocated = vec.makeFrom(surf.position)        
+        obj.headTo(surf.position)
+        return true         
+      end    
     end 
-      
-    --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
-    --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
-    obj.lastTimeSeen[surf.name] = cfg.simFrameNumber
+  end --function
   
-  end
   
   function obj.storePosition( posi )
      vec.setFrom( fPastPositions[fOldestPositionIndex], posi )
@@ -181,24 +177,9 @@ function TAnt.create()
     
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
-    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end
-    
-       --priority target    
-    --if fTargetInSight then
-    --  obj.headTo( fTargetLocated )      
-    --  fTargetInSight = false         
-    --end
-    
-    if fDirectionAffected then 
-      if fDirectionChange.byCollision then obj.direction = fDirectionChange.byCollision; fDirectionChange.byCollision = nil 
-        elseif fDirectionChange.byTargetInSight then obj.direction = fDirectionChange.byTargetInSight ; fDirectionChange.byTargetInSight = nil
-        end
-      fDirectionAffected = false  
-    end    
- 
-    
-    local velocity = vec.makeScale( obj.direction, obj.speed )
-    vec.add( obj.position, velocity )   
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end    
+       
+    vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
       
@@ -249,14 +230,21 @@ function TAnt.create()
     vec.setFrom(obj.direction, v)    
   end 
   
-     
+  --- ask ant if need comunication for this frame
+  function obj.isComNeeded()
+    return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
+  end
+  
+  --- This is the heart of the path finding magic
+  -- returns true IF better direction path is offered by the other ant 
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?
       local myNeed = obj.tasks[obj.lookingForTask]
       if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
         fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
         -- In that case I will go on the direction of last position you remember you are coming        
-        obj.headTo( otherAnt.oldestPositionRemembered )        
+        obj.headTo( otherAnt.oldestPositionRemembered ) 
+        return true
       end     
   end
   

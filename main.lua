@@ -2,6 +2,7 @@
 -- try to keep it simple... oh well..
 
 g_isTesting = false
+print(_VERSION)
 
 -- We are going to play with isolated tests or runing the game?
 -- (why this? execution only start with main.lua)
@@ -22,8 +23,8 @@ if not g_isTesting then
     
   function api.update()
     sim.update()  
-  end
-
+  end  
+  
   function api.draw()        
     --gameworld  
     
@@ -34,6 +35,20 @@ if not g_isTesting then
     --ui stuff
     apiG.pop()
     apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
+  end
+  
+  function api.keypressed(key)
+    if key=='1' then
+        if cfg.antComMaxBetterPaths== 1 then
+          cfg.antComMaxBetterPaths = 10
+        else                 
+          cfg.antComMaxBetterPaths = 1
+        end
+        print('cfg.antComMaxBetterPath = ',cfg.antComMaxBetterPaths)
+    elseif key=='2' then
+        cfg.antComEveryFrame  = not cfg.antComEveryFrame 
+        print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)
+    end
   end
 
   apiG.setDefaultFilter("nearest", "nearest")
