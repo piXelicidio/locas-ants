@@ -34,6 +34,8 @@ function TAnt.create()
   local fOldestPositionIndex = 0
   local fTargetInSight = false
   local fTargetLocated = {0,0}
+  local fDirectionChange = { byCollision = nil, byTargetInSight = nil, byOtherAntAdvice = nil }
+  local fDirectionAffected = false
   
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
@@ -66,7 +68,7 @@ function TAnt.create()
   obj.comRadius = 20                  -- Distance of comunication Ant-to-Ant. obj.radius is body radius
   --PRIVATE functions
   --TODO: local function checkFor
-  
+    
   --PUBLIC 
   obj.classType = TAnt 
   obj.classParent = TActor 
@@ -82,15 +84,30 @@ function TAnt.create()
     obj.oldestPositionRemembered = fPastPositions[1]
   end
   
+  --return normalized dir heading to Posi, or {1,0} if length = 0
+  
+  function obj.getDirectionTo( posi )
+    local tempVec = vec.makeSub( posi, obj.position )
+    local tempLen = vec.length( tempVec )
+    if tempLen == 0 then tempVec[1],tempVec[2] = 1,0 else
+      tempVec[1] = tempVec[1] / tempLen
+      tempVec[2] = tempVec[2] / tempLen
+    end  
+    return tempVec
+  end
+  
   function obj.collisionTestSurface( surf )
     local dist = vec.distance( surf.position, obj.position )    
     --sight view? 
-    if dist < surf.radius + cfg.antSightDistance then
+    if (dist < surf.radius + cfg.antSightDistance)  then
       if obj.tasks[obj.lookingForTask] == surf.name then
         fTargetInSight = true
         fTargetLocated = vec.makeFrom(surf.position)
+        fDirectionChange.byTargetInSight =  obj.getDirectionTo( surf.position )
+        fDirectionAffected = true
       end
-      if dist < surf.radius + obj.radius then
+      if dist < surf.radius + obj.radius then 
+        
         fTargetInSight = false
         obj.onSurfaceCollision( surf )
       end
@@ -113,9 +130,11 @@ function TAnt.create()
         else
           vec.rotate(dv, (math.pi)/2 )
         end            
-        obj.direction = dv
+        --obj.direction = dv
+        fDirectionChange.byCollision = dv
+        fDirectionAffected = true
       end  
-      obj.speed = 0.1
+      --obj.speed = 0.1
     else
       obj.friction = surf.friction
     end
@@ -136,7 +155,9 @@ function TAnt.create()
       if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
       
       obj.comingFromAtTime = cfg.simFrameNumber
-      vec.scale( obj.direction, -1) --go oposite 
+      dv = vec.makeScale( obj.direction, -1) --go oposite 
+      fDirectionChange.byCollision = dv
+      fDirectionAffected = true
       obj.speed = 0
       --debug        
     end 
@@ -162,11 +183,19 @@ function TAnt.create()
     obj.speed = obj.speed * obj.friction
     if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end
     
-    --priority target    
-    if fTargetInSight then
-      obj.headTo( fTargetLocated )      
-      fTargetInSight = false         
-    end
+       --priority target    
+    --if fTargetInSight then
+    --  obj.headTo( fTargetLocated )      
+    --  fTargetInSight = false         
+    --end
+    
+    if fDirectionAffected then 
+      if fDirectionChange.byCollision then obj.direction = fDirectionChange.byCollision; fDirectionChange.byCollision = nil 
+        elseif fDirectionChange.byTargetInSight then obj.direction = fDirectionChange.byTargetInSight ; fDirectionChange.byTargetInSight = nil
+        end
+      fDirectionAffected = false  
+    end    
+ 
     
     local velocity = vec.makeScale( obj.direction, obj.speed )
     vec.add( obj.position, velocity )   
@@ -214,17 +243,12 @@ function TAnt.create()
     end
   end
      
-  -- TODO: maybe inline this later? Influence from 0..1
+  -- TODO: maybe inline this later? 
   function obj.headTo( posi )         
-    local v = vec.makeSub(posi, obj.position)
-    local l = vec.length( v )    
-    if l>0 then
-      -- normalizing, setting new dir 
-      v[1] = v[1] / l
-      v[2] = v[2] / l
-      vec.setFrom(obj.direction, v)
-    end
-  end
+    local v = obj.getDirectionTo( posi )
+    vec.setFrom(obj.direction, v)    
+  end 
+  
      
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?
