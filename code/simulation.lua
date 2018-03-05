@@ -51,6 +51,7 @@ function sim.init()
     if node.obj.classType == TSurface then numSurs = numSurs + 1 end
   end  
   print('numAnts: ',numAnts,' numSurs', numSurs)
+  print('Initial memory: '..math.floor( collectgarbage ('count'))..'kb')
 end
 
 function sim.collisionDetection()
@@ -92,7 +93,7 @@ function sim.collisionDetection()
       local otherAnt    
       local betterPathCount = 0
       --TODO: this of course is not final, space partition grid optimization help here      
-      if cfg.antComEveryFrame or ant.isComNeeded() then
+      if (cfg.antComEveryFrame or ant.isComNeeded()) and cfg.antComEnabled   then
         ant.communicateWithAnts(map.ants.array)       
       end
       
@@ -103,8 +104,9 @@ end;
 
 function sim.update()
   sim.collisionDetection()
-  for _,node in pairs(map.actors.array) do
+  for _,node in pairs(map.ants.array) do
     node.obj.update()    
+    map.updateOnGrid(map.grid, node.obj)
   end
   cfg.simFrameNumber = cfg.simFrameNumber + 1
 end

@@ -20,10 +20,11 @@ if not g_isTesting then
     if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
     apiG.setBackgroundColor(cfg.colorBk)
+    
   end  
     
-  function api.update()
-    sim.update()  
+  function api.update()    
+    sim.update()      
   end  
   
   function api.draw()        
@@ -49,6 +50,8 @@ if not g_isTesting then
     elseif key=='2' then
         cfg.antComEveryFrame  = not cfg.antComEveryFrame 
         print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)
+    elseif key=='m' then
+         print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
     end
   end
 

@@ -1,6 +1,30 @@
 --- TQuickList; quick adding and removing collection. 
 local TQuickList = {}
 
+--class functions
+
+--- Returns a new node, usable for any TQuickList, not tied to this instance.
+-- This actually can be created anywhere as long as the table has the required fields.
+-- Why this? Becasue we don't want to create a new node everytime we add an obj to the list,
+-- we can reuse the same node to jump from list to list (this will be very useful in the grid map later)
+-- @param refObj the data you want to store in the node
+function TQuickList.newNode( refObj )
+  local node = 
+  {  refList = nil, 
+     idx = 0, 
+     obj = refObj 
+  }    
+  -- each node has the de capability to remove itself from the current list owner (refList)
+  function node.selfRemove()   
+    -- TODO: think if we can remove this condition. 
+    --if node.refList ~= nil then 
+      node.refList.remove( node )          
+    --end
+  end
+  
+  return node
+end
+
 function TQuickList.create()  
   local qList = {
       ---Public properties (for quick access) that you should "THINK" are read-only, so... behave.
@@ -13,27 +37,7 @@ function TQuickList.create()
 
   --public funcitons
   
-  --- Returns a new node, usable for any TQuickList, not tied to this instance.
-  -- This actually can be created anywhere as long as the table has the required fields.
-  -- Why this? Becasue we don't want to create a new node everytime we add an obj to the list,
-  -- we can reuse the same node to jump from list to list (this will be very useful in the grid map later)
-  -- @param refObj the data you want to store in the node
-  function qList.newNode( refObj )
-    local node = 
-    {  refList = nil, 
-       idx = 0, 
-       obj = refObj 
-    }    
-    -- each node has the de capability to remove itself from the current list owner (refList)
-    function node.selfRemove()   
-      -- TODO: think if we can remove this condition.
-      if node.refList ~= nil then
-        node.refList.remove( node )          
-      end
-    end
-    
-    return node
-  end
+
 
   --- Adds a node to the list
   -- reuse empty items in the array if present
@@ -57,7 +61,7 @@ function TQuickList.create()
   
   --- Creates a new node and adds it to the list, combines both .add and newNode, returns node
   function qList.addNew( refObj )
-    local node = qList.newNode( refObj )
+    local node = TQuickList.newNode( refObj )
     qList.add( node )
     return node
   end
@@ -65,7 +69,7 @@ function TQuickList.create()
   --- remove node quickly just setting it to nil, and saving the idex for reuse
   -- no validations for optimization:
   -- but be careful is node.refList~=qList or node.idx==0 ploff!!
-  -- TODO: think how to make it less prone to problems
+  -- TODO: think how to make it less prone to problems... or not?  
   function qList.remove( node )
     qList.array[node.idx] = nil
     node.refList = nil --TODO: unnecesary?

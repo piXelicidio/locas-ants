@@ -11,7 +11,8 @@ local TAnt = {}
 
      
 -- PUBLIC class fields
-TAnt.SomethingClassy = 0
+-- Sim has to set this refernce to the grid 
+TAnt.grid = nil
 -- PRIVATE class fields
 local fSomething
   
@@ -55,6 +56,7 @@ function TAnt.create()
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
+  obj.color = cfg.colorAnts
   
   
   
@@ -171,8 +173,7 @@ function TAnt.create()
      obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
   end
   
-  function obj.update() 
-    
+  function obj.update()     
     obj.storePosition( obj.position )
     
     obj.speed = obj.speed + obj.acceleration
@@ -190,12 +191,12 @@ function TAnt.create()
   
 
   function obj.drawNormal()            
-    apiG.setColor(cfg.colorAnts)
+    apiG.setColor(obj.color)
         
     apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
     if obj.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1)
+      --apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1)
     end
     -- debug    
   end
@@ -235,7 +236,7 @@ function TAnt.create()
     return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
   end
   
-  --- This is the heart of the path finding magic
+  --- This is the heart of the path finding magic 
   -- returns true IF better direction path is offered by the other ant 
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
