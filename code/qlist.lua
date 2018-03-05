@@ -38,6 +38,7 @@ function TQuickList.create()
   --- Adds a node to the list
   -- reuse empty items in the array if present
   -- Warning: no validations, if you add the same node twice it gets duplicated
+  -- this not creates a new node, we are resuing node table from another qlist.
   function qList.add( node )
     local idx=0
     if #qList.emptyItems~=0 then
@@ -67,8 +68,8 @@ function TQuickList.create()
   -- TODO: think how to make it less prone to problems
   function qList.remove( node )
     qList.array[node.idx] = nil
-    node.refList = nil
-    -- save array spot for reuse (not the node, the node is free to move to other list)
+    node.refList = nil --TODO: unnecesary?
+    -- save array spot for reuse (not the node, the node is free to move to other list, or forget)
     table.insert( qList.emptyItems, node.idx )
     qList.count = qList.count - 1
   end

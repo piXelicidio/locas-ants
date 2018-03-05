@@ -3,8 +3,8 @@
 -- (PURE Lua)
 
 local TActor = require('code.actor')
-local vec = require('extlibs.vec2d')
-local map = require('code.map')
+local vec = require('libs.vec2d_arr')
+local cfg = require('code.simconfig') 
 
 
 -- Sorry of the Delphi-like class styles :P
@@ -16,13 +16,13 @@ function TSurface.create()
   --public fields
   obj.radius = 20  
   obj.name = "obstacle"
-  obj.obstacle = true              -- true, you shall not pass 
-  obj.friction = 0
+  obj.passable = false              -- you shall not pass 
+  obj.friction = 1                  -- this is actually a multiplier of speed; 1 = no friction. 0.5 = high friction
   obj.storing = false              -- false store only equal, true store mutiple like caves   
   obj.storage = {}                 -- resource stores, keyName=number pairs.
   obj.resourceCount = 0            -- amount of resources units integer
   obj.surfaceRatioMultiplier = 0  -- how much the visual ratio represent the surface content, 0 = constant radius size
-  obj.color = {100,100,100,255}  
+  obj.color = cfg.colorObstacle
   
   --private instance fields  
   local fCircle
@@ -36,11 +36,12 @@ function TSurface.create()
     
   end
   function obj.update()  
+    --TODO: Why this line bellow???????
     if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end
   end
   function obj.draw() 
     love.graphics.setColor(obj.color)
-    love.graphics.circle("fill", obj.position.x, obj.position.y, obj.radius)
+    love.graphics.circle("fill", obj.position[1], obj.position[2], obj.radius)
   end
   
   return obj
@@ -48,10 +49,32 @@ end
 
 function TSurface.createObstacle(x,y, size)
   local sur = TSurface.create()
-  sur.position.x = x
-  sur.position.y = y
+  sur.position = {x, y}
   sur.radius = size
   return sur
 end
+
+function TSurface.createFood(x,y, size)
+  local sur = TSurface.create()
+  sur.position = {x, y}
+  sur.radius = size
+  sur.name = "food"
+  sur.passable = true
+  sur.friction = 0.9
+  sur.color = cfg.colorFood
+  return sur
+end
+
+function TSurface.createCave(x,y, size)
+  local sur = TSurface.create()
+  sur.position = {x,y}
+  sur.radius = size
+  sur.name = 'cave'
+  sur.passable = true
+  sur.friction = 1
+  sur.color = cfg.colorCave
+  return sur
+end
+
 
 return TSurface

@@ -3,14 +3,15 @@
 local apiG = love.graphics
 local TActor = require('code.actor')
 local TSurface = require('code.surface')
-local vec = require('extlibs.vec2d')
-local map = require('code.map')
-
-local ANT_MAXSPEED = 1.2
+local vec = require('libs.vec2d_arr')
+local cfg = require('code.simconfig')
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
+
      
+-- PUBLIC class fields
+TAnt.SomethingClassy = 0
 -- PRIVATE class fields
 local fSomething
   
@@ -26,13 +27,37 @@ function TAnt.create()
   
   --private instance fields
   local fSomevar = 0  
+  local fLastTrustable =  {
+          comingFromAtTime = 0
+        }
+  local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
+  local fOldestPositionIndex = 0
+  local fComEvery = math.random(unpack(cfg.antComNeedFrameStep))
+  local fComEveryOffset =math.random(cfg.antComNeedFrameStep[2]) 
     
-  --PUBLIC properties
-  obj.direction = { x = 1.0, y = 0.0 } --direction heading movement unitary vector
-  obj.oldPosition = {x=0, y=0}
+  --properties
+  obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
+  obj.oldPosition = {0, 0}
   obj.speed = 0.1
-  obj.acceleration = 0.05
-  obj.erratic = 0.2                --craziness
+  obj.friction = 1
+  obj.acceleration = 0.04  + math.random()*0.05
+  obj.erratic = cfg.antErratic                  --crazyness
+  obj.maxSpeed = cfg.antMaxSpeed 
+  obj.tasks = {'food','cave'}
+  obj.lookingForTask = 1  
+  obj.comingFromTask = 0
+  obj.lookingFor = 'food'
+  obj.comingFrom = ''
+  obj.lastTimeSeenFood = -1
+  obj.lastTimeSeenCave = -1
+  obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
+  obj.comingFromAtTime = 0
+  obj.cargo = { material = '', count = 0 } 
+  obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
+  obj.betterPathCount = 0
+  
+  
+  
   obj.antPause = {
       iterMin = 10,                   --Stop for puse every iterMin to iterMax iterations.
       iterMax = 20,
@@ -40,99 +65,213 @@ function TAnt.create()
       timeMax = 15,
       nextPause = -1                  --When is the next pause?
     }
+  obj.comRadius = 20                  -- Distance of comunication Ant-to-Ant. obj.radius is body radius
   --PRIVATE functions
   --TODO: local function checkFor
-  
+    
   --PUBLIC 
   obj.classType = TAnt 
   obj.classParent = TActor 
   
-  function obj.init()
-    obj.radius=4        
-  end
-  
-  function obj.surfaceCollisionEvent( surf )
-    if surf.obstacle then
-      local dv = vec.makeSub(surf.position, obj.position)
-      local z = vec.crossProd( dv, obj.direction )      
-      if vec.length(dv)>0 then
-        vec.normalize(dv)        
-        -- push out
-        pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
-        vec.setFrom( obj.position, surf.position )
-        vec.add( obj.position, pushed )
-        -- rotate direction to circle tanget
-        if z < 0 then
-          vec.rotate(dv, -(math.pi)/2)          
-        else
-          vec.rotate(dv, (math.pi)/2 )
-        end            
-        obj.direction = dv
-      end  
-      obj.speed = 0.1
-    end
-  end
-  
-  function obj.interactions()
-    local actors = map.actorsNear(obj)    
-    for _,node in pairs(actors.array) do
-      --check if not myself -- i don't like this check
-      local a = node.obj      
-      if a ~= obj then
-        --        
-        if a.classType==TSurface then           
-          if obj.collisionWith(a)==true then
-            -- collision with surfaces             
-            obj.surfaceCollisionEvent(a)
-          end 
-        end
-      end
-    end
-  end
-  
-  function obj.update()   
     
-    obj.oldPosition.x = obj.position.x
-    obj.oldPosition.y = obj.position.y
+  function obj.init()
+    obj.radius=1  
+    --preallocating  array
+    for i=1,cfg.antPositionMemorySize do
+      fPastPositions[i] = vec.makeFrom( obj.position )
+    end
+    fOldestPositionIndex = 1
+    obj.oldestPositionRemembered = fPastPositions[1]
+  end
+  
+  --return normalized dir heading to Posi, or {1,0} if length = 0
+  
+  function obj.getDirectionTo( posi )
+    local tempVec = vec.makeSub( posi, obj.position )
+    local tempLen = vec.length( tempVec )
+    if tempLen == 0 then tempVec[1],tempVec[2] = 1,0 else
+      tempVec[1] = tempVec[1] / tempLen
+      tempVec[2] = tempVec[2] / tempLen
+    end  
+    return tempVec
+  end
+  
+  --return True if bounced with not passable object
+  function obj.collisionTestSurface( surf )
+    
+    local dist = vec.distance( surf.position, obj.position )    
+    
+    if dist < surf.radius + obj.radius then                 
+      --obj.onSurfaceCollision( surf )
+      if not surf.passable then
+        local dv = vec.makeSub(surf.position, obj.position)
+        local z = vec.crossProd( dv, obj.direction )      
+        if vec.length(dv)>0 then
+          vec.normalize(dv)        
+          -- push out
+          pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
+          vec.setFrom( obj.position, surf.position )
+          vec.add( obj.position, pushed )
+          -- rotate direction to circle tanget
+          if z < 0 then
+            vec.rotate(dv, -(math.pi)/2)          
+          else
+            vec.rotate(dv, (math.pi)/2 )
+          end            
+          obj.direction = dv  
+          --priority direction change, must return
+          return true
+        end  
+        --obj.speed = 0.1
+      else
+        obj.friction = surf.friction
+      end
+
+      --i'm looking for you?
+
+      myNeed = obj.tasks[obj.lookingForTask]
+      if myNeed == surf.name then      
+        if surf.name == 'food' then        
+          obj.cargo.count = 1
+          obj.cargo.material = surf.name                          
+        elseif surf.name == 'cave' then
+          obj.cargo.count = 0      
+        end      
+        fLastTrustable.comingFromAtTime = 0
+        obj.comingFromTask = obj.lookingForTask
+        obj.lookingForTask = obj.lookingForTask + 1          
+        if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
+
+        obj.comingFromAtTime = cfg.simFrameNumber
+        dv = vec.makeScale( obj.direction, -1) --go oposite 
+        obj.direction = dv      
+        obj.speed = 0
+        --debug        
+      end 
+
+      --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
+      --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
+      obj.lastTimeSeen[surf.name] = cfg.simFrameNumber   
+
+    elseif (dist < surf.radius + cfg.antSightDistance)  then
+      if obj.tasks[obj.lookingForTask] == surf.name then
+        --fTargetInSight = true
+        --fTargetLocated = vec.makeFrom(surf.position)        
+        obj.headTo(surf.position)
+        return true         
+      end    
+    end 
+  end --function
+  
+  
+  function obj.storePosition( posi )
+     vec.setFrom( fPastPositions[fOldestPositionIndex], posi )
+     fOldestPositionIndex = fOldestPositionIndex + 1
+     if fOldestPositionIndex > cfg.antPositionMemorySize then fOldestPositionIndex = 1 end     
+     obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
+  end
+  
+  function obj.update() 
+    
+    obj.storePosition( obj.position )
     
     obj.speed = obj.speed + obj.acceleration
-    if obj.speed > ANT_MAXSPEED then obj.speed = ANT_MAXSPEED end
-    
-    local velocity = vec.makeScale( obj.direction, obj.speed )
-    vec.add( obj.position, velocity )   
+    obj.speed = obj.speed * obj.friction
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end    
+       
+    vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
-       
-    --- checking for limits and bounce
-    if obj.position.x < map.minX then
-      obj.position.x = map.minX
-      obj.speed=0.1
-      if obj.direction.x < 0 then obj.direction.x = obj.direction.x *-1 end
-    elseif obj.position.x > map.maxX then
-      obj.position.x = map.maxX
-       obj.speed=0.1
-      if obj.direction.x > 0 then obj.direction.x = obj.direction.x *-1 end
-    end
-    
-    if obj.position.y < map.minY then
-      obj.position.y = map.minY
-      obj.speed=0.1
-      if obj.direction.y < 0 then obj.direction.y = obj.direction.y *-1 end
-    elseif obj.position.y > map.maxY then
-      obj.position.y = map.maxY  
-      obj.speed=0.1
-      if obj.direction.y > 0 then obj.direction.y = obj.direction.y *-1 end
-    end
-    
-    --- interact with other ants and objects
-    obj.interactions()
+      
+    --reset friction: 
+    --TODO: i don't like this
+    obj.friction = 1    
   end
   
-  function obj.draw()            
-    apiG.setColor(255,255,0,255);
-    apiG.circle( "line", obj.position.x, obj.position.y, obj.radius);
-    --debug direction line
-    apiG.line(obj.position.x, obj.position.y, obj.position.x + obj.direction.x*10, obj.position.y + obj.direction.y*10 ) 
+
+  function obj.drawNormal()            
+    apiG.setColor(cfg.colorAnts)
+        
+    apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
+    if obj.cargo.count~=0 then
+      apiG.setColor(cfg.colorFood)
+      apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1)
+    end
+    -- debug    
+  end
+  
+  obj.draw = obj.drawNormal
+  
+  function obj.drawDebug()
+    obj.drawNormal()
+    
+    
+        apiG.setColor(10,100,250)
+    apiG.circle("line",obj.oldestPositionRemembered[1], obj.oldestPositionRemembered[2],1);
+    --sight and comunication radius
+    apiG.setColor(130,130,130)
+    apiG.circle( "line", obj.position[1], obj.position[2], cfg.antSightDistance );
+    apiG.line( obj.position[1] , obj.position[2] - cfg.antComRadius, 
+               obj.position[1] + cfg.antComRadius, obj.position[2], 
+               obj.position[1] , obj.position[2] + cfg.antComRadius, 
+               obj.position[1] - cfg.antComRadius , obj.position[2],
+               obj.position[1] , obj.position[2] - cfg.antComRadius)
+  end
+  
+  function obj.setDrawMode( mode )
+    if mode=="debug" then obj.draw = obj.drawDebug
+    else obj.draw = obj.drawNormal
+    end
+  end
+     
+  -- TODO: maybe inline this later? 
+  function obj.headTo( posi )         
+    local v = obj.getDirectionTo( posi )
+    vec.setFrom(obj.direction, v)    
+  end 
+  
+  --- ask ant if need comunication for this frame
+  function obj.isComNeeded()
+    return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
+  end
+  
+  --- This is the heart of the path finding magic
+  -- returns true IF better direction path is offered by the other ant 
+  function obj.communicateWith( otherAnt )      
+      -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
+      local myNeed = obj.tasks[obj.lookingForTask]
+      if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
+        fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+        -- In that case I will go on the direction of last position you remember you are coming        
+        obj.headTo( otherAnt.oldestPositionRemembered ) 
+        --obj.speed = 0.1
+        return true
+      end          
+  end
+  
+  --- This is the heart of the path finding magic (array version)  
+  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
+  function obj.communicateWithAnts( otherAntsArray )            
+      local myNeed
+      local betterPathCount = 0
+      local node
+        
+      for _,node in pairs(otherAntsArray) do
+        otherAnt = node.obj
+        if (vec.manhattanDistance( otherAnt.position, obj.position ) < cfg.antComRadius) 
+            and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
+        -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
+          myNeed = obj.tasks[obj.lookingForTask]
+          if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
+            fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+            -- In that case I will go on the direction of last position you remember you are coming        
+            obj.headTo( otherAnt.oldestPositionRemembered )           
+            betterPathCount = betterPathCount + 1
+            if  betterPathCount >= cfg.antComMaxBetterPaths then return end
+          end          
+        end
+      end
+        
   end
   
   return obj
