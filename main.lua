@@ -47,9 +47,12 @@ if not g_isTesting then
           cfg.antComMaxBetterPaths = 1
         end
         print('cfg.antComMaxBetterPath = ',cfg.antComMaxBetterPaths)
-    elseif key=='2' then
+    elseif key=='2' then    
         cfg.antComEveryFrame  = not cfg.antComEveryFrame 
         print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)
+    elseif key=='3' then
+        cfg.debugGrid = not cfg.debugGrid
+        print('cfg.debugGrid =',cfg.debugGrid)
     elseif key=='m' then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
     end

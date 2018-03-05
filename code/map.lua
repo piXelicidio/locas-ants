@@ -22,26 +22,26 @@ map.surfs = TQuickList.create()    --All static surfaces (obstacles, caves, food
 --Space Partition Grid
 map.gridSize = cfg.mapGridSize
 map.grid = {}
-local fGridBorder = 2
 
 map.limitsColor = cfg.colorBkLimits
 
 local limitsRect = {}
-local minXg, minYg, maxXg, maxYg
+local gridBorder = 2
+map.minXg = math.floor(map.minX / map.gridSize) - gridBorder
+map.maxXg = math.floor(map.maxX / map.gridSize) + gridBorder
+map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
+map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
 function map.init()
   -- calculating grid map dimensions
   -- extra border (fGridBorder) to get rid of validations
-  minXg = math.floor(map.minX / map.gridSize) - fGridBorder
-  maxXg = math.floor(map.maxX / map.gridSize) + fGridBorder
-  minYg = math.floor(map.minY / map.gridSize) - fGridBorder
-  maxYg = math.floor(map.maxY / map.gridSize) + fGridBorder
-  for i = minXg, maxXg do
+
+  for i = map.minXg, map.maxXg do
     map.grid[i]={}
-    for j = minYg, maxYg do
+    for j = map.minYg, map.maxYg do
       map.grid[i][j] = {
         qlist = TQuickList.create(),
-        dcolor = {math.random(255), math.random(255), math.random(255)}
+        dcolor = {math.random(160), math.random(160), math.random(250)}
       }
     end
   end
@@ -75,7 +75,7 @@ function map.updateOnGrid(grid, actor)
     grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].qlist.add( actor.nodeRefs.gridNode )
     actor.gridInfo.lastPosi[1] = actor.gridInfo.posi[1]
     actor.gridInfo.lastPosi[2] = actor.gridInfo.posi[2]
-    actor.color = grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].dcolor
+    if cfg.debugGrid then actor.color = grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].dcolor end
   end  
 end
 
@@ -103,10 +103,30 @@ function map.update()
   --map.collisionDetection()
 end
 
+function map.gridForEachCell( doFunc )
+  for i = map.minXg+1, map.maxXg-1 do
+    for j = map.minYg+1, map.maxYg-1 do
+      doFunc(map.grid[i][j], i,j)      
+    end
+  end
+end
+
 function map.draw()      
   apiG.setColor( map.limitsColor )
   apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
+  --debuging grid
+  if cfg.debugGrid  then
+    map.gridForEachCell(
+      function(cell, i, j)
+        if cell.qlist.count>0 then
+          apiG.setColor( cell.dcolor )
+          apiG.print(cell.qlist.count, i * map.gridSize, j * map.gridSize) 
+        end
+      end
+    )
+  end
 end
+
 
 --- Currently return all actors near to given actor, must be optimized later with map partition grid
 function map.actorsNear( actor )
