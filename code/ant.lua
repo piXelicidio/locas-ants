@@ -238,14 +238,40 @@ function TAnt.create()
   --- This is the heart of the path finding magic
   -- returns true IF better direction path is offered by the other ant 
   function obj.communicateWith( otherAnt )      
-      -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?
+      -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
       local myNeed = obj.tasks[obj.lookingForTask]
       if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
         fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
         -- In that case I will go on the direction of last position you remember you are coming        
         obj.headTo( otherAnt.oldestPositionRemembered ) 
+        --obj.speed = 0.1
         return true
-      end     
+      end          
+  end
+  
+  --- This is the heart of the path finding magic (array version)  
+  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
+  function obj.communicateWithAnts( otherAntsArray )            
+      local myNeed
+      local betterPathCount = 0
+      local node
+        
+      for _,node in pairs(otherAntsArray) do
+        otherAnt = node.obj
+        if (vec.manhattanDistance( otherAnt.position, obj.position ) < cfg.antComRadius) 
+            and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
+        -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
+          myNeed = obj.tasks[obj.lookingForTask]
+          if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
+            fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+            -- In that case I will go on the direction of last position you remember you are coming        
+            obj.headTo( otherAnt.oldestPositionRemembered )           
+            betterPathCount = betterPathCount + 1
+            if  betterPathCount >= cfg.antComMaxBetterPaths then return end
+          end          
+        end
+      end
+        
   end
   
   return obj

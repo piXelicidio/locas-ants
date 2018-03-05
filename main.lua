@@ -17,6 +17,7 @@ if not g_isTesting then
 
   --- We init the application defining the load event
   function api.load()
+    if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
     apiG.setBackgroundColor(cfg.colorBk)
   end  

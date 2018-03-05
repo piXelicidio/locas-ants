@@ -47,73 +47,13 @@ function map.addSurface( surf )
 end
 
 function map.init()
-  
+
 end
 
-function map.collisionDetection()
-  local ant 
-  for _,node in pairs(map.ants.array) do
-    --ant bounces with limits
-    ant = node.obj 
-    if ant.position[1] < map.minX then
-      ant.position[1] = map.minX
-      ant.speed=0.1
-      if ant.direction[1] < 0 then ant.direction[1] = ant.direction[1] *-1; goto continue end      
-    elseif ant.position[1] > map.maxX then
-      ant.position[1] = map.maxX
-       ant.speed=0.1
-      if ant.direction[1] > 0 then ant.direction[1] = ant.direction[1] *-1; goto continue end      
-    end
-    
-    if ant.position[2] < map.minY then
-      ant.position[2] = map.minY
-      ant.speed=0.1
-      if ant.direction[2] < 0 then ant.direction[2] = ant.direction[2] *-1; goto continue end      
-    elseif ant.position[2] > map.maxY then
-      ant.position[2] = map.maxY  
-      ant.speed=0.1
-      if ant.direction[2] > 0 then ant.direction[2] = ant.direction[2] *-1; goto continue end      
-    end     
-       
-      --ants with surfaces
-      local surf      
-      for _,surfNode in pairs(map.surfs.array) do
-          surf = surfNode.obj
-          if ant.collisionTestSurface(surf) then 
-            --if test return true, there is an important direction change, nothing else matters, 
-            --continue loop with next ant, ignore path advice of our sisters
-            goto continue
-          end
-      end      
-      
-      local otherAnt    
-      local betterPathCount = 0
-      --TODO: this of course is not final, space partition grid optimization help here      
-      if cfg.antComEveryFrame or ant.isComNeeded() then
-        
-        for _,node2 in pairs(map.ants.array) do
-          --check if not myself -- i don't like this check
-          otherAnt = node2.obj      
-          if otherAnt ~= ant then                      
-            if vec.manhattanDistance( otherAnt.position, ant.position ) < cfg.antComRadius 
-            then 
-              if ant.communicateWith( otherAnt ) then 
-                betterPathCount = betterPathCount + 1 
-                if betterPathCount >= cfg.antComMaxBetterPaths then goto continue end
-              end              
-            end      
-          end --if
-          
-        end --for ]]
-      end
-      
-    --there is no 'continue' keyword in lua, we should use goto or other workaround
-    ::continue::
-  end --for 
-end;
+
 
 function map.update()
-  map.collisionDetection()
+  --map.collisionDetection()
 end
 
 function map.draw()      

@@ -32,7 +32,7 @@ function TActor.create()
   
   function obj.init()    --override this
   end
-  function obj.update()  --override this
+  function obj.update()  --override this :TODO:optional, 
   end
   function obj.draw()    --override this
   end
