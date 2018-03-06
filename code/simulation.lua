@@ -95,26 +95,28 @@ function sim.collisionDetection()
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
       ant = node.obj 
-      sim.collisionAntWithLimits(ant)       
-        --ants with surfaces      
-      if cfg.antComAlgorithm~=0 then sim.collisionAntWithSurfaces(ant) end
-      
-        -- **1) No optimizaiton, just test N*N all with all ants**.
-        --if you are porting the code to other language or api start implementing this for simplicity and safety
-        if cfg.antComAlgorithm == 1 then      
-          local otherAnt    
-          local betterPathCount = 0      
-          if (cfg.antComEveryFrame or ant.isComNeeded())  then
-            ant.communicateWithAnts(map.ants.array)       
-          end
+      if not sim.collisionAntWithLimits(ant)  then
+          --ants with surfaces      
+        if not sim.collisionAntWithSurfaces(ant) then
         
-        -- **2) Old 2003 way, chat with neighbors** 
-        elseif cfg.antComAlgorithm == 2 then
-          if (cfg.antComEveryFrame or ant.isComNeeded())  then
-            local antLists = map.antsNearMe( ant )
-            ant.communicateWithAnts_grid( antLists ) 
-          end
-        end           
+          -- **1) No optimizaiton, just test N*N all with all ants**.
+          --if you are porting the code to other language or api start implementing this for simplicity and safety
+          if cfg.antComAlgorithm == 1 then      
+            local otherAnt    
+            local betterPathCount = 0      
+            if (cfg.antComEveryFrame or ant.isComNeeded())  then
+              ant.communicateWithAnts(map.ants.array)       
+            end
+          
+          -- **2) Old 2003 way, chat with neighbors** 
+          elseif cfg.antComAlgorithm == 2 then
+            if (cfg.antComEveryFrame or ant.isComNeeded())  then
+              local antLists = map.antsNearMe( ant )
+              ant.communicateWithAnts_grid( antLists ) 
+            end
+          end   
+        end
+      end
     end --for ant node
   else  
     -- **3) New 2018, go by cell and process a cell group at once.**
@@ -170,7 +172,7 @@ function sim.antCommunication3()
       for _,node in pairs(centerCell.array) do
         local centerAnt = node.obj        
         if not sim.collisionAntWithLimits(centerAnt) then          
-          if not sim.collisionAntWithSurfaces(centerAnt) then              
+          if (not sim.collisionAntWithSurfaces(centerAnt)) and centerAnt.isComNeeded() then              
             local need = centerAnt.tasks[ centerAnt.lookingForTask ]
             if bestSeen[need] > centerAnt.maxTimeSeen then
               centerAnt.maxTimeSeen = bestSeen[need]

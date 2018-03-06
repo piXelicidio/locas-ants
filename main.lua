@@ -59,6 +59,8 @@ if not g_isTesting then
         print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
     elseif key=='m' then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
+    elseif key=='escape' then
+        api.event.quit()
     end
   end
 

@@ -7,7 +7,7 @@ local maxnodes = 100
 
 nodes={}
 for i=1,maxnodes do
-  nodes[i] = l1.newNode(i)
+  nodes[i] =  TQuickList.newNode(i)
 end
 
 -- start adding 
@@ -28,7 +28,7 @@ print('filling lists: '..(t2-t1)..'secs')
 -- randomly removing and adding
 t1 = os.clock()
 local n
-for i=1,1000 do
+for i=1,10000 do
     n = nodes[ math.random(maxnodes) ]
     --swapping from lists
     if n.refList==l1 then      
@@ -45,7 +45,7 @@ print ( 'counts:', l1.count, l2.count )
 print ('EmptyItems=nil :', #l1.emptyItems, #l2.emptyItems  )
 
 --
-local sumIterations = 50000
+local sumIterations = 500000
 --swap a bit to make it differnt, then iterate to sum with forEach
 local sum=0
 local count=0

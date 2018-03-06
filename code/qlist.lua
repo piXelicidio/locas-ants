@@ -51,8 +51,8 @@ function TQuickList.create()
       qList.array[idx] = node      
     else
       -- if no emptyItems (no arry[n]===nil ) to reuse then insert directly
-      table.insert(qList.array, node )
-      idx = #qList.array                --index is the last one     
+      idx = #qList.array + 1                --index is the last one     
+      qList.array[idx] = node 
     end
     node.idx = idx
     node.refList = qList
@@ -74,7 +74,8 @@ function TQuickList.create()
     qList.array[node.idx] = nil
     node.refList = nil --TODO: unnecesary?
     -- save array spot for reuse (not the node, the node is free to move to other list, or forget)
-    table.insert( qList.emptyItems, node.idx )
+    --table.insert( qList.emptyItems, node.idx )
+    qList.emptyItems[ #qList.emptyItems + 1] = node.idx
     qList.count = qList.count - 1
   end
 

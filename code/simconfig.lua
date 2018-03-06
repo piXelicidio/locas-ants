@@ -1,9 +1,9 @@
 ---"Constants", defaults, globals
-simconfig = {
+local simconfig = {
   
-  numAnts = 8000,
+  numAnts = 5000,
   antMaxSpeed = 1.2,
-  antComAlgorithm = 3,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm.
+  antComAlgorithm = 2,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm.
   antComRadius = 40,             -- Ants communications radious,
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
   antComNeedFrameStep = {5,15},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.
