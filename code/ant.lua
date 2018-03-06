@@ -236,7 +236,7 @@ function TAnt.create()
     return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
   end
   
-  --- This is the heart of the path finding magic 
+  --- This is the heart of the path finding magic (1)
   -- returns true IF better direction path is offered by the other ant 
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
@@ -250,15 +250,16 @@ function TAnt.create()
       end          
   end
   
-  --- This is the heart of the path finding magic (array version)  
+  --- This is the heart of the path finding magic (2) (TQuickList.array version;)  
   --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
-  function obj.communicateWithAnts( otherAntsArray )            
+  function obj.communicateWithAnts( otherAntsList )            
       local myNeed
       local betterPathCount = 0
       local node
-        
-      for _,node in pairs(otherAntsArray) do
-        otherAnt = node.obj
+      --using pairs becasue some items may be nil  
+      for _,node in pairs(otherAntsList) do
+        --the array stores nodes, nodes store obj
+        local otherAnt = node.obj
         if (vec.manhattanDistance( otherAnt.position, obj.position ) < cfg.antComRadius) 
             and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
         -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
@@ -273,6 +274,34 @@ function TAnt.create()
         end
       end
         
+  end
+  
+  --- This is the heart of the path finding magic (3) (array of TQuickList version;)  
+  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
+  function obj.communicateWithAnts_grid( otherAntsLists )            
+      local myNeed
+      local betterPathCount = 0
+      local node
+      local otherAnt
+      --using pairs becasue some items may be nil 
+      for i=1,#otherAntsLists do
+        for _,node in pairs(otherAntsLists[i].array) do
+          --the array stores nodes, nodes store obj
+          otherAnt = node.obj
+          --(manhattan distance check removed, Lists should include only near ants)
+          --otherAnt = obj, check if myself also removed, nothing bad happens if communication with itself occurs
+          -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
+            myNeed = obj.tasks[obj.lookingForTask]
+            if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
+              fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+              -- In that case I will go on the direction of last position you remember you are coming        
+              obj.headTo( otherAnt.oldestPositionRemembered )           
+              betterPathCount = betterPathCount + 1
+              if  betterPathCount >= cfg.antComMaxBetterPaths then return end
+            end          
+          
+        end
+      end  
   end
   
   return obj

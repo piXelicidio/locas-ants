@@ -115,6 +115,7 @@ function map.draw()
   apiG.setColor( map.limitsColor )
   apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
   --debuging grid
+  --TODO: function as parameter is pretty slow, but this is debug.. fix?
   if cfg.debugGrid  then
     map.gridForEachCell(
       function(cell, i, j)
@@ -128,12 +129,21 @@ function map.draw()
 end
 
 
---- Currently return all actors near to given actor, must be optimized later with map partition grid
-function map.actorsNear( actor )
-  local result
-  --if not optimized, return all actors
-  result = map.actors
-  return result
+--- Returns array of TQuickLists with all near ants
+-- do not modify this lists, use as read-only
+-- 9 TQuickLists, the last one (9th) is the center
+function map.antsNearMe( ant )
+  local near={}
+  local v
+  --integer position on the grid for 'ant'
+  local gx = ant.gridInfo.posi[1]
+  local gy = ant.gridInfo.posi[2]
+  --return ant neibours in 3x3 area
+  for i = 1,#cfg.mapGridComScan do
+    v=cfg.mapGridComScan[i]
+    near[i] = map.grid[ gx + v[1] ][ gy + v[2] ].qlist
+  end
+  return near
 end
 
 return map

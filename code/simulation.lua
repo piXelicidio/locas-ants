@@ -39,6 +39,8 @@ function sim.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
     newAnt.direction = {math.cos(ang), math.sin(ang)}
+    newAnt.position[1] = math.cos(ang)*100
+    newAnt.position[2] = math.sin(ang)*100
     if i<4 then newAnt.setDrawMode("debug") end
   end
   cam.translation.x = 500
@@ -90,17 +92,36 @@ function sim.collisionDetection()
           end
       end      
       
-      local otherAnt    
-      local betterPathCount = 0
-      --TODO: this of course is not final, space partition grid optimization help here      
-      if (cfg.antComEveryFrame or ant.isComNeeded()) and cfg.antComEnabled   then
-        ant.communicateWithAnts(map.ants.array)       
-      end
+      -- **1) No optimizaiton, just test N*N all with all ants**.
+      if cfg.antComAlgorithm == 1 then      
+        local otherAnt    
+        local betterPathCount = 0      
+        if (cfg.antComEveryFrame or ant.isComNeeded())  then
+          ant.communicateWithAnts(map.ants.array)       
+        end
+      
+      -- **2) Old 2003 way, chat with neighbors** 
+      elseif cfg.antComAlgorithm == 2 then
+        if (cfg.antComEveryFrame or ant.isComNeeded())  then
+          local antLists = map.antsNearMe( ant )
+          ant.communicateWithAnts_grid( antLists ) 
+        end
+      end     
+      
+      -- 3) New see outside the loop bellow
       
     --there is no 'continue' keyword in lua, we should use goto or other workaround
     ::continue::
-  end --for 
+  end --for ant node
+  
+  if cfg.antComAlgorithm == 3 then
+    sim.antCommunication3()
+  end
 end;
+
+function sim.antCommunication3()
+  --map.
+end
 
 function sim.update()
   sim.collisionDetection()

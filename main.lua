@@ -42,7 +42,7 @@ if not g_isTesting then
   function api.keypressed(key)
     if key=='1' then
         if cfg.antComMaxBetterPaths== 1 then
-          cfg.antComMaxBetterPaths = 10
+          cfg.antComMaxBetterPaths = 3
         else                 
           cfg.antComMaxBetterPaths = 1
         end
@@ -53,6 +53,10 @@ if not g_isTesting then
     elseif key=='3' then
         cfg.debugGrid = not cfg.debugGrid
         print('cfg.debugGrid =',cfg.debugGrid)
+    elseif key=='4' then
+        cfg.antComAlgorithm = cfg.antComAlgorithm + 1
+        if cfg.antComAlgorithm > 3 then cfg.antComAlgorithm = 0 end     
+        print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
     elseif key=='m' then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
     end
