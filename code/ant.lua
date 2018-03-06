@@ -27,10 +27,7 @@ function TAnt.create()
   local obj = TActor.create()
   
   --private instance fields
-  local fSomevar = 0  
-  local fLastTrustable =  {
-          comingFromAtTime = 0
-        }
+  local fSomevar = 0    
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
   local fOldestPositionIndex = 0
   local fComEvery = math.random(unpack(cfg.antComNeedFrameStep))
@@ -39,6 +36,7 @@ function TAnt.create()
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
+  obj.radius = 2
   obj.speed = 0.1
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
@@ -52,6 +50,7 @@ function TAnt.create()
   obj.lastTimeSeenFood = -1
   obj.lastTimeSeenCave = -1
   obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
+  obj.maxTimeSeen = -1
   obj.comingFromAtTime = 0
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
@@ -76,8 +75,7 @@ function TAnt.create()
   obj.classParent = TActor 
   
     
-  function obj.init()
-    obj.radius=1  
+  function obj.init()      
     --preallocating  array
     for i=1,cfg.antPositionMemorySize do
       fPastPositions[i] = vec.makeFrom( obj.position )
@@ -139,7 +137,7 @@ function TAnt.create()
         elseif surf.name == 'cave' then
           obj.cargo.count = 0      
         end      
-        fLastTrustable.comingFromAtTime = 0
+        obj.maxTimeSeen = 0
         obj.comingFromTask = obj.lookingForTask
         obj.lookingForTask = obj.lookingForTask + 1          
         if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
@@ -241,8 +239,8 @@ function TAnt.create()
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
       local myNeed = obj.tasks[obj.lookingForTask]
-      if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
-        fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+      if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+        obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
         -- In that case I will go on the direction of last position you remember you are coming        
         obj.headTo( otherAnt.oldestPositionRemembered ) 
         --obj.speed = 0.1
@@ -264,8 +262,8 @@ function TAnt.create()
             and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
         -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
           myNeed = obj.tasks[obj.lookingForTask]
-          if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
-            fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+          if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+            obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
             -- In that case I will go on the direction of last position you remember you are coming        
             obj.headTo( otherAnt.oldestPositionRemembered )           
             betterPathCount = betterPathCount + 1
@@ -292,8 +290,8 @@ function TAnt.create()
           --otherAnt = obj, check if myself also removed, nothing bad happens if communication with itself occurs
           -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
             myNeed = obj.tasks[obj.lookingForTask]
-            if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
-              fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+            if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+              obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
               -- In that case I will go on the direction of last position you remember you are coming        
               obj.headTo( otherAnt.oldestPositionRemembered )           
               betterPathCount = betterPathCount + 1

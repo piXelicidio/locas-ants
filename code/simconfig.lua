@@ -1,16 +1,17 @@
 ---"Constants", defaults, globals
 simconfig = {
   
-  numAnts = 4000,
+  numAnts = 8000,
   antMaxSpeed = 1.2,
-  antComAlgorithm = 2,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm.
+  antComAlgorithm = 3,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm.
   antComRadius = 40,             -- Ants communications radious,
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
   antComNeedFrameStep = {5,15},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.
-  antComMaxBetterPaths = 5,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?    
+  antComMaxBetterPaths = 3,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?    
   antSightDistance  = 40,        -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
   antPositionMemorySize = 15,    -- How many past position they can remember 
   antErratic = 0.1,  
+  antInterests = {'food','cave'},
   
   debugGrid = false,
   
@@ -22,11 +23,12 @@ simconfig = {
   mapGridSize = 16,
   mapGridComScan = {      
     --this are the neibor cells we are going to scan looking for near ants to do communications... normal is 8 'N'eibor cells in square formation around 'C'enter cell.
-    -- mapGridComScan[1..8]=neibors 
-    -- mapgridComScan[9]=center
+    -- mapGridComScan[2..9]=neibors 
+    -- mapgridComScan[1]=center
     --  N N N
     --  N 9 N
     --  N N N
+      { 0, 0},
       {-1,-1},
       { 0,-1},
       { 1,-1},
@@ -34,8 +36,7 @@ simconfig = {
       { 1, 0},
       {-1, 1},
       { 0, 1},
-      { 1, 1},
-      { 0, 0},
+      { 1, 1},      
     },
   
   colorAnts = {20,10,0},

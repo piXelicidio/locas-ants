@@ -103,6 +103,7 @@ function map.update()
   --map.collisionDetection()
 end
 
+--- for each grid cell run doFunc( TQuickList, x, y )
 function map.gridForEachCell( doFunc )
   for i = map.minXg+1, map.maxXg-1 do
     for j = map.minYg+1, map.maxYg-1 do
@@ -131,7 +132,7 @@ end
 
 --- Returns array of TQuickLists with all near ants
 -- do not modify this lists, use as read-only
--- 9 TQuickLists, the last one (9th) is the center
+-- 9 TQuickLists 
 function map.antsNearMe( ant )
   local near={}
   local v
