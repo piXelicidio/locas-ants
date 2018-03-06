@@ -25,6 +25,7 @@ function TActor.create()
   obj.position = {0, 0}
   obj.radius = 1
   obj.nodeRefs = {}   --keys=values, store nodes of TQuickLists where the actor may be referenced.  To make a clean "destruction" of the actor.
+  obj.gridInfo = {}   --store stuff useful for Grid  
   
   --PUBLIC functions
   obj.classType = TActor

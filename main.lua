@@ -20,10 +20,11 @@ if not g_isTesting then
     if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
     apiG.setBackgroundColor(cfg.colorBk)
+    
   end  
     
-  function api.update()
-    sim.update()  
+  function api.update()    
+    sim.update()      
   end  
   
   function api.draw()        
@@ -41,14 +42,25 @@ if not g_isTesting then
   function api.keypressed(key)
     if key=='1' then
         if cfg.antComMaxBetterPaths== 1 then
-          cfg.antComMaxBetterPaths = 10
+          cfg.antComMaxBetterPaths = 3
         else                 
           cfg.antComMaxBetterPaths = 1
         end
         print('cfg.antComMaxBetterPath = ',cfg.antComMaxBetterPaths)
-    elseif key=='2' then
+    elseif key=='2' then    
         cfg.antComEveryFrame  = not cfg.antComEveryFrame 
         print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)
+    elseif key=='3' then
+        cfg.debugGrid = not cfg.debugGrid
+        print('cfg.debugGrid =',cfg.debugGrid)
+    elseif key=='4' then
+        cfg.antComAlgorithm = cfg.antComAlgorithm + 1
+        if cfg.antComAlgorithm > 3 then cfg.antComAlgorithm = 0 end     
+        print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
+    elseif key=='m' then
+         print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
+    elseif key=='escape' then
+        api.event.quit()
     end
   end
 

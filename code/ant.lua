@@ -11,7 +11,8 @@ local TAnt = {}
 
      
 -- PUBLIC class fields
-TAnt.SomethingClassy = 0
+-- Sim has to set this refernce to the grid 
+TAnt.grid = nil
 -- PRIVATE class fields
 local fSomething
   
@@ -26,10 +27,7 @@ function TAnt.create()
   local obj = TActor.create()
   
   --private instance fields
-  local fSomevar = 0  
-  local fLastTrustable =  {
-          comingFromAtTime = 0
-        }
+  local fSomevar = 0    
   local fPastPositions = {}    --all positions they can remember, this is a fixed size queue as array of vectors
   local fOldestPositionIndex = 0
   local fComEvery = math.random(unpack(cfg.antComNeedFrameStep))
@@ -38,6 +36,7 @@ function TAnt.create()
   --properties
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
+  obj.radius = 2
   obj.speed = 0.1
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
@@ -51,10 +50,12 @@ function TAnt.create()
   obj.lastTimeSeenFood = -1
   obj.lastTimeSeenCave = -1
   obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
+  obj.maxTimeSeen = -1
   obj.comingFromAtTime = 0
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
+  obj.color = cfg.colorAnts
   
   
   
@@ -74,8 +75,7 @@ function TAnt.create()
   obj.classParent = TActor 
   
     
-  function obj.init()
-    obj.radius=1  
+  function obj.init()      
     --preallocating  array
     for i=1,cfg.antPositionMemorySize do
       fPastPositions[i] = vec.makeFrom( obj.position )
@@ -137,7 +137,7 @@ function TAnt.create()
         elseif surf.name == 'cave' then
           obj.cargo.count = 0      
         end      
-        fLastTrustable.comingFromAtTime = 0
+        obj.maxTimeSeen = 0
         obj.comingFromTask = obj.lookingForTask
         obj.lookingForTask = obj.lookingForTask + 1          
         if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
@@ -171,8 +171,7 @@ function TAnt.create()
      obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
   end
   
-  function obj.update() 
-    
+  function obj.update()     
     obj.storePosition( obj.position )
     
     obj.speed = obj.speed + obj.acceleration
@@ -190,12 +189,12 @@ function TAnt.create()
   
 
   function obj.drawNormal()            
-    apiG.setColor(cfg.colorAnts)
+    apiG.setColor(obj.color)
         
     apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
     if obj.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1)
+      if not cfg.debugGrid then apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1) end
     end
     -- debug    
   end
@@ -235,13 +234,13 @@ function TAnt.create()
     return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
   end
   
-  --- This is the heart of the path finding magic
+  --- This is the heart of the path finding magic (1)
   -- returns true IF better direction path is offered by the other ant 
   function obj.communicateWith( otherAnt )      
       -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
       local myNeed = obj.tasks[obj.lookingForTask]
-      if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
-        fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+      if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+        obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
         -- In that case I will go on the direction of last position you remember you are coming        
         obj.headTo( otherAnt.oldestPositionRemembered ) 
         --obj.speed = 0.1
@@ -249,21 +248,22 @@ function TAnt.create()
       end          
   end
   
-  --- This is the heart of the path finding magic (array version)  
+  --- This is the heart of the path finding magic (2) (TQuickList.array version;)  
   --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
-  function obj.communicateWithAnts( otherAntsArray )            
+  function obj.communicateWithAnts( otherAntsList )            
       local myNeed
       local betterPathCount = 0
       local node
-        
-      for _,node in pairs(otherAntsArray) do
-        otherAnt = node.obj
+      --using pairs becasue some items may be nil  
+      for _,node in pairs(otherAntsList) do
+        --the array stores nodes, nodes store obj
+        local otherAnt = node.obj
         if (vec.manhattanDistance( otherAnt.position, obj.position ) < cfg.antComRadius) 
             and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
         -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
           myNeed = obj.tasks[obj.lookingForTask]
-          if otherAnt.lastTimeSeen[myNeed] > fLastTrustable.comingFromAtTime then
-            fLastTrustable.comingFromAtTime = otherAnt.lastTimeSeen[myNeed]        
+          if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+            obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
             -- In that case I will go on the direction of last position you remember you are coming        
             obj.headTo( otherAnt.oldestPositionRemembered )           
             betterPathCount = betterPathCount + 1
@@ -272,6 +272,34 @@ function TAnt.create()
         end
       end
         
+  end
+  
+  --- This is the heart of the path finding magic (3) (array of TQuickList version;)  
+  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
+  function obj.communicateWithAnts_grid( otherAntsLists )            
+      local myNeed
+      local betterPathCount = 0
+      local node
+      local otherAnt
+      --using pairs becasue some items may be nil 
+      for i=1,#otherAntsLists do
+        for _,node in pairs(otherAntsLists[i].array) do
+          --the array stores nodes, nodes store obj
+          otherAnt = node.obj
+          --(manhattan distance check removed, Lists should include only near ants)
+          --otherAnt = obj, check if myself also removed, nothing bad happens if communication with itself occurs
+          -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
+            myNeed = obj.tasks[obj.lookingForTask]
+            if otherAnt.lastTimeSeen[myNeed] > obj.maxTimeSeen then
+              obj.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
+              -- In that case I will go on the direction of last position you remember you are coming        
+              obj.headTo( otherAnt.oldestPositionRemembered )           
+              betterPathCount = betterPathCount + 1
+              if  betterPathCount >= cfg.antComMaxBetterPaths then return end
+            end          
+          
+        end
+      end  
   end
   
   return obj
