@@ -1,7 +1,7 @@
----"Constants", defaults, globals
+---"Constants", defaults, globals...
 local simconfig = {
   
-  numAnts = 6000,
+  numAnts = 4000,
   antMaxSpeed = 1.2,
   antComAlgorithm = 2,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm.
   antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
