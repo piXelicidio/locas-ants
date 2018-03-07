@@ -1,7 +1,7 @@
 # locas-ants
-A modern Lua remake of my [Ant colony](https://www.youtube.com/watch?v=G5wb4f5n6qQ) simulation from 2003 Delphi 7.
+Is a modern Lua remake of my old [Ant colony](https://www.youtube.com/watch?v=G5wb4f5n6qQ) simulation.
 
-This is not a translation, is a remake from scratch using free engine Löve2D with friendly and popular Lua language.
+This is not a translation, is a remake from scratch using opensource engine Löve2D with friendly and popular Lua language.
 
 Last screenshots:
 
