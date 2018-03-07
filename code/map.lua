@@ -116,15 +116,15 @@ function map.draw()
   apiG.setColor( map.limitsColor )
   apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
   --debuging grid
-  --TODO: function as parameter is pretty slow, but this is debug.. fix?
+  local  cellcount = function(cell, i, j)
+      if cell.qlist.count>0 then
+        apiG.setColor( cell.dcolor )
+        apiG.print(cell.qlist.count, i * map.gridSize, j * map.gridSize) 
+      end
+    end  
   if cfg.debugGrid  then
     map.gridForEachCell(
-      function(cell, i, j)
-        if cell.qlist.count>0 then
-          apiG.setColor( cell.dcolor )
-          apiG.print(cell.qlist.count, i * map.gridSize, j * map.gridSize) 
-        end
-      end
+      
     )
   end
 end
