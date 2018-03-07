@@ -222,8 +222,7 @@ function TAnt.create()
     else obj.draw = obj.drawNormal
     end
   end
-     
-  -- TODO: maybe inline this later? 
+       
   function obj.headTo( posi )         
     local v = obj.getDirectionTo( posi )
     vec.setFrom(obj.direction, v)    
