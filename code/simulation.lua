@@ -39,8 +39,8 @@ function sim.init()
     map.addAnt( newAnt )
     local ang = math.random()*6.28
     newAnt.direction = {math.cos(ang), math.sin(ang)}
-    newAnt.position[1] = math.cos(ang)*100
-    newAnt.position[2] = math.sin(ang)*100
+    newAnt.position[1] = math.cos(ang)*(50+i/60)
+    newAnt.position[2] = math.sin(ang)*(50+i/60)
     if i<4 then newAnt.setDrawMode("debug") end
   end
   cam.translation.x = 500
