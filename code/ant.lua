@@ -42,10 +42,10 @@ function TAnt.create()
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = cfg.antErratic                  --crazyness
   obj.maxSpeed = cfg.antMaxSpeed 
-  obj.tasks = {'food','cave'}
+  obj.tasks = {'food','cave'}  --TODO: no need for Array of task, they can only have to targets, use two variables and swap
   obj.lookingForTask = 1  
   obj.comingFromTask = 0
-  obj.lookingFor = 'food'
+  --obj.lookingFor = 'food'
   obj.comingFrom = ''
   obj.lastTimeSeenFood = -1
   obj.lastTimeSeenCave = -1

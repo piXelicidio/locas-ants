@@ -17,7 +17,9 @@ if not g_isTesting then
 
   --- We init the application defining the load event
   function api.load()
-    if arg[#arg] == "-debug" then require("mobdebug").start() end    
+    TIME_start = os.clock()
+    print('Initializing...')
+    --if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
     apiG.setBackgroundColor(cfg.colorBk)
     
@@ -29,7 +31,7 @@ if not g_isTesting then
   
   function api.draw()        
     --gameworld  
-    
+    if cfg.simFrameNumber == 1 then print( (os.clock() - TIME_start)..'secs' ) end
         
     apiG.push()
     apiG.translate( cam.translation.x, cam.translation.y )
@@ -55,7 +57,7 @@ if not g_isTesting then
         print('cfg.debugGrid =',cfg.debugGrid)
     elseif key=='4' then
         cfg.antComAlgorithm = cfg.antComAlgorithm + 1
-        if cfg.antComAlgorithm > 3 then cfg.antComAlgorithm = 0 end     
+        if cfg.antComAlgorithm > 4 then cfg.antComAlgorithm = 0 end     
         print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
     elseif key=='m' then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
