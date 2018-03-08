@@ -27,24 +27,37 @@ map.limitsColor = cfg.colorBkLimits
 
 local limitsRect = {}
 local gridBorder = 2
+
+-- calculating grid map dimensions, -- extra border (fGridBorder) to get rid of validations
 map.minXg = math.floor(map.minX / map.gridSize) - gridBorder
 map.maxXg = math.floor(map.maxX / map.gridSize) + gridBorder
 map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
 map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
 function map.init()
-  -- calculating grid map dimensions
-  -- extra border (fGridBorder) to get rid of validations
-
+  -- initializing all Grid data structure, avoiding future validations and mem allocation
+  
   for i = map.minXg, map.maxXg do
     map.grid[i]={}
     for j = map.minYg, map.maxYg do
       map.grid[i][j] = {
         qlist = TQuickList.create(),
-        dcolor = {math.random(160), math.random(160), math.random(250)}
+        dcolor = {math.random(160), math.random(160), math.random(250)},
+        pheromInfo = {
+            seen = {}            
+          }
       }
+      for k = 1, #cfg.antInterests do
+        map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
+            time = -1,
+            where = {1,0}  --last position remembered on the direction coming from
+          }
+      end
+      
     end
   end
+  
+  
 end
 
 --TODO: discard AddActor OR (AddAnt and addSurface) ... think... 

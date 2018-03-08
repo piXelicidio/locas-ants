@@ -13,16 +13,15 @@ sim.interactionAlgorithm = {}
 
 function sim.init()  
   math.randomseed(os.time())
-  print(sim.algorithm2_oldChat)
-  print(sim.algorithm3_groupCells)
   
   sim.interactionAlgorithm[0] = sim.algorithm0_doNothing
   sim.interactionAlgorithm[1] = sim.algorithm1_ZeroOptimization
   sim.interactionAlgorithm[2] = sim.algorithm2_oldChat
   sim.interactionAlgorithm[3] = sim.algorithm3_groupCells
+  sim.interactionAlgorithm[4] = sim.algorithm4_pheromones
+  
   map.init()   
   
-    
   local newSur  
   for i=1,1 do
     newSur = TSurface.createCave(-250+200*(math.random()-0.5), 300*(math.random()-0.5), 20)
@@ -61,8 +60,11 @@ function sim.init()
     if node.obj.classType == TAnt then numAnts = numAnts + 1 end
     if node.obj.classType == TSurface then numSurs = numSurs + 1 end
   end  
+    
   print('numAnts: ',numAnts,' numSurs', numSurs)
-  print('Initial memory: '..math.floor( collectgarbage ('count'))..'kb')
+  print('Mem used: '..math.floor( collectgarbage ('count'))..'kb')
+  
+
 end
 
 function sim.collisionAntWithLimits(ant)
@@ -202,21 +204,35 @@ function sim.algorithm3_groupCells()
   end --fori
 end
 
--- **4) Old algorithm 2 plus Pheromones inspiration**, store good info on the cells.
-function sim.algorithm4_Pheromones()  
+-- **4) Old algorithm 2 plus Pheromones inspiration**, store bestSeen info on the cells.
+-- this time they communicate indirectly using the Grid cells, equivalent to pheromones nature
+function sim.algorithm4_pheromones()  
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
       local ant = node.obj 
       if not sim.collisionAntWithLimits(ant)  then
           --ants with surfaces      
         if not sim.collisionAntWithSurfaces(ant) then          
-            if (cfg.antComEveryFrame or ant.isComNeeded())  then              
+            if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
+              --get info on ant cell position, of time and position stored from other ants.
+              local pheromInfoSeen = map.grid[ ant.gridInfo.posi[1] ][ ant.gridInfo.posi[2] ].pheromInfo.seen
+              local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
               
-              local antLists = map.antsNearMe( ant )
-              ant.communicateWithAnts_grid( antLists )  
-              
+              if myInterest.time > ant.maxTimeSeen then                
+                ant.maxTimeSeen = myInterest.time
+                ant.headTo( myInterest.where )
+              end
+              -- share what i Know in the map...
+              for name,time in pairs(ant.lastTimeSeen) do                
+                local interest = pheromInfoSeen[ name ]                
+                if time > interest.time then
+                    interest.time = time
+                    interest.where[1] = ant.oldestPositionRemembered[1]
+                    interest.where[2] = ant.oldestPositionRemembered[2]
+                end
+              end --for             
             end             
-        end
+        end --ifnot
       end
     end --for ant node  
 end
