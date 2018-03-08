@@ -194,7 +194,7 @@ function TAnt.create()
     apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
     if obj.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      if not cfg.debugGrid then apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1) end
+      if not cfg.debugGrid then apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 0.5) end
     end
     -- debug    
   end
