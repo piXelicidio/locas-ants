@@ -58,25 +58,24 @@ function map.updateOnGrid_firstTime(grid, actor )
   --vector position inside grid, integer values x,y
   local idxX, idxY = math.floor(actor.position[1]/map.gridSize), math.floor(actor.position[2]/map.gridSize) 
   actor.gridInfo = {
-        posi = { idxX, idxY },       
-        lastPosi = { idxX, idxY }  
+        posi = { idxX, idxY }       
         }
       -- insert my node on the bidimentional array grid
       grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].qlist.add( actor.nodeRefs.gridNode )
 end
 
 function map.updateOnGrid(grid, actor)
-  actor.gridInfo.posi[1] = math.floor(actor.position[1]/map.gridSize)
-  actor.gridInfo.posi[2] = math.floor(actor.position[2]/map.gridSize)   
+  local posiX = math.floor(actor.position[1]/map.gridSize)
+  local posiY = math.floor(actor.position[2]/map.gridSize)   
   --comparing to know if actor is now in a new grid X,Y
-  if (actor.gridInfo.posi[1] ~= actor.gridInfo.lastPosi[1] ) or (actor.gridInfo.posi[2] ~= actor.gridInfo.lastPosi[2] ) then
+  if (posiX ~= actor.gridInfo.posi[1] ) or (posiY ~= actor.gridInfo.posi[2] ) then
     --move from old list to new list
     actor.nodeRefs.gridNode.selfRemove()
-    grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].qlist.add( actor.nodeRefs.gridNode )
-    actor.gridInfo.lastPosi[1] = actor.gridInfo.posi[1]
-    actor.gridInfo.lastPosi[2] = actor.gridInfo.posi[2]
-    if cfg.debugGrid then actor.color = grid[ actor.gridInfo.posi[1] ][ actor.gridInfo.posi[2] ].dcolor end
-  end  
+    grid[ posiX ][ posiY ].qlist.add( actor.nodeRefs.gridNode )
+    actor.gridInfo.posi[1] = posiX
+    actor.gridInfo.posi[2] = posiY    
+    --if cfg.debugGrid then actor.color = grid[ posiX ][ posiY ].dcolor end
+  end 
 end
 
 function map.addAnt( ant )
@@ -123,9 +122,7 @@ function map.draw()
       end
     end  
   if cfg.debugGrid  then
-    map.gridForEachCell(
-      
-    )
+    map.gridForEachCell( cellcount )
   end
 end
 

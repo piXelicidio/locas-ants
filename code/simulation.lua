@@ -127,27 +127,19 @@ end
 
 -- **2) Old 2003 way, chat with neighbors** 
 function sim.algorithm2_oldChat()
-
-  if cfg.antComAlgorithm ~= 3 then
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
       local ant = node.obj 
       if not sim.collisionAntWithLimits(ant)  then
           --ants with surfaces      
         if not sim.collisionAntWithSurfaces(ant) then
-          
             if (cfg.antComEveryFrame or ant.isComNeeded())  then
-              
               local antLists = map.antsNearMe( ant )
               ant.communicateWithAnts_grid( antLists ) 
-              
             end
-             
         end
       end
     end --for ant node
-  end  
-  
 end
 
 -- 3) **New algorithm 2018 group info matters to all**, share it
@@ -208,6 +200,25 @@ function sim.algorithm3_groupCells()
       
     end --forj
   end --fori
+end
+
+-- **4) Old algorithm 2 plus Pheromones inspiration**, store good info on the cells.
+function sim.algorithm4_Pheromones()  
+    for _,node in pairs(map.ants.array) do
+      --ant bounces with limits
+      local ant = node.obj 
+      if not sim.collisionAntWithLimits(ant)  then
+          --ants with surfaces      
+        if not sim.collisionAntWithSurfaces(ant) then          
+            if (cfg.antComEveryFrame or ant.isComNeeded())  then              
+              
+              local antLists = map.antsNearMe( ant )
+              ant.communicateWithAnts_grid( antLists )  
+              
+            end             
+        end
+      end
+    end --for ant node  
 end
 
 function sim.update()
