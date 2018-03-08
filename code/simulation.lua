@@ -9,9 +9,18 @@ local vec = require('libs.vec2d_arr')
 
 local sim = {}
 
+sim.interactionAlgorithm = {}
+
 function sim.init()  
   math.randomseed(os.time())
-  map.init()
+  print(sim.algorithm2_oldChat)
+  print(sim.algorithm3_groupCells)
+  
+  sim.interactionAlgorithm[0] = sim.algorithm0_doNothing
+  sim.interactionAlgorithm[1] = sim.algorithm1_ZeroOptimization
+  sim.interactionAlgorithm[2] = sim.algorithm2_oldChat
+  sim.interactionAlgorithm[3] = sim.algorithm3_groupCells
+  map.init()   
   
     
   local newSur  
@@ -89,45 +98,60 @@ function sim.collisionAntWithSurfaces(ant)
   end      
 end
 
-function sim.collisionDetection()
-  local ant 
+
+function sim.algorithm0_doNothing()
+    for _,node in pairs(map.ants.array) do
+      --ant bounces with limits
+      local ant = node.obj 
+      sim.collisionAntWithLimits(ant) 
+    end --for ant node  
+end
+
+-- **1) No optimizaiton, just test N*N all with all ants** no brain.
+--if you are porting the code to other language or api start implementing this for simplicity and safety 
+function sim.algorithm1_ZeroOptimization()
+    for _,node in pairs(map.ants.array) do
+      --ant bounces with limits
+      local ant = node.obj 
+      if not sim.collisionAntWithLimits(ant)  then
+          --ants with surfaces      
+        if not sim.collisionAntWithSurfaces(ant) then        
+                    
+            if (cfg.antComEveryFrame or ant.isComNeeded())  then
+              ant.communicateWithAnts(map.ants.array)       
+            end            
+        end
+      end
+    end --for ant node  
+end
+
+-- **2) Old 2003 way, chat with neighbors** 
+function sim.algorithm2_oldChat()
+
   if cfg.antComAlgorithm ~= 3 then
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
-      ant = node.obj 
+      local ant = node.obj 
       if not sim.collisionAntWithLimits(ant)  then
           --ants with surfaces      
         if not sim.collisionAntWithSurfaces(ant) then
-        
-          -- **1) No optimizaiton, just test N*N all with all ants**.
-          --if you are porting the code to other language or api start implementing this for simplicity and safety
-          if cfg.antComAlgorithm == 1 then      
-            local otherAnt    
-            local betterPathCount = 0      
-            if (cfg.antComEveryFrame or ant.isComNeeded())  then
-              ant.communicateWithAnts(map.ants.array)       
-            end
           
-          -- **2) Old 2003 way, chat with neighbors** 
-          elseif cfg.antComAlgorithm == 2 then
             if (cfg.antComEveryFrame or ant.isComNeeded())  then
+              
               local antLists = map.antsNearMe( ant )
               ant.communicateWithAnts_grid( antLists ) 
+              
             end
-          end   
+             
         end
       end
     end --for ant node
-  else  
-    -- **3) New 2018, go by cell and process a cell group at once.**
-    if cfg.antComAlgorithm == 3 then
-      sim.antCommunication3()
-    end
-  end --if cfg.antCom... ~= 3
+  end  
+  
 end
 
 -- 3) **New algorithm 2018 group info matters to all**, share it
-function sim.antCommunication3()
+function sim.algorithm3_groupCells()
   local centerCell --TQuickList
   local neiborCell --TQuickList
   
@@ -187,7 +211,8 @@ function sim.antCommunication3()
 end
 
 function sim.update()
-  sim.collisionDetection()
+  
+  sim.interactionAlgorithm[cfg.antComAlgorithm]()
 
   for _,node in pairs(map.ants.array) do
     node.obj.update()    
