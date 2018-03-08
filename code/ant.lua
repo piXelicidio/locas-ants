@@ -42,10 +42,10 @@ function TAnt.create()
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = cfg.antErratic                  --crazyness
   obj.maxSpeed = cfg.antMaxSpeed 
-  obj.tasks = {'food','cave'}
+  obj.tasks = {'food','cave'}  --TODO: no need for Array of task, they can only have to targets, use two variables and swap
   obj.lookingForTask = 1  
   obj.comingFromTask = 0
-  obj.lookingFor = 'food'
+  --obj.lookingFor = 'food'
   obj.comingFrom = ''
   obj.lastTimeSeenFood = -1
   obj.lastTimeSeenCave = -1
@@ -194,7 +194,7 @@ function TAnt.create()
     apiG.line(obj.position[1] - obj.direction[1]*2, obj.position[2] - obj.direction[2]*2, obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2 ) 
     if obj.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      if not cfg.debugGrid then apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 1) end
+      if not cfg.debugGrid then apiG.circle("line", obj.position[1] + obj.direction[1]*2, obj.position[2] + obj.direction[2]*2, 0.5) end
     end
     -- debug    
   end
