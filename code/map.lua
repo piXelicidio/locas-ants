@@ -21,7 +21,7 @@ map.ants = TQuickList.create()     --All ants
 map.surfs = TQuickList.create()    --All static surfaces (obstacles, caves, food... )
 --Space Partition Grid
 map.gridSize = cfg.mapGridSize
-map.grid = {}
+map.grid = {}                       --array[X] of array[Y] of (qlist, dcolor, pheromInfo)
 
 map.limitsColor = cfg.colorBkLimits
 
@@ -35,8 +35,7 @@ map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
 map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
 function map.init()
-  -- initializing all Grid data structure, avoiding future validations and mem allocation
-  
+  -- initializing all Grid data structure, avoiding future validations and mem allocation  
   for i = map.minXg, map.maxXg do
     map.grid[i]={}
     for j = map.minYg, map.maxYg do
@@ -137,7 +136,7 @@ local cellPheromInfo = function(cell, i, j)
       local alpha = 255 - (( cfg.simFrameNumber - info.time) / 2);
       if alpha < 30 then alpha = 10 end
       if name=='food' then apiG.setColor(255,255,200, alpha) 
-      elseif name=='cave' then apiG.setColor(0,0,100, alpha) end
+      elseif name=='cave' then apiG.setColor(200,200,255, alpha) end
       if info.where[1]~=0 and info.where[2]~=0 then
         apiG.circle('line', i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, 1 )           
         apiG.line( i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, info.where[1], info.where[2] )

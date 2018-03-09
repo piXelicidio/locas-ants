@@ -52,6 +52,7 @@ function TAnt.create()
   obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
   obj.maxTimeSeen = -1
   obj.comingFromAtTime = 0
+  obj.lastTimeUpdatedPath = -1
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
@@ -193,10 +194,19 @@ function TAnt.create()
     vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
     -- direction variation for next update
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
+    
+    --I'm lost?
+    if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
+      --reconsider my demands
+      obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
+      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end
+      
+    end
       
     --reset friction: 
     --TODO: i don't like this
-    obj.friction = 1    
+    obj.friction = 1   
+    
   end
   
 
@@ -240,6 +250,7 @@ function TAnt.create()
     --local v = obj.getDirectionTo( posi )
     --vec.setFrom(obj.direction, v)    
     obj.setDirectionTo( obj.direction, posi )
+    obj.lastTimeUpdatedPath = cfg.simFrameNumber
   end 
   
   --- ask ant if need comunication for this frame
