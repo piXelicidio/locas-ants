@@ -34,7 +34,7 @@ function sim.init()
     newSur.init()    
     map.addSurface( newSur )
   end
-  for i=1,8 do
+  for i=1,14 do
     newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )
@@ -215,20 +215,26 @@ function sim.algorithm4_pheromones()
         if not sim.collisionAntWithSurfaces(ant) then          
             if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
               --get info on ant cell position, of time and position stored from other ants.
-              local pheromInfoSeen = map.grid[ ant.gridInfo.posi[1] ][ ant.gridInfo.posi[2] ].pheromInfo.seen
-              local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
-              
-              if myInterest.time > ant.maxTimeSeen then                
-                ant.maxTimeSeen = myInterest.time
-                ant.headTo( myInterest.where )
+              local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+              local pheromInfoSeen
+              for i = 1,9 do --do it for the 9 cells block
+                pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
+                                         [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
+                local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
+                
+                if myInterest.time > ant.maxTimeSeen then                
+                  ant.maxTimeSeen = myInterest.time
+                  ant.headTo( myInterest.where )                                    
+                end              
               end
               -- share what i Know in the map...
+              pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
               for name,time in pairs(ant.lastTimeSeen) do                
                 local interest = pheromInfoSeen[ name ]                
                 if time > interest.time then
-                    interest.time = time
+                    interest.time = time                    
                     interest.where[1] = ant.oldestPositionRemembered[1]
-                    interest.where[2] = ant.oldestPositionRemembered[2]
+                    interest.where[2] = ant.oldestPositionRemembered[2]                                        
                 end
               end --for             
             end             

@@ -96,6 +96,17 @@ function TAnt.create()
     return tempVec
   end
   
+  -- same as getDirectionTo, but do not create and not return a new table, use the one in the parameter
+  function obj.setDirectionTo(varVec, posi )
+    vec.setFrom( varVec, posi)
+    vec.sub( varVec, obj.position )
+    local tempLen = vec.length( varVec )
+    if tempLen == 0 then varVec[1], varVec[2] = 1,0 else
+      varVec[1] = varVec[1] / tempLen
+      varVec[2] = varVec[2] / tempLen
+    end      
+  end
+  
   --return True if bounced with not passable object
   function obj.collisionTestSurface( surf )
     
@@ -152,6 +163,7 @@ function TAnt.create()
       --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
       --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
       obj.lastTimeSeen[surf.name] = cfg.simFrameNumber   
+      --vec.setFrom(obj.oldestPositionRemembered, surf.position)
 
     elseif (dist < surf.radius + cfg.antSightDistance)  then
       if obj.tasks[obj.lookingForTask] == surf.name then
@@ -225,8 +237,9 @@ function TAnt.create()
      
   -- TODO: maybe inline this later? 
   function obj.headTo( posi )         
-    local v = obj.getDirectionTo( posi )
-    vec.setFrom(obj.direction, v)    
+    --local v = obj.getDirectionTo( posi )
+    --vec.setFrom(obj.direction, v)    
+    obj.setDirectionTo( obj.direction, posi )
   end 
   
   --- ask ant if need comunication for this frame

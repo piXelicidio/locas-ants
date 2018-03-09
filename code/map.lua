@@ -50,7 +50,7 @@ function map.init()
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
             time = -1,
-            where = {1,0}  --last position remembered on the direction coming from
+            where = {0,0}  --the non-normalized vector direction of last position remembered.
           }
       end
       
@@ -124,19 +124,40 @@ function map.gridForEachCell( doFunc )
   end
 end
 
-function map.draw()      
-  apiG.setColor( map.limitsColor )
-  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
-  --debuging grid
-  local  cellcount = function(cell, i, j)
+local  cellcount = function(cell, i, j)
       if cell.qlist.count>0 then
         apiG.setColor( cell.dcolor )
         apiG.print(cell.qlist.count, i * map.gridSize, j * map.gridSize) 
       end
-    end  
+end  
+
+local cellPheromInfo = function(cell, i, j)
+    local pheromInfo = cell.pheromInfo
+    for name,info in pairs(pheromInfo.seen) do      
+      local alpha = 255 - (( cfg.simFrameNumber - info.time) / 2);
+      if alpha < 30 then alpha = 10 end
+      if name=='food' then apiG.setColor(255,255,200, alpha) 
+      elseif name=='cave' then apiG.setColor(0,0,100, alpha) end
+      if info.where[1]~=0 and info.where[2]~=0 then
+        apiG.circle('line', i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, 1 )           
+        apiG.line( i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, info.where[1], info.where[2] )
+      end
+    end
+end
+
+function map.draw()      
+  apiG.setColor( map.limitsColor )
+  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
+  --debuging grid
+  
   if cfg.debugGrid  then
     map.gridForEachCell( cellcount )
   end
+  
+  if cfg.debugPheromones then
+    map.gridForEachCell( cellPheromInfo )
+  end
+  
 end
 
 

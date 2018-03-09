@@ -36,8 +36,7 @@ function TSurface.create()
     
   end
   function obj.update()  
-    --TODO: Why this line bellow???????
-    if obj.surfaceRatioMultiplier ~= 0 then obj.radius = obj.surfaceCount * obj.surfaceRatioMultiplier end
+    
   end
   function obj.draw() 
     love.graphics.setColor(obj.color)
