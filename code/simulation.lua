@@ -34,7 +34,7 @@ function sim.init()
     newSur.init()    
     map.addSurface( newSur )
   end
-  for i=1,14 do
+  for i=1,4 do
     newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )

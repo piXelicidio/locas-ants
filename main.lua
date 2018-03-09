@@ -61,6 +61,9 @@ if not g_isTesting then
         cfg.antComAlgorithm = cfg.antComAlgorithm + 1
         if cfg.antComAlgorithm > 4 then cfg.antComAlgorithm = 0 end     
         print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
+    elseif key=='5' then
+        cfg.debugPheromones = not cfg.debugPheromones
+        print('cfg.debugPheromones =',cfg.debugPheromones)
     elseif key=='m' then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
     elseif key=='escape' then

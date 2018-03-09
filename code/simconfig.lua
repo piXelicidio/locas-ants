@@ -3,11 +3,11 @@
 
 local simconfig = {
   
-  numAnts = 150,
+  numAnts = 6150,
   antMaxSpeed = 1.2,
   antComAlgorithm = 4,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm; 4 = Pheromones inspiration
   antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
-  antComEveryFrame = true,      -- comunicate every frame? or use values of antComNeedFrameStep below  
+  antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
   antComNeedFrameStep = {3,13},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.
   antComMaxBetterPaths = 3,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?  (ignored by Algorithm #4)  
   antComTimeToAcceptImLost = 500, -- if in N frames I don't find a fresh direction suggestion then I'll conform with older less quality info
@@ -18,7 +18,7 @@ local simconfig = {
   antInterests = {'food','cave'},
   
   debugGrid = false,
-  debugPheromones = true,
+  debugPheromones = false,
   debugCounters = {0,0,0,0,0,0},
   
   -- our map dimensions, it can grow on any direction not only on positive integers 
