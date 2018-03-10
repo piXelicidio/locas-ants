@@ -67,7 +67,50 @@ function sim.init()
 
 end
 
-function sim.collisionAntWithLimits(ant)
+function sim.collisionAntWithCells(ant)
+   -- TODO: maybe this go better on map.updateOnGrid(...)
+    local antX, antY = ant.position[1], ant.position[2]
+    local posiXg = math.floor( antX / cfg.mapGridSize )
+    local posiYg = math.floor( antY / cfg.mapGridSize )
+    if not map.grid[posiXg][posiYg].pass then      
+      --block pass
+      local centerX = (posiXg + 0.5) * cfg.mapGridSize 
+      local centerY = (posiYg + 0.5) * cfg.mapGridSize
+      local relX = antX - centerX
+      local relY = antY - centerY
+      --know in what side of the square relX,relY is:
+      if ((relY<-relX) and (relY>relX)) or ((relY>-relX) and (relY<relX)) then
+        -- left or right side
+        if ant.direction[2] >= 0 then
+          ant.direction[1], ant.direction[2] = 0,1
+        else
+          ant.direction[1], ant.direction[2] = 0,-1
+        end
+        --push back
+        if relX < 0 then ant.position[1] = centerX - ((cfg.mapGridSize /  2) + ant.radius)  
+          else
+            ant.position[1] = centerX + (cfg.mapGridSize /  2) 
+        end
+      else
+        -- top or bottom
+        if ant.direction[1] >= 0 then
+          ant.direction[1], ant.direction[2] = 1,0
+        else
+          ant.direction[1], ant.direction[2] = -1,0
+        end
+        --push back
+        if relY < 0 then ant.position[2] = centerY - ((cfg.mapGridSize /  2) + ant.radius)  
+          else
+            ant.position[2] = centerY + (cfg.mapGridSize /  2) 
+        end
+      end
+    end
+end
+
+function sim.collisionAntWithLimits(ant)   
+  
+    sim.collisionAntWithCells(ant)  
+    
     if ant.position[1] < map.minX then
       ant.position[1] = map.minX
       ant.speed=0.1
@@ -89,7 +132,7 @@ function sim.collisionAntWithLimits(ant)
     end 
 end
 
-function sim.collisionAntWithSurfaces(ant)
+function sim.collisionAntWithSurfaces(ant)  
   for _,surfNode in pairs(map.surfs.array) do
       local surf = surfNode.obj
       if ant.collisionTestSurface(surf) then 

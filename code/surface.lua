@@ -16,7 +16,7 @@ function TSurface.create()
   --public fields
   obj.radius = 20  
   obj.name = "obstacle"
-  obj.passable = false              -- you shall not pass 
+  obj.passable = false              -- you shall not pass? 
   obj.friction = 1                  -- this is actually a multiplier of speed; 1 = no friction. 0.5 = high friction
   obj.storing = false              -- false store only equal, true store mutiple like caves   
   obj.storage = {}                 -- resource stores, keyName=number pairs.

@@ -3,7 +3,7 @@
 
 local simconfig = {
   
-  numAnts = 6150,
+  numAnts = 2150,
   antMaxSpeed = 1.2,
   antComAlgorithm = 4,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm; 4 = Pheromones inspiration
   antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
@@ -26,7 +26,7 @@ local simconfig = {
   mapMinY = -250,
   mapMaxX = 550,
   mapMaxY = 350,
-  mapGridSize = 16,
+  mapGridSize = 20,
   mapGridComScan = {      
     --this are the neibor cells we are going to scan looking for near ants to do communications... normal is 8 'N'eibor cells in square formation around 'C'enter cell.
     -- mapGridComScan[2..9]=neibors 
