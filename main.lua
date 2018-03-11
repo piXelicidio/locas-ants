@@ -73,7 +73,7 @@ if not g_isTesting then
   
   function api.mousepressed(x, y, button, istouch)
     if button == 1 then 
-      print( x, y )
+      sim.onClick( cam.screenToWorld(x, y) )
     end
   end
 

@@ -307,5 +307,11 @@ function sim.draw()
   end   
 end
 
+function sim.onClick(x, y)
+  local xg, yg = map.worldToGrid( x, y)
+  print (xg, yg)
+  if map.isInsideGrid(xg, yg) then map.grid[xg][yg].pass = false end
+end
+
 
 return sim
