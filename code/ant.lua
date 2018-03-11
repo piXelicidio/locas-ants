@@ -37,7 +37,7 @@ function TAnt.create()
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
   obj.radius = 2
-  obj.speed = 0.1
+  obj.speed = 0.1  
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = cfg.antErratic                  --crazyness
@@ -185,24 +185,24 @@ function TAnt.create()
   end
   
   function obj.update()     
-    obj.storePosition( obj.position )
-    
+    obj.storePosition( obj.position )    
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
-    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end    
-       
-    vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end           
     -- direction variation for next update
-    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
+    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )    
+    -- MOVE, not move, just TRY by testing collisions first
+     --vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
+     
+     -- This ant wants to move obj.position + obj.direction * obj.speed; future collision tests will tell if possible and determine.
+     -- Simulation determine collision and actual modtion.
     
     --I'm lost?
     if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
       --reconsider my demands
       obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
-      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end
-      
-    end
-      
+      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end      
+    end      
     --reset friction: 
     --TODO: i don't like this
     obj.friction = 1   

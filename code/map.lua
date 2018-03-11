@@ -44,7 +44,7 @@ function map.init()
         qlist = TQuickList.create(),
         dcolor = {math.random(160), math.random(160), math.random(250)},
         pheromInfo = { seen = {} },
-        pass = not ( (i == map.minXg) or (i == map.maxXg) or (j == map.minYg) or (j == map.maxYg) or (math.random()<0.02)),  --pasable or obstacle? setting borders 
+        pass = (math.random()>0.02),  --pasable or obstacle? setting borders 
       }
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {

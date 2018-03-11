@@ -67,6 +67,96 @@ function sim.init()
 
 end
 
+function sim.anyCollisionWithCell(position, direction)
+    local antX, antY = position[1], position[2]
+    local posiXg = math.floor( antX / cfg.mapGridSize )
+    local posiYg = math.floor( antY / cfg.mapGridSize )
+    if not map.grid[posiXg][posiYg].pass then      
+      --block pass
+      local centerX = (posiXg + 0.5) * cfg.mapGridSize 
+      local centerY = (posiYg + 0.5) * cfg.mapGridSize
+      local relX = antX - centerX
+      local relY = antY - centerY
+      --know in what side of the square relX,relY is:
+      if ((relY<-relX) and (relY>relX)) or ((relY>-relX) and (relY<relX)) then
+        -- left or right side
+        if direction[2] >= 0 then
+          direction[1], direction[2] = 0,1
+        else
+          direction[1], direction[2] = 0,-1
+        end 
+       
+        --push back        
+      else
+        -- top or bottom        
+        if direction[1] >= 0 then
+           direction[1], direction[2] = 1,0
+        else
+          direction[1], direction[2] = -1,0
+        end 
+      end
+      return true
+    end
+end
+
+function sim.AnyCollisionWithLimits(position, direction)     
+   -- sim.collisionAntWithCells(ant)      
+    if position[1] < map.minX then
+      position[1] = map.minX      
+      if direction[1] < 0 then direction[1] = direction[1] *-1; return true end      
+    elseif position[1] > map.maxX then
+      position[1] = map.maxX      
+      if direction[1] > 0 then direction[1] = direction[1] *-1; return true end      
+    end
+    
+    if position[2] < map.minY then
+      position[2] = map.minY
+      
+      if direction[2] < 0 then direction[2] = direction[2] *-1; return true end      
+    elseif position[2] > map.maxY then
+      position[2] = map.maxY        
+      if direction[2] > 0 then direction[2] = direction[2] *-1; return true end      
+    end 
+end
+
+function sim.anyCollisionWith(position, direction)
+    if sim.AnyCollisionWithLimits(position, direction) then
+      return true
+    elseif sim.anyCollisionWithCell(position, direction) then
+      return true
+    end
+end
+
+function sim.resolve_BlockingCollision_andMove( ant )
+  local numTries = 0
+  local collision = false
+  local newPosi = {0, 0}
+  local dir = { ant.direction[1], ant.direction[2] }
+  repeat 
+    numTries = numTries + 1
+    vec.setFrom(newPosi, ant.position)
+    newPosi[1] = newPosi[1] + dir[1] * ant.speed
+    newPosi[2] = newPosi[2] + dir[2] * ant.speed
+    
+    --Test collision with cells:
+    collision = sim.anyCollisionWith( newPosi, dir )
+    
+    
+    
+  until (not collision)  or (numTries >= 3)  
+  
+  if collision and numTries >= 3 then
+    --stuck, go back?    
+    ant.direction[1] = - ant.direction[1]
+    ant.direction[2] = - ant.direction[2]
+  else  
+  
+  vec.setFrom( ant.direction, dir)
+  ant.position[1] =  ant.position[1] + dir[1] * ant.speed
+  ant.position[2] =  ant.position[2] + dir[2] * ant.speed
+  end
+end
+
 function sim.collisionAntWithCells(ant)
    -- TODO: maybe this go better on map.updateOnGrid(...)
     local antX, antY = ant.position[1], ant.position[2]
@@ -109,7 +199,7 @@ end
 
 function sim.collisionAntWithLimits(ant)   
   
-    sim.collisionAntWithCells(ant)  
+   -- sim.collisionAntWithCells(ant)  
     
     if ant.position[1] < map.minX then
       ant.position[1] = map.minX
@@ -253,38 +343,40 @@ function sim.algorithm4_pheromones()
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
       local ant = node.obj 
-      if not sim.collisionAntWithLimits(ant)  then
-          --ants with surfaces      
-        if not sim.collisionAntWithSurfaces(ant) then          
-            if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
-              --get info on ant cell position, of time and position stored from other ants.
-             -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
-              local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
-              local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
-              local pheromInfoSeen
-              for i = 1,9 do --do it for the 9 cells block
-                pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
-                                         [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
-                local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
-                
-                if myInterest.time > ant.maxTimeSeen then                
-                  ant.maxTimeSeen = myInterest.time
-                  ant.headTo( myInterest.where )                                    
-                end              
-              end
-              -- share what i Know in the map...
-              pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
-              for name,time in pairs(ant.lastTimeSeen) do                
-                local interest = pheromInfoSeen[ name ]                
-                if time > interest.time then
-                    interest.time = time                    
-                    interest.where[1] = ant.oldestPositionRemembered[1]
-                    interest.where[2] = ant.oldestPositionRemembered[2]                                        
-                end
-              end --for             
-            end             
-        end --ifnot
-      end
+     -- sim.collisionAntWithLimits(ant)  
+    --ants with surfaces      
+      sim.resolve_BlockingCollision_andMove( ant ) 
+      sim.collisionAntWithSurfaces(ant) 
+      
+      
+      if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
+        --get info on ant cell position, of time and position stored from other ants.
+       -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+        local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
+        local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
+        local pheromInfoSeen
+        for i = 1,9 do --do it for the 9 cells block
+          pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
+                                   [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
+          local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
+          
+          if myInterest.time > ant.maxTimeSeen then                
+            ant.maxTimeSeen = myInterest.time
+            ant.headTo( myInterest.where )                                    
+          end              
+        end
+        -- share what i Know in the map...
+        pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
+        for name,time in pairs(ant.lastTimeSeen) do                
+          local interest = pheromInfoSeen[ name ]                
+          if time > interest.time then
+              interest.time = time                    
+              interest.where[1] = ant.oldestPositionRemembered[1]
+              interest.where[2] = ant.oldestPositionRemembered[2]                                        
+          end
+        end --for             
+      end             
+      
     end --for ant node  
 end
 
