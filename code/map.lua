@@ -28,7 +28,8 @@ map.limitsColor = cfg.colorBkLimits
 local limitsRect = {}
 local gridBorder = 2
 
--- calculating grid map dimensions, -- extra border (fGridBorder) to get rid of validations
+-- calculating grid map dimensions, 
+-- extra border (fGridBorder) to get rid of validations (extraborder limits map)
 map.minXg = math.floor(map.minX / map.gridSize) - gridBorder
 map.maxXg = math.floor(map.maxX / map.gridSize) + gridBorder
 map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
@@ -42,9 +43,8 @@ function map.init()
       map.grid[i][j] = {
         qlist = TQuickList.create(),
         dcolor = {math.random(160), math.random(160), math.random(250)},
-        pheromInfo = {
-            seen = {}            
-          }
+        pheromInfo = { seen = {} },
+        pass = not ( (i == map.minXg) or (i == map.maxXg) or (j == map.minYg) or (j == map.maxYg) or (math.random()<0.2)),  --pasable or obstacle? setting borders 
       }
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
@@ -147,6 +147,17 @@ end
 function map.draw()      
   apiG.setColor( map.limitsColor )
   apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
+  
+  --
+  for i = map.minXg, map.maxXg do
+    for j = map.minYg, map.maxYg do
+      if map.grid[i][j].pass then
+      else
+        apiG.setColor( cfg.colorObstacle )
+        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+      end
+    end
+  end 
   --debuging grid
   
   if cfg.debugGrid  then

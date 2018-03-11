@@ -67,7 +67,50 @@ function sim.init()
 
 end
 
-function sim.collisionAntWithLimits(ant)
+function sim.collisionAntWithCells(ant)
+   -- TODO: maybe this go better on map.updateOnGrid(...)
+    local antX, antY = ant.position[1], ant.position[2]
+    local posiXg = math.floor( antX / cfg.mapGridSize )
+    local posiYg = math.floor( antY / cfg.mapGridSize )
+    if not map.grid[posiXg][posiYg].pass then      
+      --block pass
+      local centerX = (posiXg + 0.5) * cfg.mapGridSize 
+      local centerY = (posiYg + 0.5) * cfg.mapGridSize
+      local relX = antX - centerX
+      local relY = antY - centerY
+      --know in what side of the square relX,relY is:
+      if ((relY<-relX) and (relY>relX)) or ((relY>-relX) and (relY<relX)) then
+        -- left or right side
+        if ant.direction[2] >= 0 then
+          ant.direction[1], ant.direction[2] = 0,1
+        else
+          ant.direction[1], ant.direction[2] = 0,-1
+        end
+        --push back
+        if relX < 0 then ant.position[1] = centerX - ((cfg.mapGridSize /  2) + ant.radius)  
+          else
+            ant.position[1] = centerX + (cfg.mapGridSize /  2) 
+        end
+      else
+        -- top or bottom
+        if ant.direction[1] >= 0 then
+          ant.direction[1], ant.direction[2] = 1,0
+        else
+          ant.direction[1], ant.direction[2] = -1,0
+        end
+        --push back
+        if relY < 0 then ant.position[2] = centerY - ((cfg.mapGridSize /  2) + ant.radius)  
+          else
+            ant.position[2] = centerY + (cfg.mapGridSize /  2) 
+        end
+      end
+    end
+end
+
+function sim.collisionAntWithLimits(ant)   
+  
+    sim.collisionAntWithCells(ant)  
+    
     if ant.position[1] < map.minX then
       ant.position[1] = map.minX
       ant.speed=0.1
@@ -89,7 +132,7 @@ function sim.collisionAntWithLimits(ant)
     end 
 end
 
-function sim.collisionAntWithSurfaces(ant)
+function sim.collisionAntWithSurfaces(ant)  
   for _,surfNode in pairs(map.surfs.array) do
       local surf = surfNode.obj
       if ant.collisionTestSurface(surf) then 
@@ -215,7 +258,9 @@ function sim.algorithm4_pheromones()
         if not sim.collisionAntWithSurfaces(ant) then          
             if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
               --get info on ant cell position, of time and position stored from other ants.
-              local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+             -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+              local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
+              local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
               local pheromInfoSeen
               for i = 1,9 do --do it for the 9 cells block
                 pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
@@ -249,7 +294,7 @@ function sim.update()
 
   for _,node in pairs(map.ants.array) do
     node.obj.update()    
-    map.updateOnGrid(map.grid, node.obj)
+    if (cfg.antComAlgorithm == 2) or (cfg.antComAlgorithm==3) then map.updateOnGrid(map.grid, node.obj) end
   end
 
   cfg.simFrameNumber = cfg.simFrameNumber + 1

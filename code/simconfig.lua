@@ -26,7 +26,7 @@ local simconfig = {
   mapMinY = -250,
   mapMaxX = 550,
   mapMaxY = 350,
-  mapGridSize = 16,
+  mapGridSize = 20,
   mapGridComScan = {      
     --this are the neibor cells we are going to scan looking for near ants to do communications... normal is 8 'N'eibor cells in square formation around 'C'enter cell.
     -- mapGridComScan[2..9]=neibors 
