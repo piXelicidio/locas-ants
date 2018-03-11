@@ -258,7 +258,9 @@ function sim.algorithm4_pheromones()
         if not sim.collisionAntWithSurfaces(ant) then          
             if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
               --get info on ant cell position, of time and position stored from other ants.
-              local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+             -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+              local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
+              local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
               local pheromInfoSeen
               for i = 1,9 do --do it for the 9 cells block
                 pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
@@ -292,7 +294,7 @@ function sim.update()
 
   for _,node in pairs(map.ants.array) do
     node.obj.update()    
-    map.updateOnGrid(map.grid, node.obj)
+    if (cfg.antComAlgorithm == 2) or (cfg.antComAlgorithm==3) then map.updateOnGrid(map.grid, node.obj) end
   end
 
   cfg.simFrameNumber = cfg.simFrameNumber + 1

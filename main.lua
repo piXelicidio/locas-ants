@@ -70,6 +70,13 @@ if not g_isTesting then
         api.event.quit()
     end
   end
+  
+  function api.mousepressed(x, y, button, istouch)
+    if button == 1 then 
+      print( x, y )
+    end
+  end
+
 
   apiG.setDefaultFilter("nearest", "nearest")
   apiG.setLineStyle( 'rough' )
