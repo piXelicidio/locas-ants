@@ -71,7 +71,13 @@ if not g_isTesting then
     end
   end
   
-  function api.mousepressed(x, y, button, istouch)
+  function api.mousemoved(x, y,  istouch)
+    if api.mouse.isDown(1) then 
+      sim.onClick( cam.screenToWorld(x, y) )
+    end
+  end
+  
+  function api.mousepressed(x, y, button,  istouch)
     if button == 1 then 
       sim.onClick( cam.screenToWorld(x, y) )
     end
