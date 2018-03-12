@@ -37,7 +37,7 @@ function TAnt.create()
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
   obj.radius = 2
-  obj.speed = 0.1
+  obj.speed = 0.1  
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = cfg.antErratic                  --crazyness
@@ -57,6 +57,7 @@ function TAnt.create()
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
   obj.color = cfg.colorAnts
+  obj.lastCollisionTime = -1
   
   
   
@@ -121,7 +122,7 @@ function TAnt.create()
         if vec.length(dv)>0 then
           vec.normalize(dv)        
           -- push out
-          pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
+          local pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
           vec.setFrom( obj.position, surf.position )
           vec.add( obj.position, pushed )
           -- rotate direction to circle tanget
@@ -141,7 +142,7 @@ function TAnt.create()
 
       --i'm looking for you?
 
-      myNeed = obj.tasks[obj.lookingForTask]
+      local myNeed = obj.tasks[obj.lookingForTask]
       if myNeed == surf.name then      
         if surf.name == 'food' then        
           obj.cargo.count = 1
@@ -155,9 +156,11 @@ function TAnt.create()
         if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
 
         obj.comingFromAtTime = cfg.simFrameNumber
-        dv = vec.makeScale( obj.direction, -1) --go oposite 
+        local dv = vec.makeScale( obj.direction, -1) --go oposite 
         obj.direction = dv      
         obj.speed = 0
+        
+        --obj.resetPositionMemory(obj.position)
         --debug        
       end 
 
@@ -184,25 +187,32 @@ function TAnt.create()
      obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
   end
   
+  function obj.resetPositionMemory( posi )
+      for i = 1, #fPastPositions do
+        vec.setFrom( fPastPositions[i], posi )
+      end
+  end
+  
+  
   function obj.update()     
-    obj.storePosition( obj.position )
-    
+    obj.storePosition( obj.position )    
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
-    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end    
-       
-    vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end           
     -- direction variation for next update
-    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
+    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )    
+    -- MOVE, not move, just TRY by testing collisions first
+     --vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
+     
+     -- This ant wants to move obj.position + obj.direction * obj.speed; future collision tests will tell if possible and determine.
+     -- Simulation determine collision and actual modtion.
     
     --I'm lost?
     if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
       --reconsider my demands
       obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
-      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end
-      
-    end
-      
+      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end      
+    end      
     --reset friction: 
     --TODO: i don't like this
     obj.friction = 1   
@@ -254,8 +264,10 @@ function TAnt.create()
   end 
   
   --- ask ant if need comunication for this frame
+  -- TODO: name has to change, is not always communication.. not in algorithm 4
   function obj.isComNeeded()
-    return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
+    return 
+      ((cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0     )   
   end
   
   --- This is the heart of the path finding magic (1)

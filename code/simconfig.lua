@@ -3,7 +3,7 @@
 
 local simconfig = {
   
-  numAnts = 6150,
+  numAnts = 5550,
   antMaxSpeed = 1.2,
   antComAlgorithm = 4,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm; 4 = Pheromones inspiration
   antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
@@ -52,6 +52,7 @@ local simconfig = {
   colorBk = {180,180,180},  
   colorBkLimits = {120, 120, 120},  
   
+  -- << simFrameNumber is a "global" frame number counter, used to measure Time in the game >>>
   simFrameNumber = 0,  
   
   foo = 0

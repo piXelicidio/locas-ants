@@ -38,9 +38,9 @@ if not g_isTesting then
     sim.draw()
     --ui stuff
     apiG.pop()
-    apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
-    apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
-    apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
+    --apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
+    --apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
+    --apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
   end
   
   function api.keypressed(key)
@@ -71,7 +71,13 @@ if not g_isTesting then
     end
   end
   
-  function api.mousepressed(x, y, button, istouch)
+  function api.mousemoved(x, y,  istouch)
+    if api.mouse.isDown(1) then 
+      sim.onClick( cam.screenToWorld(x, y) )
+    end
+  end
+  
+  function api.mousepressed(x, y, button,  istouch)
     if button == 1 then 
       sim.onClick( cam.screenToWorld(x, y) )
     end
