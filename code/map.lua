@@ -6,6 +6,7 @@ local TSurface = require('code.surface')
 local TAnt = require('code.ant')
 local cfg = require('code.simconfig')
 local vec = require('libs.vec2d_arr')
+local TCell = require('code.cell')
 local apiG = love.graphics
 
 local map = {}
@@ -42,7 +43,13 @@ function map.init()
   for i = map.minXg, map.maxXg do
     map.grid[i]={}
     for j = map.minYg, map.maxYg do
-      map.grid[i][j] = {
+      map.initCell(i,j)      
+    end
+  end  
+end
+
+function map.initCell(xg, yg)
+    map.grid[xg][yg] = {
         qlist = TQuickList.create(),
         dcolor = {math.random(160), math.random(160), math.random(250)},
         pheromInfo = { seen = {} },
@@ -50,16 +57,29 @@ function map.init()
         cell = nil,   --if 
       }
       for k = 1, #cfg.antInterests do
-        map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
+        map.grid[xg][yg].pheromInfo.seen[ cfg.antInterests[k] ] = {
             time = -1,
             where = {0,0},  --the non-normalized vector direction of last position remembered.            
           }
       end
-      
-    end
+end
+
+function map.setCell_food(xg, yg)
+  if not map.grid[xg][yg] then  
+    map.initCell(xg,yg)
   end
-  
-  
+  local cell = TCell.newFood()
+  map.grid[xg][yg].cell = cell  
+  cell.posi = {xg * cfg.mapGridSize, yg * cfg.mapGridSize }
+end
+
+function map.setCell_cave(xg, yg)
+  if not map.grid[xg][yg] then  
+    map.initCell(xg,yg)
+  end  
+  local cell = TCell.newCave() 
+  map.grid[xg][yg].cell = TCell.newCave()
+  cell.posi = {xg * cfg.mapGridSize, yg * cfg.mapGridSize }
 end
 
 --TODO: discard AddActor OR (AddAnt and addSurface) ... think... 
@@ -68,6 +88,7 @@ function map.addActor( a )
   -- remember you are referenced on the actors list
   a.nodeRefs.actorsList = node
 end
+
 
 function map.fixTraped( ant ) 
   --doing the spiral of freedom  
@@ -278,6 +299,11 @@ function map.draw()
   for i = map.minXg, map.maxXg do
     for j = map.minYg, map.maxYg do
       if map.grid[i][j].pass then
+        local cell = map.grid[i][j].cell
+        if cell then
+          apiG.setColor( cell.color )
+          apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+        end
       else
         apiG.setColor( cfg.colorObstacle )
         apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   

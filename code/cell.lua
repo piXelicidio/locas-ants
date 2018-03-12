@@ -1,4 +1,5 @@
 local cfg = require('code.simconfig')
+local apiG = love.graphics
 
 local TCell = {}
 
@@ -9,6 +10,8 @@ function TCell.newCell()
   cell.type = 'obstacle'
   cell.pass = false
   cell.color = cfg.colorObstacle 
+  cell.posi = {0,0}     --world position
+        
   return cell
 end
 

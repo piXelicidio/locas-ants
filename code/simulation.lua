@@ -22,6 +22,9 @@ function sim.init()
   
   map.init()   
   
+  map.setCell_food(-10, -4)
+  map.setCell_cave(10, 5)
+  
    --
   local newSur  
   for i=1,1 do
@@ -70,45 +73,6 @@ end
 
 
 
-function sim.collisionAntWithCells(ant)
-   -- TODO: maybe this go better on map.updateOnGrid(...)
-    local antX, antY = ant.position[1], ant.position[2]
-    local posiXg = math.floor( antX / cfg.mapGridSize )
-    local posiYg = math.floor( antY / cfg.mapGridSize )
-    if not map.grid[posiXg][posiYg].pass then      
-      --block pass
-      local centerX = (posiXg + 0.5) * cfg.mapGridSize 
-      local centerY = (posiYg + 0.5) * cfg.mapGridSize
-      local relX = antX - centerX
-      local relY = antY - centerY
-      --know in what side of the square relX,relY is:
-      if ((relY<-relX) and (relY>relX)) or ((relY>-relX) and (relY<relX)) then
-        -- left or right side
-        if ant.direction[2] >= 0 then
-          ant.direction[1], ant.direction[2] = 0,1
-        else
-          ant.direction[1], ant.direction[2] = 0,-1
-        end
-        --push back
-        if relX < 0 then ant.position[1] = centerX - ((cfg.mapGridSize /  2) + ant.radius)  
-          else
-            ant.position[1] = centerX + (cfg.mapGridSize /  2) 
-        end
-      else
-        -- top or bottom
-        if ant.direction[1] >= 0 then
-          ant.direction[1], ant.direction[2] = 1,0
-        else
-          ant.direction[1], ant.direction[2] = -1,0
-        end
-        --push back
-        if relY < 0 then ant.position[2] = centerY - ((cfg.mapGridSize /  2) + ant.radius)  
-          else
-            ant.position[2] = centerY + (cfg.mapGridSize /  2) 
-        end
-      end
-    end
-end
 
 function sim.collisionAntWithLimits(ant)   
   
@@ -145,6 +109,7 @@ function sim.collisionAntWithSurfaces(ant)
       end
   end      
 end
+
 
 
 function sim.algorithm0_doNothing()
@@ -250,6 +215,38 @@ function sim.algorithm3_groupCells()
   end --fori
 end
 
+function sim.interactionWithCells(ant)
+  local gx = math.floor( ant.position[1] / cfg.mapGridSize )
+  local gy = math.floor( ant.position[2] / cfg.mapGridSize )
+  local cell =  map.grid[gx][gy].cell
+  if cell then      
+      --i'm looking for you?
+      local myNeed = ant.tasks[ant.lookingForTask]
+      if myNeed == cell.type then      
+        --ant.pause(20)
+        if cell.type == 'food' then        
+          ant.cargo.count = 1
+          ant.cargo.material = cell.name                          
+        elseif cell.name == 'cave' then
+          ant.cargo.count = 0      
+        end      
+        ant.maxTimeSeen = 0
+        ant.comingFromTask = ant.lookingForTask
+        ant.lookingForTask = ant.lookingForTask + 1          
+        if ant.lookingForTask > #ant.tasks then ant.lookingForTask = 1 end         
+
+        ant.comingFromAtTime = cfg.simFrameNumber
+        local dv = vec.makeScale( ant.direction, -1) --go oposite 
+        --ant.direction = dv      
+        ant.speed = 0        
+        ant.resetPositionMemory( vec.makeSum(cell.posi, {cfg.mapGridSize/2, cfg.mapGridSize/2} ) )
+        --debug        
+      end 
+      --record everything interesting I see
+      ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   
+  end
+end
+
 -- **4) Old algorithm 2 plus Pheromones inspiration**, store bestSeen info on the cells.
 -- this time they communicate indirectly using the Grid cells, equivalent to pheromones nature
 function sim.algorithm4_pheromones()  
@@ -260,6 +257,7 @@ function sim.algorithm4_pheromones()
        -- sim.collisionAntWithLimits(ant)  
       --ants with surfaces      
         map.resolve_BlockingCollision_andMove( ant ) 
+        sim.interactionWithCells(ant)
         sim.collisionAntWithSurfaces(ant) 
         
         
