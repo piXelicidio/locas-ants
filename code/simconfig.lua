@@ -3,7 +3,7 @@
 
 local simconfig = {
   
-  numAnts = 2550,
+  numAnts = 5550,
   antMaxSpeed = 1.2,
   antComAlgorithm = 4,           -- 0 = Comm disabled; 1 = No optimizations; 2= Old 2003 gridmap way; 3 = New improved 2018 gridmap group-to-group comm; 4 = Pheromones inspiration
   antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
@@ -12,7 +12,7 @@ local simconfig = {
   antComMaxBetterPaths = 3,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?  (ignored by Algorithm #4)  
   antComTimeToAcceptImLost = 500, -- if in N frames I don't find a fresh direction suggestion then I'll conform with older less quality info
   antComOlderInfoIfLost = 300,   -- How older info I'll accept if I'm lost!? 
-  antSightDistance  = 20,        -- Only bellow this distance the ant can identify and locate things, bettr if > than antComRadius
+  antSightDistance  = 30,        -- Only bellow this distance the ant can identify and locate|avoid things, bettr if > than antComRadius
   antPositionMemorySize = 15,    -- How many past position they can remember 
   antErratic = 0.2,  
   antInterests = {'food','cave'},

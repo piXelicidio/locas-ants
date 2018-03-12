@@ -38,7 +38,7 @@ if not g_isTesting then
     sim.draw()
     --ui stuff
     apiG.pop()
-    --apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
+    apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
     --apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
     --apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
   end

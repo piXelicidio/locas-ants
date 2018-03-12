@@ -6,11 +6,14 @@ local TSurface = require('code.surface')
 local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig')
 
+
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
 
      
 -- PUBLIC class fields
+TAnt.map = {}  --circular reference to Map module. Set on map.lua
+
 -- Sim has to set this refernce to the grid 
 TAnt.grid = nil
 -- PRIVATE class fields
@@ -193,14 +196,42 @@ function TAnt.create()
       end
   end
   
+  function obj.objectAvoidance()
+    local ahead = vec.makeScale( obj.direction, cfg.antSightDistance )
+    if TAnt.map.anyCollisionWith( vec.makeSum( obj.position, ahead ) ) then
+      -- if something blocking ahead, where to turn? left or right?
+      --print('something in my way')
+      local vLeft = vec.makeFrom( obj.direction )
+      local vRight = vec.makeFrom( obj.direction )
+      vec.rotate( vLeft, -3.14/6 )
+      vec.rotate( vRight, 3.14/6 )
+      local goLeft = vec.makeScale( vLeft, cfg.antSightDistance )
+      local goRight = vec.makeScale( vRight, cfg.antSightDistance )    
+      vec.add( goLeft, obj.position )
+      vec.add( goRight, obj.position )
+      local freeLeft = not TAnt.map.anyCollisionWith( goLeft )
+      local freeRight = not TAnt.map.anyCollisionWith( goRight )      
+      
+      if freeLeft and not freeRight then
+        --goleft
+        vec.setFrom( obj.direction, vLeft )        
+      elseif freeRight and not freeLeft then
+        --goright
+        vec.setFrom( obj.direction, vRight )        
+      end --else keep going
+    end
+  end
+  
   
   function obj.update()     
     obj.storePosition( obj.position )    
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
-    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end           
-    -- direction variation for next update
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end               
+    
+    -- direction variation for next update    
     vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )    
+    
     -- MOVE, not move, just TRY by testing collisions first
      --vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
      
