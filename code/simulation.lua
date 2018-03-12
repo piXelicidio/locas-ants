@@ -291,7 +291,7 @@ function sim.algorithm4_pheromones()
       end   
       
       --ant knows where to go, but lets avoid some future collisons
-      ant.objectAvoidance()    
+      if cfg.antObjectAvoidance then ant.objectAvoidance()    end
       
     end --for ant node  
 end

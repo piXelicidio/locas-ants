@@ -16,6 +16,7 @@ local simconfig = {
   antPositionMemorySize = 15,    -- How many past position they can remember 
   antErratic = 0.2,  
   antInterests = {'food','cave'},
+  antObjectAvoidance = true,
   
   debugGrid = false,
   debugPheromones = false,

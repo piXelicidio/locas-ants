@@ -68,6 +68,9 @@ if not g_isTesting then
          print('Memory: '..math.floor( collectgarbage ('count'))..'kb')
     elseif key=='escape' then
         api.event.quit()
+    elseif key=='6' then
+        cfg.antObjectAvoidance = not cfg.antObjectAvoidance 
+        print('cfg.antObjectAvoidance = ', cfg.antObjectAvoidance )
     end
   end
   
