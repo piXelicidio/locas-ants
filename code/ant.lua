@@ -208,11 +208,11 @@ function TAnt.create()
      -- Simulation determine collision and actual modtion.
     
     --I'm lost?
-    if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
-      --reconsider my demands
-      obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
-      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end      
-    end      
+--    if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
+--      --reconsider my demands
+--      obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
+--      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end      
+--    end      
     --reset friction: 
     --TODO: i don't like this
     obj.friction = 1   
@@ -259,6 +259,12 @@ function TAnt.create()
   function obj.headTo( posi )         
     --local v = obj.getDirectionTo( posi )
     --vec.setFrom(obj.direction, v)    
+    local v = {1,0}
+--    obj.setDirectionTo( v, posi)
+--    vec.scale(v, 5)
+--    vec.add(v, obj.direction)
+--    vec.normalize(v)
+--    vec.setFrom(obj.direction, v)
     obj.setDirectionTo( obj.direction, posi )
     obj.lastTimeUpdatedPath = cfg.simFrameNumber
   end 
