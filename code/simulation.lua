@@ -22,6 +22,7 @@ function sim.init()
   
   map.init()   
   
+   --
   local newSur  
   for i=1,1 do
     newSur = TSurface.createCave(-250+200*(math.random()-0.5), 300*(math.random()-0.5), 20)
@@ -38,7 +39,7 @@ function sim.init()
     newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )
-  end 
+  end
   
   local newAnt
   for i=1,cfg.numAnts do

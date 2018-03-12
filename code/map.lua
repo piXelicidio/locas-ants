@@ -47,6 +47,7 @@ function map.init()
         dcolor = {math.random(160), math.random(160), math.random(250)},
         pheromInfo = { seen = {} },
         pass = true,  --pasable or obstacle? setting borders 
+        cell = nil,   --if 
       }
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {

@@ -215,9 +215,9 @@ function TAnt.create()
       if freeLeft and not freeRight then
         --goleft
         vec.setFrom( obj.direction, vLeft )        
-      elseif freeRight and not freeLeft then
+      elseif not freeLeft then
         --goright
-        vec.setFrom( obj.direction, vRight )        
+        vec.setFrom( obj.direction, vRight )              
       end --else keep going
     end
   end
