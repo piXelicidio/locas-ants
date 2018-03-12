@@ -44,7 +44,7 @@ function map.init()
         qlist = TQuickList.create(),
         dcolor = {math.random(160), math.random(160), math.random(250)},
         pheromInfo = { seen = {} },
-        pass = (math.random()>0.02),  --pasable or obstacle? setting borders 
+        pass = true,  --pasable or obstacle? setting borders 
       }
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
@@ -133,7 +133,7 @@ end
 local cellPheromInfo = function(cell, i, j)
     local pheromInfo = cell.pheromInfo
     for name,info in pairs(pheromInfo.seen) do      
-      local alpha = 255 - (( cfg.simFrameNumber - info.time) / 2);
+      local alpha = 255 - (( cfg.simFrameNumber - info.time) / 5);
       if alpha < 30 then alpha = 10 end
       if name=='food' then apiG.setColor(255,255,200, alpha) 
       elseif name=='cave' then apiG.setColor(200,200,255, alpha) end

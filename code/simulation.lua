@@ -102,19 +102,14 @@ end
 function sim.AnyCollisionWithLimits(position, direction)     
    -- sim.collisionAntWithCells(ant)      
     if position[1] < map.minX then
-      position[1] = map.minX      
       if direction[1] < 0 then direction[1] = direction[1] *-1; return true end      
     elseif position[1] > map.maxX then
-      position[1] = map.maxX      
       if direction[1] > 0 then direction[1] = direction[1] *-1; return true end      
     end
     
-    if position[2] < map.minY then
-      position[2] = map.minY
-      
+    if position[2] < map.minY then  
       if direction[2] < 0 then direction[2] = direction[2] *-1; return true end      
     elseif position[2] > map.maxY then
-      position[2] = map.maxY        
       if direction[2] > 0 then direction[2] = direction[2] *-1; return true end      
     end 
 end
@@ -127,11 +122,35 @@ function sim.anyCollisionWith(position, direction)
     end
 end
 
+function sim.FixTraped( ant ) 
+  --doing the spiral of freedom  
+  local a, r= 0, 1, 0, 0
+  local p = {0,0}
+  local mcos, msin = math.cos, math.sin
+  local collision =  true
+  repeat 
+    
+    r = r + 1
+    a = a + 0.1
+    p[1] = ant.position[1] + r * mcos( a )
+    p[2] = ant.position[2] + r * msin( a )
+    collision = sim.anyCollisionWith( p, ant.direction )
+  until (not collision) or r >= 100
+  if r < 100 then
+    --fixed
+    vec.setFrom( ant.position, p)    
+  else 
+    -- extreme case
+    print ('Ant stuck bigly');
+  end
+end
+
 function sim.resolve_BlockingCollision_andMove( ant )
   local numTries = 0
   local collision = false
   local newPosi = {0, 0}
   local dir = { ant.direction[1], ant.direction[2] }
+  
   repeat 
     numTries = numTries + 1
     vec.setFrom(newPosi, ant.position)
@@ -140,21 +159,29 @@ function sim.resolve_BlockingCollision_andMove( ant )
     
     --Test collision with cells:
     collision = sim.anyCollisionWith( newPosi, dir )
+    if collision and numTries==3 then
+      --looks like stuck, try going back
+      dir[1] = -ant.direction[1]
+      dir[2] = -ant.direction[2]
+    elseif collision and numTries == 6 then
+      --no way to go
+      print( 'its a trap') 
+      --do a severe push back to find a non-colliding place
+      --this usually ocours if the user place a blocking object/gridCell over any ant
+      sim.FixTraped( ant )
+    end
+        
+  until (not collision)  or (numTries >= 6)  
     
-    
-    
-  until (not collision)  or (numTries >= 3)  
-  
-  if collision and numTries >= 3 then
-    --stuck, go back?    
-    ant.direction[1] = - ant.direction[1]
-    ant.direction[2] = - ant.direction[2]
-  else  
-  
   vec.setFrom( ant.direction, dir)
   ant.position[1] =  ant.position[1] + dir[1] * ant.speed
   ant.position[2] =  ant.position[2] + dir[2] * ant.speed
+  
+  if numTries > 1 then
+    --there was al least one collision
+    ant.lastCollisionTime = cfg.simFrameNumber
   end
+  
 end
 
 function sim.collisionAntWithCells(ant)
@@ -355,7 +382,7 @@ function sim.algorithm4_pheromones()
         local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
         local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
         local pheromInfoSeen
-        for i = 1,9 do --do it for the 9 cells block
+        for i = 1,1 do --do it for the 9 cells block
           pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
                                    [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
           local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]

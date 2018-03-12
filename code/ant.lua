@@ -57,6 +57,7 @@ function TAnt.create()
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
   obj.color = cfg.colorAnts
+  obj.lastCollisionTime = -1
   
   
   
@@ -254,8 +255,10 @@ function TAnt.create()
   end 
   
   --- ask ant if need comunication for this frame
+  -- TODO: name has to change, is not always communication.. not in algorithm 4
   function obj.isComNeeded()
-    return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
+    return 
+      ((cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0     )   
   end
   
   --- This is the heart of the path finding magic (1)

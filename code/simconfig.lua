@@ -52,6 +52,7 @@ local simconfig = {
   colorBk = {180,180,180},  
   colorBkLimits = {120, 120, 120},  
   
+  -- << simFrameNumber is a "global" frame number counter, used to measure Time in the game >>>
   simFrameNumber = 0,  
   
   foo = 0
