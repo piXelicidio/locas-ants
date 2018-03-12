@@ -6,11 +6,14 @@ local TSurface = require('code.surface')
 local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig')
 
+
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
 
      
 -- PUBLIC class fields
+TAnt.map = {}  --circular reference to Map module. Set on map.lua
+
 -- Sim has to set this refernce to the grid 
 TAnt.grid = nil
 -- PRIVATE class fields
@@ -37,7 +40,7 @@ function TAnt.create()
   obj.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   obj.oldPosition = {0, 0}
   obj.radius = 2
-  obj.speed = 0.1
+  obj.speed = 0.1  
   obj.friction = 1
   obj.acceleration = 0.04  + math.random()*0.05
   obj.erratic = cfg.antErratic                  --crazyness
@@ -52,10 +55,12 @@ function TAnt.create()
   obj.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
   obj.maxTimeSeen = -1
   obj.comingFromAtTime = 0
+  obj.lastTimeUpdatedPath = -1
   obj.cargo = { material = '', count = 0 } 
   obj.oldestPositionRemembered = {0,0}  --vector 2D arr  
   obj.betterPathCount = 0
   obj.color = cfg.colorAnts
+  obj.lastCollisionTime = -1
   
   
   
@@ -96,6 +101,17 @@ function TAnt.create()
     return tempVec
   end
   
+  -- same as getDirectionTo, but do not create and not return a new table, use the one in the parameter
+  function obj.setDirectionTo(varVec, posi )
+    vec.setFrom( varVec, posi)
+    vec.sub( varVec, obj.position )
+    local tempLen = vec.length( varVec )
+    if tempLen == 0 then varVec[1], varVec[2] = 1,0 else
+      varVec[1] = varVec[1] / tempLen
+      varVec[2] = varVec[2] / tempLen
+    end      
+  end
+  
   --return True if bounced with not passable object
   function obj.collisionTestSurface( surf )
     
@@ -109,7 +125,7 @@ function TAnt.create()
         if vec.length(dv)>0 then
           vec.normalize(dv)        
           -- push out
-          pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
+          local pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
           vec.setFrom( obj.position, surf.position )
           vec.add( obj.position, pushed )
           -- rotate direction to circle tanget
@@ -129,7 +145,7 @@ function TAnt.create()
 
       --i'm looking for you?
 
-      myNeed = obj.tasks[obj.lookingForTask]
+      local myNeed = obj.tasks[obj.lookingForTask]
       if myNeed == surf.name then      
         if surf.name == 'food' then        
           obj.cargo.count = 1
@@ -143,15 +159,18 @@ function TAnt.create()
         if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
 
         obj.comingFromAtTime = cfg.simFrameNumber
-        dv = vec.makeScale( obj.direction, -1) --go oposite 
+        local dv = vec.makeScale( obj.direction, -1) --go oposite 
         obj.direction = dv      
         obj.speed = 0
+        
+        --obj.resetPositionMemory(obj.position)
         --debug        
       end 
 
       --if surf.name == 'food' then obj.lastTimeSeenFood = cfg.simFrameNumber
       --elseif surf.name == 'cave' then obj.lastTimeSeenCave = cfg.simFrameNumber end
       obj.lastTimeSeen[surf.name] = cfg.simFrameNumber   
+      --vec.setFrom(obj.oldestPositionRemembered, surf.position)
 
     elseif (dist < surf.radius + cfg.antSightDistance)  then
       if obj.tasks[obj.lookingForTask] == surf.name then
@@ -171,20 +190,64 @@ function TAnt.create()
      obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
   end
   
+  function obj.resetPositionMemory( posi )
+      for i = 1, #fPastPositions do
+        vec.setFrom( fPastPositions[i], posi )
+      end
+  end
+  
+  function obj.objectAvoidance()
+    local ahead = vec.makeScale( obj.direction, cfg.antSightDistance )
+    if TAnt.map.anyCollisionWith( vec.makeSum( obj.position, ahead ) ) then
+      -- if something blocking ahead, where to turn? left or right?
+      --print('something in my way')
+      local vLeft = vec.makeFrom( obj.direction )
+      local vRight = vec.makeFrom( obj.direction )
+      vec.rotate( vLeft, -3.14/6 )
+      vec.rotate( vRight, 3.14/6 )
+      local goLeft = vec.makeScale( vLeft, cfg.antSightDistance )
+      local goRight = vec.makeScale( vRight, cfg.antSightDistance )    
+      vec.add( goLeft, obj.position )
+      vec.add( goRight, obj.position )
+      local freeLeft = not TAnt.map.anyCollisionWith( goLeft )
+      local freeRight = not TAnt.map.anyCollisionWith( goRight )      
+      
+      if freeLeft and not freeRight then
+        --goleft
+        vec.setFrom( obj.direction, vLeft )        
+      elseif freeRight and not freeLeft then
+        --goright
+        vec.setFrom( obj.direction, vRight )        
+      end --else keep going
+    end
+  end
+  
+  
   function obj.update()     
-    obj.storePosition( obj.position )
-    
+    obj.storePosition( obj.position )    
     obj.speed = obj.speed + obj.acceleration
     obj.speed = obj.speed * obj.friction
-    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end    
-       
-    vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
-    -- direction variation for next update
-    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )
-      
+    if obj.speed > obj.maxSpeed then obj.speed = obj.maxSpeed end               
+    
+    -- direction variation for next update    
+    vec.rotate( obj.direction, obj.erratic * math.random() -(obj.erratic*0.5) )    
+    
+    -- MOVE, not move, just TRY by testing collisions first
+     --vec.add( obj.position, vec.makeScale( obj.direction, obj.speed ) )   
+     
+     -- This ant wants to move obj.position + obj.direction * obj.speed; future collision tests will tell if possible and determine.
+     -- Simulation determine collision and actual modtion.
+    
+    --I'm lost?
+--    if (cfg.simFrameNumber - obj.lastTimeUpdatedPath) > cfg.antComTimeToAcceptImLost then
+--      --reconsider my demands
+--      obj.maxTimeSeen = - obj.maxTimeSeen - cfg.antComOlderInfoIfLost
+--      if obj.maxTimeSeen < -1 then obj.maxTimeSeen = -1 end      
+--    end      
     --reset friction: 
     --TODO: i don't like this
-    obj.friction = 1    
+    obj.friction = 1   
+    
   end
   
 
@@ -225,13 +288,23 @@ function TAnt.create()
      
   -- TODO: maybe inline this later? 
   function obj.headTo( posi )         
-    local v = obj.getDirectionTo( posi )
-    vec.setFrom(obj.direction, v)    
+    --local v = obj.getDirectionTo( posi )
+    --vec.setFrom(obj.direction, v)    
+    local v = {1,0}
+--    obj.setDirectionTo( v, posi)
+--    vec.scale(v, 5)
+--    vec.add(v, obj.direction)
+--    vec.normalize(v)
+--    vec.setFrom(obj.direction, v)
+    obj.setDirectionTo( obj.direction, posi )
+    obj.lastTimeUpdatedPath = cfg.simFrameNumber
   end 
   
   --- ask ant if need comunication for this frame
+  -- TODO: name has to change, is not always communication.. not in algorithm 4
   function obj.isComNeeded()
-    return (cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0    
+    return 
+      ((cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0     )   
   end
   
   --- This is the heart of the path finding magic (1)
