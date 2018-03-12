@@ -39,7 +39,7 @@ function sim.init()
     newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
     newSur.init()    
     map.addSurface( newSur )
-  end
+  end 
   
   local newAnt
   for i=1,cfg.numAnts do
@@ -55,7 +55,7 @@ function sim.init()
   cam.translation.x = 500
   cam.translation.y = 300
 
-  
+  --[[
   local numAnts, numSurs = 0,0;
   for _,node in pairs(map.actors.array) do
     if node.obj.classType == TAnt then numAnts = numAnts + 1 end
@@ -64,7 +64,7 @@ function sim.init()
     
   print('numAnts: ',numAnts,' numSurs', numSurs)
   print('Mem used: '..math.floor( collectgarbage ('count'))..'kb')
-  
+ ]]  
 
 end
 
@@ -253,47 +253,48 @@ end
 -- **4) Old algorithm 2 plus Pheromones inspiration**, store bestSeen info on the cells.
 -- this time they communicate indirectly using the Grid cells, equivalent to pheromones nature
 function sim.algorithm4_pheromones()  
-    for _,node in pairs(map.ants.array) do
+    for _,node in pairs(map.ants.array) do      
       --ant bounces with limits
       local ant = node.obj 
-     -- sim.collisionAntWithLimits(ant)  
-    --ants with surfaces      
-      map.resolve_BlockingCollision_andMove( ant ) 
-      sim.collisionAntWithSurfaces(ant) 
-      
-      
-      if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
-        --get info on ant cell position, of time and position stored from other ants.
-       -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
-        local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
-        local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
-        local pheromInfoSeen
-        for i = 1,1 do --do it for the 9 cells block
-          pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
-                                   [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
-          local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
-          
-          if myInterest.time > ant.maxTimeSeen then                
-            ant.maxTimeSeen = myInterest.time
-            ant.headTo( myInterest.where )                                   
-           
-          end              
-        end
-        -- share what i Know in the map...
-        pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
-        for name,time in pairs(ant.lastTimeSeen) do                
-          local interest = pheromInfoSeen[ name ]                
-          if time > interest.time then
-              interest.time = time                    
-              interest.where[1] = ant.oldestPositionRemembered[1]
-              interest.where[2] = ant.oldestPositionRemembered[2]               
+      if not ant.paused then
+       -- sim.collisionAntWithLimits(ant)  
+      --ants with surfaces      
+        map.resolve_BlockingCollision_andMove( ant ) 
+        sim.collisionAntWithSurfaces(ant) 
+        
+        
+        if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
+          --get info on ant cell position, of time and position stored from other ants.
+         -- local antPosiX, antPosiY = ant.gridInfo.posi[1], ant.gridInfo.posi[2] 
+          local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
+          local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
+          local pheromInfoSeen
+          for i = 1,1 do --do it for the 9 cells block
+            pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
+                                     [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
+            local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
+            
+            if myInterest.time > ant.maxTimeSeen then                
+              ant.maxTimeSeen = myInterest.time
+              ant.headTo( myInterest.where )                                   
+             
+            end              
           end
-        end --for             
-      end   
-      
-      --ant knows where to go, but lets avoid some future collisons
-      if cfg.antObjectAvoidance then ant.objectAvoidance()    end
-      
+          -- share what i Know in the map...
+          pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
+          for name,time in pairs(ant.lastTimeSeen) do                
+            local interest = pheromInfoSeen[ name ]                
+            if time > interest.time then
+                interest.time = time                    
+                interest.where[1] = ant.oldestPositionRemembered[1]
+                interest.where[2] = ant.oldestPositionRemembered[2]               
+            end
+          end --for             
+        end   
+        
+        --ant knows where to go, but lets avoid some future collisons
+        if cfg.antObjectAvoidance then ant.objectAvoidance()    end
+      end --paused?
     end --for ant node  
 end
 
