@@ -102,15 +102,19 @@ end
 function sim.AnyCollisionWithLimits(position, direction)     
    -- sim.collisionAntWithCells(ant)      
     if position[1] < map.minX then
-      if direction[1] < 0 then direction[1] = direction[1] *-1; return true end      
+      if direction[1] < 0 then direction[1] = direction[1] *-1 end
+      return true
     elseif position[1] > map.maxX then
-      if direction[1] > 0 then direction[1] = direction[1] *-1; return true end      
+      if direction[1] > 0 then direction[1] = direction[1] *-1 end
+      return true
     end
     
     if position[2] < map.minY then  
-      if direction[2] < 0 then direction[2] = direction[2] *-1; return true end      
+      if direction[2] < 0 then direction[2] = direction[2] *-1 end
+      return true
     elseif position[2] > map.maxY then
-      if direction[2] > 0 then direction[2] = direction[2] *-1; return true end      
+      if direction[2] > 0 then direction[2] = direction[2] *-1 end
+      return true
     end 
 end
 
@@ -141,7 +145,7 @@ function sim.FixTraped( ant )
     vec.setFrom( ant.position, p)    
   else 
     -- extreme case
-    print ('Ant stuck bigly');
+    --print ('Ant stuck bigly');
   end
 end
 
@@ -164,8 +168,7 @@ function sim.resolve_BlockingCollision_andMove( ant )
       dir[1] = -ant.direction[1]
       dir[2] = -ant.direction[2]
     elseif collision and numTries == 6 then
-      --no way to go
-      print( 'its a trap') 
+      --no way to go     
       --do a severe push back to find a non-colliding place
       --this usually ocours if the user place a blocking object/gridCell over any ant
       sim.FixTraped( ant )
@@ -389,7 +392,8 @@ function sim.algorithm4_pheromones()
           
           if myInterest.time > ant.maxTimeSeen then                
             ant.maxTimeSeen = myInterest.time
-            ant.headTo( myInterest.where )                                    
+            ant.headTo( myInterest.where )                                   
+           
           end              
         end
         -- share what i Know in the map...
@@ -399,7 +403,7 @@ function sim.algorithm4_pheromones()
           if time > interest.time then
               interest.time = time                    
               interest.where[1] = ant.oldestPositionRemembered[1]
-              interest.where[2] = ant.oldestPositionRemembered[2]                                        
+              interest.where[2] = ant.oldestPositionRemembered[2]               
           end
         end --for             
       end             

@@ -122,7 +122,7 @@ function TAnt.create()
         if vec.length(dv)>0 then
           vec.normalize(dv)        
           -- push out
-          pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
+          local pushed = vec.makeScale(dv, -(surf.radius + obj.radius+0.01) )
           vec.setFrom( obj.position, surf.position )
           vec.add( obj.position, pushed )
           -- rotate direction to circle tanget
@@ -142,7 +142,7 @@ function TAnt.create()
 
       --i'm looking for you?
 
-      myNeed = obj.tasks[obj.lookingForTask]
+      local myNeed = obj.tasks[obj.lookingForTask]
       if myNeed == surf.name then      
         if surf.name == 'food' then        
           obj.cargo.count = 1
@@ -156,9 +156,11 @@ function TAnt.create()
         if obj.lookingForTask > #obj.tasks then obj.lookingForTask = 1 end         
 
         obj.comingFromAtTime = cfg.simFrameNumber
-        dv = vec.makeScale( obj.direction, -1) --go oposite 
+        local dv = vec.makeScale( obj.direction, -1) --go oposite 
         obj.direction = dv      
         obj.speed = 0
+        
+        --obj.resetPositionMemory(obj.position)
         --debug        
       end 
 
@@ -184,6 +186,13 @@ function TAnt.create()
      if fOldestPositionIndex > cfg.antPositionMemorySize then fOldestPositionIndex = 1 end     
      obj.oldestPositionRemembered = fPastPositions[ fOldestPositionIndex ]
   end
+  
+  function obj.resetPositionMemory( posi )
+      for i = 1, #fPastPositions do
+        vec.setFrom( fPastPositions[i], posi )
+      end
+  end
+  
   
   function obj.update()     
     obj.storePosition( obj.position )    

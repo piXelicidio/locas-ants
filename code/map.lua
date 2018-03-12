@@ -49,7 +49,7 @@ function map.init()
       for k = 1, #cfg.antInterests do
         map.grid[i][j].pheromInfo.seen[ cfg.antInterests[k] ] = {
             time = -1,
-            where = {0,0}  --the non-normalized vector direction of last position remembered.
+            where = {0,0},  --the non-normalized vector direction of last position remembered.            
           }
       end
       
