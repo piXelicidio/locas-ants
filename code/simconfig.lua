@@ -3,20 +3,17 @@
 
 local simconfig = {
   
-  numAnts = 1550,
+  numAnts = 3550,
   antMaxSpeed = 1.2,
-  antComAlgorithm = 1,           -- 0 = Comm disabled; 1 = Pheromones inspiration
-  antComRadius = 40,             -- Ants communications radious, ignored on algorithm >1  ... gridSize*3/2 is the equivalent
+  antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
-  antComNeedFrameStep = {3,13},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.
-  antComMaxBetterPaths = 3,     -- During communicaitons, in a single frame  each ant gets many better advices of new direction, how many are enough?  (ignored by Algorithm #4)  
-  antComTimeToAcceptImLost = 500, -- if in N frames I don't find a fresh direction suggestion then I'll conform with older less quality info
-  antComOlderInfoIfLost = 300,   -- How older info I'll accept if I'm lost!? 
+  antComNeedFrameStep = {3,13},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.  
   antSightDistance  = 30,        -- Only bellow this distance the ant can identify and locate|avoid things, bettr if > than antComRadius
   antPositionMemorySize = 15,    -- How many past position they can remember 
   antErratic = 0.2,  
   antInterests = {'food','cave'},
   antObjectAvoidance = true,
+  antObjectAvoidance_FOV = 3.14/6, -- Field of view, for avoiding collision, number is half of angle in radians
   
   debugGrid = false,
   debugPheromones = false,

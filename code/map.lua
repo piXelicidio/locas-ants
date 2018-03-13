@@ -10,7 +10,7 @@ local apiG = love.graphics
 
 local map = {}
 
-TAnt.map = map   -- back reference, ants want to know about map too.
+TAnt.setMap( map )   -- back reference, ants want to know about map too.
 
 -- Map limits
 map.minX = cfg.mapMinX
@@ -112,11 +112,18 @@ function map.fixTraped( ant )
   end
 end
 
+function map.gridCanPass( position )
+  local posiXg = math.floor( position[1] / cfg.mapGridSize )
+  local posiYg = math.floor( position[2] / cfg.mapGridSize )
+  return map.grid[posiXg][posiYg].pass
+end
+
 function map.anyCollisionWithCell(position, direction)
     local antX, antY = position[1], position[2]
     local posiXg = math.floor( antX / cfg.mapGridSize )
     local posiYg = math.floor( antY / cfg.mapGridSize )
     direction = direction or {1,0} 
+    
     if not map.grid[posiXg][posiYg].pass then      
       --block pass
       local centerX = (posiXg + 0.5) * cfg.mapGridSize 
@@ -124,15 +131,14 @@ function map.anyCollisionWithCell(position, direction)
       local relX = antX - centerX
       local relY = antY - centerY
       --know in what side of the square relX,relY is:
+      --suggest a new direction to go
       if ((relY<-relX) and (relY>relX)) or ((relY>-relX) and (relY<relX)) then
         -- left or right side
         if direction[2] >= 0 then
           direction[1], direction[2] = 0,1
         else
           direction[1], direction[2] = 0,-1
-        end 
-       
-        --push back        
+        end     
       else
         -- top or bottom        
         if direction[1] >= 0 then

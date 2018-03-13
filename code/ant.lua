@@ -4,6 +4,7 @@ local apiG = love.graphics
 local TActor = require('code.actor')
 local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig')
+local map = {}                          --circular reference to Map module. Set with TAnt.setMap on map.lua
 
 
 -- Sorry of the Delphi-like class styles :P
@@ -11,7 +12,10 @@ local TAnt = {}
 
      
 -- PUBLIC class fields
-TAnt.map = {}  --circular reference to Map module. Set on map.lua
+function TAnt.setMap ( ourMap )
+  map = ourMap
+end
+
 
 -- Sim has to set this refernce to the grid 
 TAnt.grid = nil
@@ -140,77 +144,6 @@ function TAnt.create()
     end      
   end
   
-  --return True if bounced with not passable object
-  function ant.collisionTestSurface( surf )
-    
-    local dist = vec.distance( surf.position, ant.position )    
-    
-    if dist < surf.radius + ant.radius then                 
-      --ant.onSurfaceCollision( surf )
-      if not surf.passable then
-        local dv = vec.makeSub(surf.position, ant.position)
-        local z = vec.crossProd( dv, ant.direction )      
-        if vec.length(dv)>0 then
-          vec.normalize(dv)        
-          -- push out
-          local pushed = vec.makeScale(dv, -(surf.radius + ant.radius+0.01) )
-          vec.setFrom( ant.position, surf.position )
-          vec.add( ant.position, pushed )
-          -- rotate direction to circle tanget
-          if z < 0 then
-            vec.rotate(dv, -(math.pi)/2)          
-          else
-            vec.rotate(dv, (math.pi)/2 )
-          end            
-          ant.direction = dv  
-          --priority direction change, must return
-          return true
-        end  
-        --ant.speed = 0.1
-      else
-        ant.friction = surf.friction
-      end
-
-      --i'm looking for you?
-
-      local myNeed = ant.tasks[ant.lookingForTask]
-      if myNeed == surf.name then      
-        --ant.pause(20)
-        if surf.name == 'food' then        
-          ant.cargo.count = 1
-          ant.cargo.material = surf.name                          
-        elseif surf.name == 'cave' then
-          ant.cargo.count = 0      
-        end      
-        ant.maxTimeSeen = 0
-        ant.comingFromTask = ant.lookingForTask
-        ant.lookingForTask = ant.lookingForTask + 1          
-        if ant.lookingForTask > #ant.tasks then ant.lookingForTask = 1 end         
-
-        ant.comingFromAtTime = cfg.simFrameNumber
-        local dv = vec.makeScale( ant.direction, -1) --go oposite 
-        --ant.direction = dv      
-        ant.speed = 0        
-        ant.resetPositionMemory(surf.position)
-        --debug        
-      end 
-
-      --if surf.name == 'food' then ant.lastTimeSeenFood = cfg.simFrameNumber
-      --elseif surf.name == 'cave' then ant.lastTimeSeenCave = cfg.simFrameNumber end
-      ant.lastTimeSeen[surf.name] = cfg.simFrameNumber   
-      --vec.setFrom(ant.oldestPositionRemembered, surf.position)
-
-    elseif (dist < surf.radius + cfg.antSightDistance)  then
-      if ant.tasks[ant.lookingForTask] == surf.name then
-        --fTargetInSight = true
-        --fTargetLocated = vec.makeFrom(surf.position)        
-        --ant.headTo(surf.position)
-        return true         
-      end    
-    end 
-  end --function
-  
-  
   function ant.storePosition( posi )
      vec.setFrom( fPastPositions[fOldestPositionIndex], posi )
      fOldestPositionIndex = fOldestPositionIndex + 1
@@ -224,21 +157,23 @@ function TAnt.create()
       end
   end
   
+  --- Avoid collisions with obstacles
+ 
   function ant.objectAvoidance()
     local ahead = vec.makeScale( ant.direction, cfg.antSightDistance )
-    if TAnt.map.anyCollisionWith( vec.makeSum( ant.position, ahead ) ) then
+    if  not map.gridCanPass(vec.makeSum( ant.position, ahead )) --[[TAnt.map.anyCollisionWith( vec.makeSum( ant.position, ahead ) )]] then
       -- if something blocking ahead, where to turn? left or right?
       --print('something in my way')
       local vLeft = vec.makeFrom( ant.direction )
       local vRight = vec.makeFrom( ant.direction )
-      vec.rotate( vLeft, -3.14/6 )
-      vec.rotate( vRight, 3.14/6 )
+      vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
+      vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
       local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
       local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
       vec.add( goLeft, ant.position )
       vec.add( goRight, ant.position )
-      local freeLeft = not TAnt.map.anyCollisionWith( goLeft )
-      local freeRight = not TAnt.map.anyCollisionWith( goRight )      
+      local freeLeft = not map.gridCanPass( goLeft )
+      local freeRight = not map.gridCanPass( goRight )      
       
       if freeLeft and not freeRight then
         --goleft
@@ -248,7 +183,9 @@ function TAnt.create()
         vec.setFrom( ant.direction, vRight )              
       end --else keep going
     end
-  end
+  end 
+  
+ 
   
   
   function ant.update()     
@@ -286,19 +223,12 @@ function TAnt.create()
   ant.draw = ant.drawNormal
   
   function ant.drawDebug()
-    ant.drawNormal()
-    
-    
-        apiG.setColor(10,100,250)
+    ant.drawNormal()    
+    apiG.setColor(10,100,250)
     apiG.circle("line",ant.oldestPositionRemembered[1], ant.oldestPositionRemembered[2],1);
     --sight and comunication radius
     apiG.setColor(130,130,130)
-    apiG.circle( "line", ant.position[1], ant.position[2], cfg.antSightDistance );
-    apiG.line( ant.position[1] , ant.position[2] - cfg.antComRadius, 
-               ant.position[1] + cfg.antComRadius, ant.position[2], 
-               ant.position[1] , ant.position[2] + cfg.antComRadius, 
-               ant.position[1] - cfg.antComRadius , ant.position[2],
-               ant.position[1] , ant.position[2] - cfg.antComRadius)
+    apiG.circle( "line", ant.position[1], ant.position[2], cfg.antSightDistance );    
   end
   
   function ant.setDrawMode( mode )
@@ -307,17 +237,15 @@ function TAnt.create()
     end
   end
      
-  -- TODO: maybe inline this later? 
-  function ant.headTo( posi )         
-    --local v = ant.getDirectionTo( posi )
-    --vec.setFrom(ant.direction, v)    
-    local v = {1,0}
---    ant.setDirectionTo( v, posi)
---    vec.scale(v, 5)
---    vec.add(v, ant.direction)
---    vec.normalize(v)
---    vec.setFrom(ant.direction, v)
-    ant.setDirectionTo( ant.direction, posi )
+  
+  function ant.headTo( posi )             
+    vec.setFrom( ant.direction, posi)
+    vec.sub( ant.direction, ant.position )
+    local tempLen = vec.length( ant.direction )
+    if tempLen == 0 then ant.direction[1], ant.direction[2] = 1,0 else
+     ant.direction[1] = ant.direction[1] / tempLen
+     ant.direction[2] = ant.direction[2] / tempLen
+    end
     ant.lastTimeUpdatedPath = cfg.simFrameNumber
   end 
   
@@ -328,73 +256,6 @@ function TAnt.create()
       ((cfg.simFrameNumber + fComEveryOffset) % fComEvery == 0     )   
   end
   
-  --- This is the heart of the path finding magic (1)
-  -- returns true IF better direction path is offered by the other ant 
-  function ant.communicateWith( otherAnt )      
-      -- Our essential ant-thinking rules: Have you seen recently what I'm interested in?      
-      local myNeed = ant.tasks[ant.lookingForTask]
-      if otherAnt.lastTimeSeen[myNeed] > ant.maxTimeSeen then
-        ant.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
-        -- In that case I will go on the direction of last position you remember you are coming        
-        ant.headTo( otherAnt.oldestPositionRemembered ) 
-        --ant.speed = 0.1
-        return true
-      end          
-  end
-  
-  --- This is the heart of the path finding magic (2) (TQuickList.array version;)  
-  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
-  function ant.communicateWithAnts( otherAntsList )            
-      local myNeed
-      local betterPathCount = 0
-      local node
-      --using pairs becasue some items may be nil  
-      for _,node in pairs(otherAntsList) do
-        --the array stores nodes, nodes store obj
-        local otherAnt = node.obj
-        if (vec.manhattanDistance( otherAnt.position, ant.position ) < cfg.antComRadius) 
-            and (otherAnt~=obj) then --TODO: this should be eliminated when GRID implemented.
-        -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
-          myNeed = ant.tasks[ant.lookingForTask]
-          if otherAnt.lastTimeSeen[myNeed] > ant.maxTimeSeen then
-            ant.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
-            -- In that case I will go on the direction of last position you remember you are coming        
-            ant.headTo( otherAnt.oldestPositionRemembered )           
-            betterPathCount = betterPathCount + 1
-            if  betterPathCount >= cfg.antComMaxBetterPaths then return end
-          end          
-        end
-      end
-        
-  end
-  
-  --- This is the heart of the path finding magic (3) (array of TQuickList version;)  
-  --  Don't test if obj~-otherAnt and dont' test manhattanDistance.
-  function ant.communicateWithAnts_grid( otherAntsLists )            
-      local myNeed
-      local betterPathCount = 0
-      local node
-      local otherAnt
-      --using pairs becasue some items may be nil 
-      for i=1,#otherAntsLists do
-        for _,node in pairs(otherAntsLists[i].array) do
-          --the array stores nodes, nodes store obj
-          otherAnt = node.obj
-          --(manhattan distance check removed, Lists should include only near ants)
-          --otherAnt = obj, check if myself also removed, nothing bad happens if communication with itself occurs
-          -- Our essential ant-thinking rules: Have you seen recently what I'm interested in? 
-            myNeed = ant.tasks[ant.lookingForTask]
-            if otherAnt.lastTimeSeen[myNeed] > ant.maxTimeSeen then
-              ant.maxTimeSeen = otherAnt.lastTimeSeen[myNeed]        
-              -- In that case I will go on the direction of last position you remember you are coming        
-              ant.headTo( otherAnt.oldestPositionRemembered )           
-              betterPathCount = betterPathCount + 1
-              if  betterPathCount >= cfg.antComMaxBetterPaths then return end
-            end          
-          
-        end
-      end  
-  end
   
   return ant
 end

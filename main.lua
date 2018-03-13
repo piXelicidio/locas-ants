@@ -45,12 +45,7 @@ if not g_isTesting then
   
   function api.keypressed(key)
     if key=='1' then
-        if cfg.antComMaxBetterPaths== 1 then
-          cfg.antComMaxBetterPaths = 3
-        else                 
-          cfg.antComMaxBetterPaths = 1
-        end
-        print('cfg.antComMaxBetterPath = ',cfg.antComMaxBetterPaths)
+        
     elseif key=='2' then    
         cfg.antComEveryFrame  = not cfg.antComEveryFrame 
         print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)

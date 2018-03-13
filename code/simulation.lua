@@ -35,40 +35,8 @@ function sim.init()
 
 end
 
-
-
-
-function sim.collisionAntWithLimits(ant)   
-  
-   -- sim.collisionAntWithCells(ant)  
-    
-    if ant.position[1] < map.minX then
-      ant.position[1] = map.minX
-      ant.speed=0.1
-      if ant.direction[1] < 0 then ant.direction[1] = ant.direction[1] *-1; return true end      
-    elseif ant.position[1] > map.maxX then
-      ant.position[1] = map.maxX
-       ant.speed=0.1
-      if ant.direction[1] > 0 then ant.direction[1] = ant.direction[1] *-1; return true end      
-    end
-    
-    if ant.position[2] < map.minY then
-      ant.position[2] = map.minY
-      ant.speed=0.1
-      if ant.direction[2] < 0 then ant.direction[2] = ant.direction[2] *-1; return true end      
-    elseif ant.position[2] > map.maxY then
-      ant.position[2] = map.maxY  
-      ant.speed=0.1
-      if ant.direction[2] > 0 then ant.direction[2] = ant.direction[2] *-1; return true end      
-    end 
-end 
-
 function sim.algorithm_doNothing()
-    for _,node in pairs(map.ants.array) do
-      --ant bounces with limits
-      local ant = node.obj 
-      --sim.collisionAntWithLimits(ant) 
-    end --for ant node  
+    
 end
 
 function sim.interactionWithCells(ant)
@@ -162,7 +130,8 @@ function sim.update()
 
   for _,node in pairs(map.ants.array) do
     node.obj.update()    
-    if (cfg.antComAlgorithm == 2) or (cfg.antComAlgorithm==3) then map.updateOnGrid(map.grid, node.obj) end
+    --update on grid > don't delete yet, maybe needed again chico.
+    --map.updateOnGrid(map.grid, node.obj) 
   end
 
   cfg.simFrameNumber = cfg.simFrameNumber + 1
