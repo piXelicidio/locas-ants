@@ -22,28 +22,10 @@ function sim.init()
   
   map.init()   
   
-  map.setCell_food(-10, -4)
-  map.setCell_cave(10, 5)
+  map.setCell_cave(-10, -4)
+  map.setCell_food(20, 5)
   
-   --
-  local newSur  
-  for i=1,1 do
-    newSur = TSurface.createCave(-250+200*(math.random()-0.5), 300*(math.random()-0.5), 20)
-    newSur.init()    
-    map.addSurface( newSur )
-  end
-  
-  for i=1,1 do
-    newSur = TSurface.createFood(400+200*(math.random()-0.5), 300*(math.random()-0.5), 30)
-    newSur.init()    
-    map.addSurface( newSur )
-  end
-  for i=1,4 do
-    newSur = TSurface.createObstacle(-80+40*i, 500*(math.random()-0.5), 30+math.random()*20)    
-    newSur.init()    
-    map.addSurface( newSur )
-  end 
-  
+   
   local newAnt
   for i=1,cfg.numAnts do
     newAnt = TAnt.create() 
@@ -226,8 +208,8 @@ function sim.interactionWithCells(ant)
         --ant.pause(20)
         if cell.type == 'food' then        
           ant.cargo.count = 1
-          ant.cargo.material = cell.name                          
-        elseif cell.name == 'cave' then
+          ant.cargo.material = cell.type                         
+        elseif cell.type == 'cave' then
           ant.cargo.count = 0      
         end      
         ant.maxTimeSeen = 0
@@ -237,10 +219,10 @@ function sim.interactionWithCells(ant)
 
         ant.comingFromAtTime = cfg.simFrameNumber
         local dv = vec.makeScale( ant.direction, -1) --go oposite 
-        --ant.direction = dv      
-        ant.speed = 0        
-        ant.resetPositionMemory( vec.makeSum(cell.posi, {cfg.mapGridSize/2, cfg.mapGridSize/2} ) )
-        --debug        
+        ant.direction = dv      
+        ant.speed = 0          
+        ant.disablePheromonesWrite( cfg.antPositionMemorySize )
+        
       end 
       --record everything interesting I see
       ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   
@@ -278,16 +260,21 @@ function sim.algorithm4_pheromones()
              
             end              
           end
-          -- share what i Know in the map...
-          pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
-          for name,time in pairs(ant.lastTimeSeen) do                
-            local interest = pheromInfoSeen[ name ]                
-            if time > interest.time then
-                interest.time = time                    
-                interest.where[1] = ant.oldestPositionRemembered[1]
-                interest.where[2] = ant.oldestPositionRemembered[2]               
-            end
-          end --for             
+          -- share what i Know in the map... if
+          if ant.pheromonesWrite then 
+            
+            pheromInfoSeen = map.grid[ antPosiX ] [ antPosiY ].pheromInfo.seen
+            for name,time in pairs(ant.lastTimeSeen) do                
+              local interest = pheromInfoSeen[ name ]                
+              if time > interest.time then
+                  interest.time = time                    
+                  interest.where[1] = ant.oldestPositionRemembered[1]
+                  interest.where[2] = ant.oldestPositionRemembered[2]               
+              end
+            end --for             
+            
+          elseif cfg.simFrameNumber >= ant.pheromonesBackTime  then ant.enablePheromonesWrite() end
+          
         end   
         
         --ant knows where to go, but lets avoid some future collisons

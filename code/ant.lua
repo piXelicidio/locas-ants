@@ -61,6 +61,8 @@ function TAnt.create()
   ant.betterPathCount = 0
   ant.color = cfg.colorAnts
   ant.lastCollisionTime = -1
+  ant.pheromonesBackTime = -1
+  ant.pheromonesWrite = true
   
   
   
@@ -93,6 +95,16 @@ function TAnt.create()
   
   function ant.updatePaused()    
     if cfg.simFrameNumber >= ant.pauseUntil then ant.unPause() end    
+  end
+  
+  --- 
+  function ant.disablePheromonesWrite( time )
+    ant.pheromonesWrite = false
+    ant.pheromonesBackTime = cfg.simFrameNumber + time
+  end
+  
+  function ant.enablePheromonesWrite()
+    ant.pheromonesWrite = true
   end
   
   --- Pause ant movement and thinking
