@@ -34,7 +34,8 @@ if not g_isTesting then
     if cfg.simFrameNumber == 1 then print( (os.clock() - TIME_start)..'secs' ) end
         
     apiG.push()
-    apiG.translate( cam.translation.x, cam.translation.y )
+    apiG.translate( cam.translation.x, cam.translation.y )        
+    apiG.scale( cam.scale.x, cam.scale.y )    
     sim.draw()
     --ui stuff
     apiG.pop()
@@ -69,9 +70,13 @@ if not g_isTesting then
     end
   end
   
-  function api.mousemoved(x, y,  istouch)
+  function api.mousemoved(x, y, dx, dy, istouch)
     if api.mouse.isDown(1) then 
       sim.onClick( cam.screenToWorld(x, y) )
+    elseif api.mouse.isDown(3) then
+      print(dx,dy)
+      cam.translation.x = cam.translation.x + dx
+      cam.translation.y = cam.translation.y + dy
     end
   end
   
@@ -79,6 +84,18 @@ if not g_isTesting then
     if button == 1 then 
       sim.onClick( cam.screenToWorld(x, y) )
     end
+  end
+  
+  function api.wheelmoved( x, y)    
+    cam.scale.x = cam.scale.x + y/5
+    cam.scale.y = cam.scale.y + y/5
+    if cam.scale.x <1 then
+      cam.scale.x = 1
+      cam.scale.y = 1
+    elseif cam.scale.x > 5 then
+      cam.scale.x = 5
+      cam.scale.y = 5
+    end    
   end
 
 

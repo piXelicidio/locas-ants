@@ -32,7 +32,8 @@ function sim.init()
   end
   cam.translation.x = 500
   cam.translation.y = 300
-
+  cam.scale.x = 1
+  cam.scale.y = 1
 end
 
 function sim.algorithm_doNothing()
@@ -145,8 +146,7 @@ function sim.draw()
 end
 
 function sim.onClick(x, y)
-  local xg, yg = map.worldToGrid( x, y)
-  print (xg, yg)
+  local xg, yg = map.worldToGrid( x, y)  
   if map.isInsideGrid(xg, yg) then map.grid[xg][yg].pass = false end
 end
 
