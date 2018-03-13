@@ -45,12 +45,7 @@ if not g_isTesting then
   
   function api.keypressed(key)
     if key=='1' then
-        if cfg.antComMaxBetterPaths== 1 then
-          cfg.antComMaxBetterPaths = 3
-        else                 
-          cfg.antComMaxBetterPaths = 1
-        end
-        print('cfg.antComMaxBetterPath = ',cfg.antComMaxBetterPaths)
+        
     elseif key=='2' then    
         cfg.antComEveryFrame  = not cfg.antComEveryFrame 
         print('cfg.antComEveryFrame = ',cfg.antComEveryFrame)
@@ -59,7 +54,7 @@ if not g_isTesting then
         print('cfg.debugGrid =',cfg.debugGrid)
     elseif key=='4' then
         cfg.antComAlgorithm = cfg.antComAlgorithm + 1
-        if cfg.antComAlgorithm > 4 then cfg.antComAlgorithm = 0 end     
+        if cfg.antComAlgorithm > 1 then cfg.antComAlgorithm = 0 end     
         print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
     elseif key=='5' then
         cfg.debugPheromones = not cfg.debugPheromones
