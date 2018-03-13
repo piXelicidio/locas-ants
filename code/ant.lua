@@ -53,12 +53,14 @@ function TAnt.create()
   ant.comingFromTask = 0
   --ant.lookingFor = 'food'
   ant.comingFrom = ''
-  ant.lastTimeSeenFood = -1
-  ant.lastTimeSeenCave = -1
+  --ant.lastTimeSeenFood = -1
+  --ant.lastTimeSeenCave = -1
   ant.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
   ant.maxTimeSeen = -1
-  ant.comingFromAtTime = 0
+  --ant.comingFromAtTime = 0
   ant.lastTimeUpdatedPath = -1
+  ant.lookingFor = 'food'
+  ant.nextTask   = 'cave'
   ant.cargo = { material = '', count = 0 } 
   ant.oldestPositionRemembered = {0,0}  --vector 2D arr  
   ant.betterPathCount = 0

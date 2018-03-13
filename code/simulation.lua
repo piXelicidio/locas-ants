@@ -45,9 +45,11 @@ function sim.interactionWithCells(ant)
   local cell =  map.grid[gx][gy].cell
   if cell then      
       --i'm looking for you?
-      local myNeed = ant.tasks[ant.lookingForTask]
+      local myNeed = ant.lookingFor
       if myNeed == cell.type then      
         --ant.pause(20)
+        
+        --TODO: think about this...
         if cell.type == 'food' then        
           ant.cargo.count = 1
           ant.cargo.material = cell.type                         
@@ -55,10 +57,9 @@ function sim.interactionWithCells(ant)
           ant.cargo.count = 0      
         end      
         ant.maxTimeSeen = 0
-        ant.comingFromTask = ant.lookingForTask
-        ant.lookingForTask = ant.lookingForTask + 1          
-        if ant.lookingForTask > #ant.tasks then ant.lookingForTask = 1 end         
-
+        
+        --swap
+        ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor
         ant.comingFromAtTime = cfg.simFrameNumber
         local dv = vec.makeScale( ant.direction, -1) --go oposite 
         ant.direction = dv      
@@ -90,17 +91,16 @@ function sim.algorithm_pheromones()
           local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
-          for i = 1,1 do --do it for the 9 cells block
-            pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1] ]
-                                     [ antPosiY + cfg.mapGridComScan[i][2] ].pheromInfo.seen
-            local myInterest = pheromInfoSeen[ ant.tasks[ant.lookingForTask] ]
+          
+            pheromInfoSeen = map.grid[ antPosiX ]
+                                     [ antPosiY ].pheromInfo.seen
+            local myInterest = pheromInfoSeen[ ant.lookingFor ]
             
             if myInterest.time > ant.maxTimeSeen then                
               ant.maxTimeSeen = myInterest.time
-              ant.headTo( myInterest.where )                                   
-             
+              ant.headTo( myInterest.where )
             end              
-          end
+          
           -- share what i Know in the map... if
           if ant.pheromonesWrite then 
             
