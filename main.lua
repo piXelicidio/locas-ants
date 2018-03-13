@@ -59,7 +59,7 @@ if not g_isTesting then
         print('cfg.debugGrid =',cfg.debugGrid)
     elseif key=='4' then
         cfg.antComAlgorithm = cfg.antComAlgorithm + 1
-        if cfg.antComAlgorithm > 4 then cfg.antComAlgorithm = 0 end     
+        if cfg.antComAlgorithm > 1 then cfg.antComAlgorithm = 0 end     
         print('cfg.antComAlgorithm = ', cfg.antComAlgorithm )
     elseif key=='5' then
         cfg.debugPheromones = not cfg.debugPheromones

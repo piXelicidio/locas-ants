@@ -3,7 +3,6 @@ local cfg = require('code.simconfig')
 local cam = require('code.camview')
 local TAnt = require('code.ant')
 local map = require('code.map')
-local TSurface = require('code.surface')
 local TQuickList = require('code.qlist')
 local vec = require('libs.vec2d_arr')
 
@@ -13,13 +12,7 @@ sim.interactionAlgorithm = {}
 
 function sim.init()  
   math.randomseed(os.time())
-  
-  sim.interactionAlgorithm[0] = sim.algorithm0_doNothing
-  sim.interactionAlgorithm[1] = sim.algorithm1_ZeroOptimization
-  sim.interactionAlgorithm[2] = sim.algorithm2_oldChat
-  sim.interactionAlgorithm[3] = sim.algorithm3_groupCells
-  sim.interactionAlgorithm[4] = sim.algorithm4_pheromones
-  
+   
   map.init()   
   
   map.setCell_cave(-10, -4)
@@ -39,17 +32,6 @@ function sim.init()
   end
   cam.translation.x = 500
   cam.translation.y = 300
-
-  --[[
-  local numAnts, numSurs = 0,0;
-  for _,node in pairs(map.actors.array) do
-    if node.obj.classType == TAnt then numAnts = numAnts + 1 end
-    if node.obj.classType == TSurface then numSurs = numSurs + 1 end
-  end  
-    
-  print('numAnts: ',numAnts,' numSurs', numSurs)
-  print('Mem used: '..math.floor( collectgarbage ('count'))..'kb')
- ]]  
 
 end
 
@@ -79,122 +61,14 @@ function sim.collisionAntWithLimits(ant)
       ant.speed=0.1
       if ant.direction[2] > 0 then ant.direction[2] = ant.direction[2] *-1; return true end      
     end 
-end
+end 
 
-function sim.collisionAntWithSurfaces(ant)  
-  for _,surfNode in pairs(map.surfs.array) do
-      local surf = surfNode.obj
-      if ant.collisionTestSurface(surf) then 
-        --if test return true, there is an important direction change, nothing else matters, 
-        --continue loop with next ant, ignore path advice of our sisters
-        return true
-      end
-  end      
-end
-
-
-
-function sim.algorithm0_doNothing()
+function sim.algorithm_doNothing()
     for _,node in pairs(map.ants.array) do
       --ant bounces with limits
       local ant = node.obj 
-      sim.collisionAntWithLimits(ant) 
+      --sim.collisionAntWithLimits(ant) 
     end --for ant node  
-end
-
--- **1) No optimizaiton, just test N*N all with all ants** no brain.
---if you are porting the code to other language or api start implementing this for simplicity and safety 
-function sim.algorithm1_ZeroOptimization()
-    for _,node in pairs(map.ants.array) do
-      --ant bounces with limits
-      local ant = node.obj 
-      if not sim.collisionAntWithLimits(ant)  then
-          --ants with surfaces      
-        if not sim.collisionAntWithSurfaces(ant) then        
-                    
-            if (cfg.antComEveryFrame or ant.isComNeeded())  then
-              ant.communicateWithAnts(map.ants.array)       
-            end            
-        end
-      end
-    end --for ant node  
-end
-
--- **2) Old 2003 way, chat with neighbors** 
-function sim.algorithm2_oldChat()
-    for _,node in pairs(map.ants.array) do
-      --ant bounces with limits
-      local ant = node.obj 
-      if not sim.collisionAntWithLimits(ant)  then
-          --ants with surfaces      
-        if not sim.collisionAntWithSurfaces(ant) then
-            if (cfg.antComEveryFrame or ant.isComNeeded())  then
-              local antLists = map.antsNearMe( ant )
-              ant.communicateWithAnts_grid( antLists ) 
-            end
-        end
-      end
-    end --for ant node
-end
-
--- 3) **New algorithm 2018 group info matters to all**, share it
-function sim.algorithm3_groupCells()
-  local centerCell --TQuickList
-  local neiborCell --TQuickList
-  
-    
-  -- visinting all cells
-  for i = map.minXg+1, map.maxXg-1 do
-    for j = map.minYg+1, map.maxYg-1 do
-      -- get center cell
-      centerCell = map.grid[i][j].qlist
-      -- looking for best of these values, for tasks 
-      local bestSeen = {}
-      local bestDir = {} 
-      local bestCount = 0
-      
-      for tasks = 1, #cfg.antInterests do
-        bestSeen[ cfg.antInterests[ tasks ] ] = -1
-        bestDir[ cfg.antInterests[ tasks ] ] = {1,0}
-      end
-      -- visit all neibors and center
-      --if math.random()<0.1 then
-        for n=1,#cfg.mapGridComScan do
-          neiborCell = map.grid[ i + cfg.mapGridComScan[n][1] ][ j + cfg.mapGridComScan[n][2] ].qlist
-          --for each ant found
-          for _,node in pairs(neiborCell.array) do
-            local neiborAnt = node.obj
-            for t = 1, #cfg.antInterests do
-              local task = cfg.antInterests[t]
-              local seen = neiborAnt.lastTimeSeen[task]            
-              if seen > bestSeen[ task ] then 
-                bestSeen[ task ] = seen
-                bestDir[ task ][1] = neiborAnt.oldestPositionRemembered[1]
-                bestDir[ task ][2] = neiborAnt.oldestPositionRemembered[2]
-                bestCount = bestCount + 1
-                --if bestCount > 3 then goto continue end
-              end
-            end --fortasks  
-          end --fora
-        end --forn
-      --end
-      
-      --apply collision and com info to center cell ants
-      for _,node in pairs(centerCell.array) do
-        local centerAnt = node.obj        
-        if not sim.collisionAntWithLimits(centerAnt) then          
-          if (not sim.collisionAntWithSurfaces(centerAnt)) and centerAnt.isComNeeded() then              
-            local need = centerAnt.tasks[ centerAnt.lookingForTask ]
-            if bestSeen[need] > centerAnt.maxTimeSeen then
-              centerAnt.maxTimeSeen = bestSeen[need]
-              centerAnt.headTo( bestDir[need] )
-            end                
-          end --ifnot
-        end --ifnot
-      end --for_,node
-      
-    end --forj
-  end --fori
 end
 
 function sim.interactionWithCells(ant)
@@ -229,19 +103,18 @@ function sim.interactionWithCells(ant)
   end
 end
 
--- **4) Old algorithm 2 plus Pheromones inspiration**, store bestSeen info on the cells.
+-- **Mix of old algorithm with Pheromones inspiration**, store bestSeen info on the cells.
 -- this time they communicate indirectly using the Grid cells, equivalent to pheromones nature
-function sim.algorithm4_pheromones()  
+function sim.algorithm_pheromones()  
     for _,node in pairs(map.ants.array) do      
       --ant bounces with limits
       local ant = node.obj 
       if not ant.paused then
-       -- sim.collisionAntWithLimits(ant)  
+       
       --ants with surfaces      
         map.resolve_BlockingCollision_andMove( ant ) 
         sim.interactionWithCells(ant)
-        sim.collisionAntWithSurfaces(ant) 
-        
+                
         
         if (cfg.antComEveryFrame or ant.isComNeeded())  then                            
           --get info on ant cell position, of time and position stored from other ants.
@@ -285,7 +158,7 @@ end
 
 function sim.update()
   
-  sim.interactionAlgorithm[cfg.antComAlgorithm]()
+  if cfg.antComAlgorithm == 1 then sim.algorithm_pheromones() else  sim.algorithm_doNothing() end
 
   for _,node in pairs(map.ants.array) do
     node.obj.update()    

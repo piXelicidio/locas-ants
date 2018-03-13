@@ -2,7 +2,6 @@
 
 local apiG = love.graphics
 local TActor = require('code.actor')
-local TSurface = require('code.surface')
 local vec = require('libs.vec2d_arr')
 local cfg = require('code.simconfig')
 

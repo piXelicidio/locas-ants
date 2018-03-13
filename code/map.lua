@@ -2,7 +2,6 @@
 
 -- modules and aliases
 local TQuickList = require('code.qlist')
-local TSurface = require('code.surface') 
 local TAnt = require('code.ant')
 local cfg = require('code.simconfig')
 local vec = require('libs.vec2d_arr')
@@ -249,12 +248,6 @@ function map.addAnt( ant )
   end
 end
 
-function map.addSurface( surf )
-  local node = map.surfs.addNew( surf )
-  -- remember you are referenced on the surfs list, knowYourNode.com for quick remove 'couse node know index
-  surf.nodeRefs.surfsList = node
-  map.addActor(surf)
-end
 
 
 function map.update()
