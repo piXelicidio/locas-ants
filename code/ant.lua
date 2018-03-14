@@ -47,17 +47,12 @@ function TAnt.create()
   ant.friction = 1
   ant.acceleration = 0.04  + math.random()*0.05
   ant.erratic = cfg.antErratic                  --crazyness
-  ant.maxSpeed = cfg.antMaxSpeed 
-  ant.tasks = {'food','cave'}  --TODO: no need for Array of task, they can only have to targets, use two variables and swap
+  ant.maxSpeed = cfg.antMaxSpeed   
   ant.lookingForTask = 1  
-  ant.comingFromTask = 0
-  --ant.lookingFor = 'food'
-  ant.comingFrom = ''
-  --ant.lastTimeSeenFood = -1
-  --ant.lastTimeSeenCave = -1
+  ant.comingFromTask = 0 
+  ant.comingFrom = ''  
   ant.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
-  ant.maxTimeSeen = -1
-  --ant.comingFromAtTime = 0
+  ant.maxTimeSeen = -1  
   ant.lastTimeUpdatedPath = -1
   ant.lookingFor = 'food'
   ant.nextTask   = 'cave'
@@ -163,27 +158,33 @@ function TAnt.create()
  
   function ant.objectAvoidance()
     local ahead = vec.makeScale( ant.direction, cfg.antSightDistance )
-    if  not map.gridCanPass(vec.makeSum( ant.position, ahead )) --[[TAnt.map.anyCollisionWith( vec.makeSum( ant.position, ahead ) )]] then
+    local adir = { ant.direction[1], ant.direction[2] }
+    if  not map.gridCanPass(vec.makeSum( ant.position, ahead )) then        
       -- if something blocking ahead, where to turn? left or right?
       --print('something in my way')
       local vLeft = vec.makeFrom( ant.direction )
       local vRight = vec.makeFrom( ant.direction )
+      
+      
       vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
       vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
       local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
       local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
       vec.add( goLeft, ant.position )
       vec.add( goRight, ant.position )
-      local freeLeft = not map.gridCanPass( goLeft )
-      local freeRight = not map.gridCanPass( goRight )      
+      local freeLeft = map.gridCanPass( goLeft )
+      local freeRight = map.gridCanPass( goRight )      
       
       if freeLeft and not freeRight then
         --goleft
         vec.setFrom( ant.direction, vLeft )        
-      elseif not freeLeft then
+      elseif freeRight and not freeLeft then
         --goright
         vec.setFrom( ant.direction, vRight )              
-      end --else keep going
+      else 
+        --I'm blocked try more wide
+      end
+      
     end
   end 
   

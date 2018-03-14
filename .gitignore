@@ -41,3 +41,4 @@ luac.out
 
 # Folders starting with 'i_'
 i_*/
+*.love
