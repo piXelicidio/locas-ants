@@ -5,7 +5,7 @@ This is not a translation, is a remake from scratch using free engine Löve2D wi
 
 Last screenshots:
 
-![](https://raw.githubusercontent.com/piXelicidio/locas-ants/develop/screenshots/manypaths2.gif)
+![](https://raw.githubusercontent.com/piXelicidio/locas-ants/develop/screenshots/gridCellsOnly.gif)
 
 (Btw, I'm learning Git/Github so beware of weird things with this my first Open Source"?" project) 
  

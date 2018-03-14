@@ -15,8 +15,8 @@ function sim.init()
    
   map.init()   
   
-  map.setCell_cave(-10, -4)
-  map.setCell_food(20, 5)
+  map.setCell_cave(-6, -4)
+  map.setCell_food(12, 5)
   
    
   local newAnt
@@ -92,16 +92,16 @@ function sim.algorithm_pheromones()
           local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
-          
-            pheromInfoSeen = map.grid[ antPosiX ]
-                                     [ antPosiY ].pheromInfo.seen
+          for i=1,9 do
+            pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1]  ]
+                                     [ antPosiY + cfg.mapGridComScan[i][2]  ].pheromInfo.seen
             local myInterest = pheromInfoSeen[ ant.lookingFor ]
             
             if myInterest.time > ant.maxTimeSeen then                
               ant.maxTimeSeen = myInterest.time
               ant.headTo( myInterest.where )
             end              
-          
+          end
           -- share what i Know in the map... if
           if ant.pheromonesWrite then 
             
