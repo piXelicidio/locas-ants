@@ -140,9 +140,11 @@ end
 
 function sim.draw()
   map.draw()  
-  for _,node in pairs(map.actors.array) do
-    node.obj.draw()    
-  end   
+  if not cfg.debugHideAnts then
+    for _,node in pairs(map.actors.array) do
+      node.obj.draw()    
+    end  
+  end
 end
 
 function sim.onClick(x, y)

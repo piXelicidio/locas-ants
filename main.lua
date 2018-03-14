@@ -67,7 +67,11 @@ if not g_isTesting then
     elseif key=='6' then
         cfg.antObjectAvoidance = not cfg.antObjectAvoidance 
         print('cfg.antObjectAvoidance = ', cfg.antObjectAvoidance )
+    elseif key=='0'then
+        cfg.debugHideAnts = not cfg.debugHideAnts
+        print('cfg.debugHideAnts = ', cfg.debugHideAnts )
     end
+    
   end
   
   function api.mousemoved(x, y, dx, dy, istouch)

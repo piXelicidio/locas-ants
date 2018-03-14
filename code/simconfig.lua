@@ -9,7 +9,7 @@ local simconfig = {
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
   antComNeedFrameStep = {3,13},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.  
   antSightDistance  = 30,        -- Only bellow this distance the ant can identify and locate|avoid things, bettr if > than antComRadius
-  antPositionMemorySize = 15,    -- How many past position they can remember 
+  antPositionMemorySize = 10,    -- How many past position they can remember 
   antErratic = 0.2,  
   antInterests = {'food','cave'},
   antObjectAvoidance = true,
@@ -17,6 +17,7 @@ local simconfig = {
   
   debugGrid = false,
   debugPheromones = false,
+  debugHideAnts = false,
   debugCounters = {0,0,0,0,0,0},
   
   -- our map dimensions, it can grow on any direction not only on positive integers 

@@ -165,25 +165,26 @@ function TAnt.create()
       local vLeft = vec.makeFrom( ant.direction )
       local vRight = vec.makeFrom( ant.direction )
       
-      
-      vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
-      vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
-      local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
-      local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
-      vec.add( goLeft, ant.position )
-      vec.add( goRight, ant.position )
-      local freeLeft = map.gridCanPass( goLeft )
-      local freeRight = map.gridCanPass( goRight )      
-      
-      if freeLeft and not freeRight then
-        --goleft
-        vec.setFrom( ant.direction, vLeft )        
-      elseif freeRight and not freeLeft then
-        --goright
-        vec.setFrom( ant.direction, vRight )              
-      else 
-        --I'm blocked try more wide
-      end
+        local blocked = false
+        vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
+        vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
+        local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
+        local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
+        vec.add( goLeft, ant.position )
+        vec.add( goRight, ant.position )
+        local freeLeft = map.gridCanPass( goLeft )
+        local freeRight = map.gridCanPass( goRight )      
+        
+        if freeLeft and not freeRight then
+          --goleft
+          vec.setFrom( ant.direction, vLeft )        
+        elseif freeRight and not freeLeft then
+          --goright
+          vec.setFrom( ant.direction, vRight )              
+        elseif not freeLeft and not freeRight then 
+          --I'm blocked try more wide, one more time
+          blocked = true
+        end
       
     end
   end 
