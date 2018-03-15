@@ -3,7 +3,7 @@
 
 local simconfig = {
   
-  numAnts = 7550,
+  numAnts = 6550,
   antMaxSpeed = 1.2,
   antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
@@ -43,8 +43,9 @@ local simconfig = {
       { 0, 1},
       { 1, 1},      
     },
-    
-  imgScale = 0.2, 
+  
+  zoomMaxScale = 4,
+  imgScale = 1/4,  
   
   colorAnts = {255,255,255},
   colorObstacle = {200,200,200},

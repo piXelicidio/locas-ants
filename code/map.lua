@@ -37,6 +37,9 @@ map.maxXg = math.floor(map.maxX / map.gridSize) + gridBorder
 map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
 map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
+local imgGround = apiG.newImage('images//ground01.png')
+local imgBlock = apiG.newImage('images//block01.png')
+
 function map.init()
   -- initializing all Grid data structure, avoiding future validations and mem allocation  
   for i = map.minXg, map.maxXg do
@@ -292,25 +295,28 @@ local cellPheromInfo = function(cell, i, j)
 end
 
 function map.draw()      
-  apiG.setColor( map.limitsColor )
-  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
-  
-  --
+    --
   for i = map.minXg, map.maxXg do
     for j = map.minYg, map.maxYg do
       if map.grid[i][j].pass then
+         apiG.setColor(255,255,255); 
+         apiG.draw(imgGround, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
         local cell = map.grid[i][j].cell
         if cell then
           apiG.setColor( cell.color )
           apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
         end
       else
-        apiG.setColor( cfg.colorObstacle )
-        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+--        apiG.setColor( cfg.colorObstacle )
+--        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+         apiG.setColor(255,255,255);
+         apiG.draw(imgBlock, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
       end
     end
   end 
   --debuging grid
+  apiG.setColor( map.limitsColor )
+  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
   
   if cfg.debugGrid  then
     map.gridForEachCell( cellcount )
