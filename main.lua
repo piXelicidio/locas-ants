@@ -103,7 +103,7 @@ if not g_isTesting then
   end
 
 
-  apiG.setDefaultFilter("nearest", "nearest")
+  --apiG.setDefaultFilter("nearest", "nearest")
   apiG.setLineStyle( 'rough' )
 
 else

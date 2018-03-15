@@ -13,7 +13,8 @@ sim.interactionAlgorithm = {}
 function sim.init()  
   math.randomseed(os.time())
    
-  map.init()   
+  map.init()  
+  TAnt.init()
   
   map.setCell_cave(-6, -4)
   map.setCell_food(12, 5)

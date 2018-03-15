@@ -9,11 +9,19 @@ local map = {}                          --circular reference to Map module. Set 
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
+local imgAntWalk = {} 
 
      
 -- PUBLIC class fields
 function TAnt.setMap ( ourMap )
   map = ourMap
+end
+
+-- a global init before any ant is created.
+function TAnt.init()
+  imgAntWalk[0] = apiG.newImage('images//brownAnt_walk01.png')
+  imgAntWalk[1] = apiG.newImage('images//brownAnt_walk02.png')
+  imgAntWalk[2] = apiG.newImage('images//brownAnt_walk03.png')
 end
 
 
@@ -221,11 +229,19 @@ function TAnt.create()
     --test pause    
   end
   
+  function ant.dirToRad()
+    if ant.direction[2]>0 then 
+      return math.acos( ant.direction[1] )
+    else
+      return math.pi - math.acos( ant.direction[1] )
+    end    
+  end
 
   function ant.drawNormal()            
-    apiG.setColor(ant.color)
+--    apiG.setColor(ant.color)
         
-    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
+--    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
+    apiG.draw(imgAntWalk[1], ant.position[1] , ant.position[2], ant.dirToRad(), 0.2, 0.2, 16, 16)
     if ant.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
       if not cfg.debugGrid then apiG.circle("line", ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2, 0.5) end
