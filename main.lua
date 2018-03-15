@@ -21,8 +21,13 @@ if not g_isTesting then
     print('Initializing...')
     --if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
+    cam.translation.x = 500
+    cam.translation.y = 300
+    cam.scale.x = 2.5
+    cam.scale.y = 2.5
     apiG.setBackgroundColor(cfg.colorBk)
-    
+    apiG.setDefaultFilter("nearest", "nearest")
+    apiG.setLineStyle( 'rough' )
   end  
     
   function api.update()    
@@ -103,8 +108,7 @@ if not g_isTesting then
   end
 
 
-  --apiG.setDefaultFilter("nearest", "nearest")
-  apiG.setLineStyle( 'rough' )
+  
 
 else
 -- This is not the game, we are testing stuff

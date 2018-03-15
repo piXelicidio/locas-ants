@@ -19,9 +19,10 @@ end
 
 -- a global init before any ant is created.
 function TAnt.init()
-  imgAntWalk[0] = apiG.newImage('images//brownAnt_walk01.png')
-  imgAntWalk[1] = apiG.newImage('images//brownAnt_walk02.png')
-  imgAntWalk[2] = apiG.newImage('images//brownAnt_walk03.png')
+  imgAntWalk[0] = apiG.newImage('images//antWalk_01.png')
+  imgAntWalk[1] = apiG.newImage('images//antWalk_02.png')
+  imgAntWalk[2] = apiG.newImage('images//antWalk_02.png')
+  imgAntWalk[3] = apiG.newImage('images//antWalk_03.png')
 end
 
 
@@ -239,12 +240,12 @@ function TAnt.create()
   end
 
   function ant.drawNormal()            
-    apiG.setColor(255,255,255)
+    apiG.setColor(ant.color)
         
 --    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
     --sprites draw
-    local imgIdx = math.floor(ant.traveled % 3 )
-    apiG.draw(imgAntWalk[ imgIdx ], ant.position[1] , ant.position[2], ant.dirToRad(), 0.2, 0.2, 16, 16)
+    local imgIdx = math.floor(ant.traveled % 4 )
+    apiG.draw(imgAntWalk[ imgIdx ], ant.position[1] , ant.position[2], ant.dirToRad(), cfg.imgScale, cfg.imgScale, 16, 16)
     
     
     if ant.cargo.count~=0 then
