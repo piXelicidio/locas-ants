@@ -44,8 +44,10 @@ function sim.interactionWithCells(ant)
   local gx = math.floor( ant.position[1] / cfg.mapGridSize )
   local gy = math.floor( ant.position[2] / cfg.mapGridSize )
   local cell =  map.grid[gx][gy].cell
-  if cell then      
+  if cell then     
+      cell.affectAnt( ant )
       --i'm looking for you?
+      --[[
       local myNeed = ant.lookingFor
       if myNeed == cell.type then      
         --ant.pause(20)
@@ -60,14 +62,13 @@ function sim.interactionWithCells(ant)
         ant.maxTimeSeen = 0
         
         --swap
-        ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor
-        ant.comingFromAtTime = cfg.simFrameNumber
+        ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor        
         local dv = vec.makeScale( ant.direction, -1) --go oposite 
         ant.direction = dv      
         ant.speed = 0          
         ant.disablePheromonesWrite( cfg.antPositionMemorySize )
         
-      end 
+      end  --]]
       --record everything interesting I see
       ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   
   end
@@ -92,7 +93,7 @@ function sim.algorithm_pheromones()
           local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
-          for i=1,9 do
+          for i=1,1 do
             pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1]  ]
                                      [ antPosiY + cfg.mapGridComScan[i][2]  ].pheromInfo.seen
             local myInterest = pheromInfoSeen[ ant.lookingFor ]

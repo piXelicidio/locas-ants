@@ -3,6 +3,8 @@ local apiG = love.graphics
 
 local TCell = {}
 
+TCell.cavesStorage = {}
+
 --- cell base classs
 function TCell.newCell()
   local cell={} 
@@ -21,7 +23,28 @@ function TCell.newFood()
   --public proeprties
   food.type = 'food'
   food.pass = true
-  food.color = cfg.colorFood
+  food.color = cfg.colorFood  
+  food.storage = 1000  
+  food.infinite = true
+  
+  --methods
+  function food.affectAnt( ant )
+    if ant.lookingFor == food.type then
+      if (ant.cargo.count < ant.cargo.capacity ) and ( food.storage > 0 )  then
+        local take = ant.cargo.capacity - ant.cargo.count
+        if take >= food.storage then 
+          ant.cargo.count = ant.cargo.count + food.storage
+          food.storage = 0
+        else
+          ant.cargo.count = ant.cargo.count + take          
+          if not food.infinite then food.storage = food.storage - take end
+        end         
+      end
+      ant.maxTimeSeen = 0
+      ant.taskFound(food)
+    end
+  end
+    
   return food
 end
 
@@ -31,6 +54,14 @@ function TCell.newCave()
   cave.type = 'cave'
   cave.pass = true
   cave.color = cfg.colorCave
+  --methods
+  function cave.affectAnt( ant )
+      if ant.lookingFor == cave.type then        
+        ant.cargo.count = 0
+        ant.maxTimeSeen = 0
+        ant.taskFound(cave)
+      end            
+  end
   return cave
 end
 

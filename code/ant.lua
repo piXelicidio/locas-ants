@@ -56,7 +56,7 @@ function TAnt.create()
   ant.lastTimeUpdatedPath = -1
   ant.lookingFor = 'food'
   ant.nextTask   = 'cave'
-  ant.cargo = { material = '', count = 0 } 
+  ant.cargo = { material = '', count = 0, capacity = 1 } 
   ant.oldestPositionRemembered = {0,0}  --vector 2D arr  
   ant.betterPathCount = 0
   ant.color = cfg.colorAnts
@@ -91,6 +91,15 @@ function TAnt.create()
     end
     fOldestPositionIndex = 1
     ant.oldestPositionRemembered = fPastPositions[1]
+  end
+  
+  function ant.taskFound( cell )
+    --swap
+    ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor        
+    local dv = vec.makeScale( ant.direction, -1) --go oposite 
+    ant.direction = dv      
+    ant.speed = 0          
+    ant.disablePheromonesWrite( cfg.antPositionMemorySize )
   end
   
   function ant.updatePaused()    
