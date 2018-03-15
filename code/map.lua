@@ -210,6 +210,7 @@ function map.resolve_BlockingCollision_andMove( ant )
   vec.setFrom( ant.direction, dir)
   ant.position[1] =  ant.position[1] + dir[1] * ant.speed
   ant.position[2] =  ant.position[2] + dir[2] * ant.speed
+  ant.traveled = ant.traveled + ant.speed
   
   if numTries > 1 then
     --there was al least one collision

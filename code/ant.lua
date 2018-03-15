@@ -51,7 +51,8 @@ function TAnt.create()
   ant.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   ant.oldPosition = {0, 0}
   ant.radius = 2
-  ant.speed = 0.1  
+  ant.speed = 0.1 
+  ant.traveled = 0 -- traveled distance
   ant.friction = 1
   ant.acceleration = 0.04  + math.random()*0.05
   ant.erratic = cfg.antErratic                  --crazyness
@@ -233,18 +234,22 @@ function TAnt.create()
     if ant.direction[2]>0 then 
       return math.acos( ant.direction[1] )
     else
-      return math.pi - math.acos( ant.direction[1] )
+      return math.pi*2 - math.acos( ant.direction[1] )
     end    
   end
 
   function ant.drawNormal()            
---    apiG.setColor(ant.color)
+    apiG.setColor(255,255,255)
         
 --    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
-    apiG.draw(imgAntWalk[1], ant.position[1] , ant.position[2], ant.dirToRad(), 0.2, 0.2, 16, 16)
+    --sprites draw
+    local imgIdx = math.floor(ant.traveled % 3 )
+    apiG.draw(imgAntWalk[ imgIdx ], ant.position[1] , ant.position[2], ant.dirToRad(), 0.2, 0.2, 16, 16)
+    
+    
     if ant.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      if not cfg.debugGrid then apiG.circle("line", ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2, 0.5) end
+      if not cfg.debugGrid then apiG.circle("line", ant.position[1] + ant.direction[1]*2.1, ant.position[2] + ant.direction[2]*2.1, 0.5) end
     end
     -- debug    
   end
