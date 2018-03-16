@@ -13,7 +13,8 @@ sim.interactionAlgorithm = {}
 function sim.init()  
   math.randomseed(os.time())
    
-  map.init()   
+  map.init()  
+  TAnt.init()
   
   map.setCell_cave(-6, -4)
   map.setCell_food(12, 5)
@@ -29,11 +30,7 @@ function sim.init()
     newAnt.position[1] = math.cos(ang)*(50+i/60)
     newAnt.position[2] = math.sin(ang)*(50+i/60)
     if i<4 then newAnt.setDrawMode("debug") end
-  end
-  cam.translation.x = 500
-  cam.translation.y = 300
-  cam.scale.x = 1
-  cam.scale.y = 1
+  end  
 end
 
 function sim.algorithm_doNothing()

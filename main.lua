@@ -21,8 +21,13 @@ if not g_isTesting then
     print('Initializing...')
     --if arg[#arg] == "-debug" then require("mobdebug").start() end    
     sim.init()  
+    cam.translation.x = 500
+    cam.translation.y = 300
+    cam.scale.x = 1
+    cam.scale.y = 1
     apiG.setBackgroundColor(cfg.colorBk)
-    
+    apiG.setDefaultFilter("nearest", "nearest")
+    apiG.setLineStyle( 'rough' )
   end  
     
   function api.update()    
@@ -91,20 +96,22 @@ if not g_isTesting then
   end
   
   function api.wheelmoved( x, y)    
-    cam.scale.x = cam.scale.x + y/5
-    cam.scale.y = cam.scale.y + y/5
+    local inc
+    if y>0 then inc = 1 end
+    if y<0 then inc = -1 end
+    cam.scale.x = cam.scale.x + inc
+    cam.scale.y = cam.scale.y +  inc
     if cam.scale.x <1 then
       cam.scale.x = 1
       cam.scale.y = 1
-    elseif cam.scale.x > 5 then
-      cam.scale.x = 5
-      cam.scale.y = 5
+    elseif cam.scale.x > cfg.zoomMaxScale then
+      cam.scale.x = cfg.zoomMaxScale
+      cam.scale.y = cfg.zoomMaxScale
     end    
   end
 
 
-  apiG.setDefaultFilter("nearest", "nearest")
-  apiG.setLineStyle( 'rough' )
+  
 
 else
 -- This is not the game, we are testing stuff
