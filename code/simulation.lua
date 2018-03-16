@@ -67,6 +67,7 @@ function sim.algorithm_pheromones()
           local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
+          --TODO: what if ant can see a good phermone close to current cell and go for it? 
           for i=1,1 do
             pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1]  ]
                                      [ antPosiY + cfg.mapGridComScan[i][2]  ].pheromInfo.seen
