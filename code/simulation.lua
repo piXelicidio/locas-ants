@@ -42,32 +42,9 @@ function sim.interactionWithCells(ant)
   local gy = math.floor( ant.position[2] / cfg.mapGridSize )
   local cell =  map.grid[gx][gy].cell
   if cell then     
-      cell.affectAnt( ant )
-      --i'm looking for you?
-      --[[
-      local myNeed = ant.lookingFor
-      if myNeed == cell.type then      
-        --ant.pause(20)
-        
-        --TODO: think about this...
-        if cell.type == 'food' then        
-          ant.cargo.count = 1
-          ant.cargo.material = cell.type                         
-        elseif cell.type == 'cave' then
-          ant.cargo.count = 0      
-        end      
-        ant.maxTimeSeen = 0
-        
-        --swap
-        ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor        
-        local dv = vec.makeScale( ant.direction, -1) --go oposite 
-        ant.direction = dv      
-        ant.speed = 0          
-        ant.disablePheromonesWrite( cfg.antPositionMemorySize )
-        
-      end  --]]
-      --record everything interesting I see
-      ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   
+      cell.affectAnt( ant )      
+      -- is this cell interesting for me?
+      if ant.lastTimeSeen[cell.type] then ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   end
   end
 end
 

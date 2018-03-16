@@ -49,7 +49,7 @@ local simconfig = {
   
   colorAnts = {255,255,255},
   colorObstacle = {200,200,200},
-  colorFood = {240, 240, 230},
+  colorFood = {250, 240, 100},
   colorCave = {40,40,40},
   colorBk = {180,180,180},  
   colorBkLimits = {120, 120, 120},  

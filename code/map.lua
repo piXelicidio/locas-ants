@@ -39,10 +39,10 @@ map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
 local imgGround = apiG.newImage('images//ground01.png')
 local imgBlock = apiG.newImage('images//block01.png')
-local imgGrass = apiG.newImage('images//grass01.png')
 
 function map.init()
   -- initializing all Grid data structure, avoiding future validations and mem allocation  
+  TCell.init()
   for i = map.minXg, map.maxXg do
     map.grid[i]={}
     for j = map.minYg, map.maxYg do
@@ -65,6 +65,7 @@ function map.initCell(xg, yg)
             where = {0,0},  --the non-normalized vector direction of last position remembered.            
           }
       end
+    if math.random()<0.3 then map.grid[xg][yg].cell = TCell.newGrass() end
 end
 
 function map.setCell_food(xg, yg)
@@ -304,8 +305,8 @@ function map.draw()
          apiG.draw(imgGround, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
         local cell = map.grid[i][j].cell
         if cell then
-          apiG.setColor( cell.color )
-          apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+          --apiG.setColor( cell.color )
+          apiG.draw(cell.img, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale    )   
         end
       else
 --        apiG.setColor( cfg.colorObstacle )
