@@ -39,6 +39,7 @@ map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
 local imgGround = apiG.newImage('images//ground01.png')
 local imgBlock = apiG.newImage('images//block01.png')
+local imgGrass = apiG.newImage('images//grass01.png')
 
 function map.init()
   -- initializing all Grid data structure, avoiding future validations and mem allocation  
