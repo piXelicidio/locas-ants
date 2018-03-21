@@ -5,6 +5,7 @@ local TAnt = require('code.ant')
 local map = require('code.map')
 local TQuickList = require('code.qlist')
 local vec = require('libs.vec2d_arr')
+local TCell = require('code.cell')
 
 local sim = {}
 
@@ -13,7 +14,8 @@ sim.interactionAlgorithm = {}
 function sim.init()  
   math.randomseed(os.time())
    
-  map.init()   
+  map.init()  
+  TAnt.init()
   
   map.setCell_cave(-6, -4)
   map.setCell_food(12, 5)
@@ -29,11 +31,7 @@ function sim.init()
     newAnt.position[1] = math.cos(ang)*(50+i/60)
     newAnt.position[2] = math.sin(ang)*(50+i/60)
     if i<4 then newAnt.setDrawMode("debug") end
-  end
-  cam.translation.x = 500
-  cam.translation.y = 300
-  cam.scale.x = 1
-  cam.scale.y = 1
+  end  
 end
 
 function sim.algorithm_doNothing()
@@ -44,32 +42,10 @@ function sim.interactionWithCells(ant)
   local gx = math.floor( ant.position[1] / cfg.mapGridSize )
   local gy = math.floor( ant.position[2] / cfg.mapGridSize )
   local cell =  map.grid[gx][gy].cell
-  if cell then      
-      --i'm looking for you?
-      local myNeed = ant.lookingFor
-      if myNeed == cell.type then      
-        --ant.pause(20)
-        
-        --TODO: think about this...
-        if cell.type == 'food' then        
-          ant.cargo.count = 1
-          ant.cargo.material = cell.type                         
-        elseif cell.type == 'cave' then
-          ant.cargo.count = 0      
-        end      
-        ant.maxTimeSeen = 0
-        
-        --swap
-        ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor
-        ant.comingFromAtTime = cfg.simFrameNumber
-        local dv = vec.makeScale( ant.direction, -1) --go oposite 
-        ant.direction = dv      
-        ant.speed = 0          
-        ant.disablePheromonesWrite( cfg.antPositionMemorySize )
-        
-      end 
-      --record everything interesting I see
-      ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   
+  if cell then     
+      cell.affectAnt( ant )      
+      -- is this cell interesting for me?
+      if ant.lastTimeSeen[cell.type] then ant.lastTimeSeen[cell.type] = cfg.simFrameNumber   end
   end
 end
 
@@ -92,6 +68,7 @@ function sim.algorithm_pheromones()
           local antPosiX = math.floor( ant.position[1] / cfg.mapGridSize )
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
+          --TODO: what if ant can see a good phermone close to current cell and go for it? 
           for i=1,9 do
             pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1]  ]
                                      [ antPosiY + cfg.mapGridComScan[i][2]  ].pheromInfo.seen
@@ -140,14 +117,38 @@ end
 
 function sim.draw()
   map.draw()  
-  for _,node in pairs(map.actors.array) do
-    node.obj.draw()    
-  end   
+  if not cfg.debugHideAnts then
+    for _,node in pairs(map.actors.array) do
+      node.obj.draw()    
+    end  
+  end
 end
 
 function sim.onClick(x, y)
   local xg, yg = map.worldToGrid( x, y)  
   if map.isInsideGrid(xg, yg) then map.grid[xg][yg].pass = false end
+end
+
+function sim.setCell( cellType, xworld, yworld)
+  local xg, yg = map.worldToGrid( xworld, yworld)
+  if map.isInsideGrid(xg, yg) then
+    local grid = map.grid[xg][yg]
+    if (cellType == 'block') or (cellType == 'obstacle') or (cellType == 'donotpass') then
+      grid.pass = false
+    elseif (cellType == 'grass') then
+      grid.pass = true
+      grid.cell = TCell.newGrass()
+    elseif (cellType == 'food') then
+      grid.pass = true
+      grid.cell = TCell.newFood()
+    elseif (cellType == 'cave') then
+      grid.pass = true
+      grid.cell = TCell.newCave()
+    elseif (cellType == 'ground') then
+      grid.pass =true
+      grid.cell = nil
+    end
+  end    
 end
 
 

@@ -5,7 +5,7 @@ This is not a translation, is a remake from scratch using opensource engine Löv
 
 Last screenshots:
 
-![](https://raw.githubusercontent.com/piXelicidio/locas-ants/develop/screenshots/gridCellsOnly.gif)
+![](https://raw.githubusercontent.com/piXelicidio/locas-ants/develop/screenshots/nicePath.gif)
 
 (Btw, I'm learning Git/Github so beware of weird things with this my first Open Source"?" project) 
  

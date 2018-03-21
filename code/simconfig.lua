@@ -3,13 +3,13 @@
 
 local simconfig = {
   
-  numAnts = 2550,
+  numAnts = 4500,
   antMaxSpeed = 1.2,
   antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
   antComNeedFrameStep = {3,13},  -- {a,b} ant would need for comunication with other ants every amount of frames form a to b. Greater values more speed less path quality.  
   antSightDistance  = 30,        -- Only bellow this distance the ant can identify and locate|avoid things, bettr if > than antComRadius
-  antPositionMemorySize = 15,    -- How many past position they can remember 
+  antPositionMemorySize = 10,    -- How many past position they can remember 
   antErratic = 0.2,  
   antInterests = {'food','cave'},
   antObjectAvoidance = true,
@@ -17,6 +17,7 @@ local simconfig = {
   
   debugGrid = false,
   debugPheromones = false,
+  debugHideAnts = false,
   debugCounters = {0,0,0,0,0,0},
   
   -- our map dimensions, it can grow on any direction not only on positive integers 
@@ -24,7 +25,7 @@ local simconfig = {
   mapMinY = -250,
   mapMaxX = 550,
   mapMaxY = 350,
-  mapGridSize = 20,
+  mapGridSize = 16,
   mapGridComScan = {      
     --this are the neibor cells we are going to scan looking for near ants to do communications... normal is 8 'N'eibor cells in square formation around 'C'enter cell.
     -- mapGridComScan[2..9]=neibors 
@@ -43,9 +44,12 @@ local simconfig = {
       { 1, 1},      
     },
   
-  colorAnts = {20,10,0},
+  zoomMaxScale = 4,
+  imgScale = 1/4,  
+  
+  colorAnts = {255,255,255},
   colorObstacle = {200,200,200},
-  colorFood = {240, 240, 230},
+  colorFood = {250, 240, 100},
   colorCave = {40,40,40},
   colorBk = {180,180,180},  
   colorBkLimits = {120, 120, 120},  

@@ -37,8 +37,12 @@ map.maxXg = math.floor(map.maxX / map.gridSize) + gridBorder
 map.minYg = math.floor(map.minY / map.gridSize) - gridBorder
 map.maxYg = math.floor(map.maxY / map.gridSize) + gridBorder
 
+local imgGround = apiG.newImage('images//ground01.png')
+local imgBlock = apiG.newImage('images//block01.png')
+
 function map.init()
   -- initializing all Grid data structure, avoiding future validations and mem allocation  
+  TCell.init()
   for i = map.minXg, map.maxXg do
     map.grid[i]={}
     for j = map.minYg, map.maxYg do
@@ -61,6 +65,8 @@ function map.initCell(xg, yg)
             where = {0,0},  --the non-normalized vector direction of last position remembered.            
           }
       end
+    if math.random()<0.002 then map.grid[xg][yg].cell = TCell.newGrass() end
+    if math.random()<0.001 then map.grid[xg][yg].pass = false end
 end
 
 function map.setCell_food(xg, yg)
@@ -210,6 +216,7 @@ function map.resolve_BlockingCollision_andMove( ant )
   vec.setFrom( ant.direction, dir)
   ant.position[1] =  ant.position[1] + dir[1] * ant.speed
   ant.position[2] =  ant.position[2] + dir[2] * ant.speed
+  ant.traveled = ant.traveled + ant.speed
   
   if numTries > 1 then
     --there was al least one collision
@@ -291,25 +298,28 @@ local cellPheromInfo = function(cell, i, j)
 end
 
 function map.draw()      
-  apiG.setColor( map.limitsColor )
-  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
-  
-  --
+    --
   for i = map.minXg, map.maxXg do
     for j = map.minYg, map.maxYg do
       if map.grid[i][j].pass then
+         apiG.setColor(255,255,255); 
+         apiG.draw(imgGround, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
         local cell = map.grid[i][j].cell
         if cell then
-          apiG.setColor( cell.color )
-          apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+          --apiG.setColor( cell.color )
+          apiG.draw(cell.img, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale    )   
         end
       else
-        apiG.setColor( cfg.colorObstacle )
-        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+--        apiG.setColor( cfg.colorObstacle )
+--        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
+         apiG.setColor(255,255,255);
+         apiG.draw(imgBlock, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
       end
     end
   end 
   --debuging grid
+  apiG.setColor( map.limitsColor )
+  apiG.rectangle("line", map.minX, map.minY, map.maxX-map.minX, map.maxY-map.minY )
   
   if cfg.debugGrid  then
     map.gridForEachCell( cellcount )

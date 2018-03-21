@@ -9,11 +9,20 @@ local map = {}                          --circular reference to Map module. Set 
 
 -- Sorry of the Delphi-like class styles :P
 local TAnt = {}
+local imgAntWalk = {} 
 
      
 -- PUBLIC class fields
 function TAnt.setMap ( ourMap )
   map = ourMap
+end
+
+-- a global init before any ant is created.
+function TAnt.init()
+  imgAntWalk[0] = apiG.newImage('images//antWalk_01.png')
+  imgAntWalk[1] = apiG.newImage('images//antWalk_02.png')
+  imgAntWalk[2] = apiG.newImage('images//antWalk_02.png')
+  imgAntWalk[3] = apiG.newImage('images//antWalk_03.png')
 end
 
 
@@ -43,25 +52,21 @@ function TAnt.create()
   ant.direction = { 1.0, 0.0 } --direction heading movement unitary vector
   ant.oldPosition = {0, 0}
   ant.radius = 2
-  ant.speed = 0.1  
+  ant.speed = 0.1 
+  ant.traveled = 0 -- traveled distance
   ant.friction = 1
   ant.acceleration = 0.04  + math.random()*0.05
   ant.erratic = cfg.antErratic                  --crazyness
-  ant.maxSpeed = cfg.antMaxSpeed 
-  ant.tasks = {'food','cave'}  --TODO: no need for Array of task, they can only have to targets, use two variables and swap
+  ant.maxSpeed = cfg.antMaxSpeed   
   ant.lookingForTask = 1  
-  ant.comingFromTask = 0
-  --ant.lookingFor = 'food'
-  ant.comingFrom = ''
-  --ant.lastTimeSeenFood = -1
-  --ant.lastTimeSeenCave = -1
+  ant.comingFromTask = 0 
+  ant.comingFrom = ''  
   ant.lastTimeSeen = {food = -1, cave = -1}   --we can access t['food'] = n
-  ant.maxTimeSeen = -1
-  --ant.comingFromAtTime = 0
+  ant.maxTimeSeen = -1  
   ant.lastTimeUpdatedPath = -1
   ant.lookingFor = 'food'
   ant.nextTask   = 'cave'
-  ant.cargo = { material = '', count = 0 } 
+  ant.cargo = { material = '', count = 0, capacity = 1 } 
   ant.oldestPositionRemembered = {0,0}  --vector 2D arr  
   ant.betterPathCount = 0
   ant.color = cfg.colorAnts
@@ -96,6 +101,15 @@ function TAnt.create()
     end
     fOldestPositionIndex = 1
     ant.oldestPositionRemembered = fPastPositions[1]
+  end
+  
+  function ant.taskFound( cell )
+    --swap
+    ant.lookingFor, ant.nextTask = ant.nextTask, ant.lookingFor        
+    local dv = vec.makeScale( ant.direction, -1) --go oposite 
+    ant.direction = dv      
+    ant.speed = 0          
+    ant.disablePheromonesWrite( cfg.antPositionMemorySize )
   end
   
   function ant.updatePaused()    
@@ -163,27 +177,34 @@ function TAnt.create()
  
   function ant.objectAvoidance()
     local ahead = vec.makeScale( ant.direction, cfg.antSightDistance )
-    if  not map.gridCanPass(vec.makeSum( ant.position, ahead )) --[[TAnt.map.anyCollisionWith( vec.makeSum( ant.position, ahead ) )]] then
+    local adir = { ant.direction[1], ant.direction[2] }
+    if  not map.gridCanPass(vec.makeSum( ant.position, ahead )) then        
       -- if something blocking ahead, where to turn? left or right?
       --print('something in my way')
       local vLeft = vec.makeFrom( ant.direction )
       local vRight = vec.makeFrom( ant.direction )
-      vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
-      vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
-      local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
-      local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
-      vec.add( goLeft, ant.position )
-      vec.add( goRight, ant.position )
-      local freeLeft = not map.gridCanPass( goLeft )
-      local freeRight = not map.gridCanPass( goRight )      
       
-      if freeLeft and not freeRight then
-        --goleft
-        vec.setFrom( ant.direction, vLeft )        
-      elseif not freeLeft then
-        --goright
-        vec.setFrom( ant.direction, vRight )              
-      end --else keep going
+        local blocked = false
+        vec.rotate( vLeft, -cfg.antObjectAvoidance_FOV )
+        vec.rotate( vRight, cfg.antObjectAvoidance_FOV )
+        local goLeft = vec.makeScale( vLeft, cfg.antSightDistance/2 )
+        local goRight = vec.makeScale( vRight, cfg.antSightDistance/2 )    
+        vec.add( goLeft, ant.position )
+        vec.add( goRight, ant.position )
+        local freeLeft = map.gridCanPass( goLeft )
+        local freeRight = map.gridCanPass( goRight )      
+        
+        if freeLeft and not freeRight then
+          --goleft
+          vec.setFrom( ant.direction, vLeft )        
+        elseif freeRight and not freeLeft then
+          --goright
+          vec.setFrom( ant.direction, vRight )              
+        elseif not freeLeft and not freeRight then 
+          --I'm blocked try more wide, one more time
+          blocked = true
+        end
+      
     end
   end 
   
@@ -210,14 +231,26 @@ function TAnt.create()
     --test pause    
   end
   
+  function ant.dirToRad()
+    if ant.direction[2]>0 then 
+      return math.acos( ant.direction[1] )
+    else
+      return math.pi*2 - math.acos( ant.direction[1] )
+    end    
+  end
 
   function ant.drawNormal()            
     apiG.setColor(ant.color)
         
-    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
+--    apiG.line(ant.position[1] - ant.direction[1]*2, ant.position[2] - ant.direction[2]*2, ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2 ) 
+    --sprites draw
+    local imgIdx = math.floor(ant.traveled % 4 )
+    apiG.draw(imgAntWalk[ imgIdx ], ant.position[1] , ant.position[2], ant.dirToRad(), cfg.imgScale, cfg.imgScale, 16, 16)
+    
+    
     if ant.cargo.count~=0 then
       apiG.setColor(cfg.colorFood)
-      if not cfg.debugGrid then apiG.circle("line", ant.position[1] + ant.direction[1]*2, ant.position[2] + ant.direction[2]*2, 0.5) end
+      if not cfg.debugGrid then apiG.circle("line", ant.position[1] + ant.direction[1]*2.1, ant.position[2] + ant.direction[2]*2.1, 0.5) end
     end
     -- debug    
   end
