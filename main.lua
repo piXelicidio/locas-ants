@@ -21,6 +21,7 @@ if not g_isTesting then
   ui.cnormal = suit.theme.color.normal
   ui.selectedColor =  { bg={55, 113, 140}, fg={255,255,255} } 
   ui.cc = ui.cnormal
+  ui.consumedClick = false
   
   
   function ui.onRadioCellsChanged( NewIdx )
@@ -45,6 +46,7 @@ if not g_isTesting then
     y = y or 10
     w = w or 100
     h = h or 30
+    --ui.consumedClick = false
     suit.layout:reset(x, y) 
     suit.layout:padding(10,2)     
     for i=1,#rbtns do 
@@ -58,7 +60,8 @@ if not g_isTesting then
         end
       end
       rbtns[i].ret = suit.Button(rbtns[i].caption, { color = { normal = ui.cc }} , suit.layout:row(w+grow,h) )  
-      if rbtns[i].ret.hit then          
+      if rbtns[i].ret.hit then  
+        --ui.consumedClick = true
         rbtns.selectedIdx = i
         if rbtns.onChanged then
           rbtns.selectedCaption = rbtns[i].caption
@@ -143,15 +146,14 @@ end
       if ui.radioBtns_cells.selectedCaption ~= 'cave' then
         sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) ) 
       end
-    elseif api.mouse.isDown(3) then
-      print(dx,dy)
+    elseif api.mouse.isDown(3) then      
       cam.translation.x = cam.translation.x + dx
       cam.translation.y = cam.translation.y + dy
     end
   end
   
   function api.mousepressed(x, y, button,  istouch)
-    if button == 1 then 
+    if button == 1 --[[and not ui.consumedClick]] then 
       sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) )
     end
   end
