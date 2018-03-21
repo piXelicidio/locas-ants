@@ -14,6 +14,59 @@ if not g_isTesting then
   local sim=require('code.simulation')
   local cam=require('code.camview')
   local cfg=require('code.simconfig')
+  local suit=require('libs.suit')
+  
+  --ui 
+  local ui = {}
+  ui.cnormal = suit.theme.color.normal
+  ui.selectedColor =  { bg={55, 113, 140}, fg={255,255,255} } 
+  ui.cc = ui.cnormal
+  
+  
+  function ui.onRadioCellsChanged( NewIdx )
+    print ( ui.radioBtns_cells.selectedCaption )
+  end
+
+  ui.radioBtns_cells = {
+    {caption = 'block'},
+    {caption = 'grass'},
+    {caption = 'cave'},
+    {caption = 'food'},
+    {caption = 'ground'},
+    selectedIdx = 1,
+    selectedCaption = 'block',
+    onChanged = ui.onRadioCellsChanged
+  }
+    
+  
+  function ui.suitRadio( rbtns, x, y, w,h )
+    local grow
+    x = x or 10
+    y = y or 10
+    w = w or 100
+    h = h or 30
+    suit.layout:reset(x, y) 
+    suit.layout:padding(10,2)     
+    for i=1,#rbtns do 
+      if rbtns.selectedIdx  then
+        if rbtns.selectedIdx == i then
+          ui.cc = ui.selectedColor
+          grow = 10
+        else
+          ui.cc = ui.cnormal
+          grow = 0
+        end
+      end
+      rbtns[i].ret = suit.Button(rbtns[i].caption, { color = { normal = ui.cc }} , suit.layout:row(w+grow,h) )  
+      if rbtns[i].ret.hit then          
+        rbtns.selectedIdx = i
+        if rbtns.onChanged then
+          rbtns.selectedCaption = rbtns[i].caption
+          rbtns.onChanged(i)
+        end
+      end
+    end 
+end
 
   --- We init the application defining the load event
   function api.load()
@@ -28,9 +81,11 @@ if not g_isTesting then
     apiG.setBackgroundColor(cfg.colorBk)
     apiG.setDefaultFilter("nearest", "nearest")
     apiG.setLineStyle( 'rough' )
-  end  
+  end    
+  
     
-  function api.update()    
+  function api.update()
+    ui.suitRadio(ui.radioBtns_cells, -5, 50, 80,30)
     sim.update()      
   end  
   
@@ -44,7 +99,11 @@ if not g_isTesting then
     sim.draw()
     --ui stuff
     apiG.pop()
-    apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10) 
+    
+    --ui
+    suit.draw()
+    
+    apiG.print("FPS: "..tostring(love.timer.getFPS( ))..' F# '..cfg.simFrameNumber, 10, 10)     
     --apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
     --apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
   end
@@ -81,7 +140,9 @@ if not g_isTesting then
   
   function api.mousemoved(x, y, dx, dy, istouch)
     if api.mouse.isDown(1) then 
-      sim.onClick( cam.screenToWorld(x, y) )
+      if ui.radioBtns_cells.selectedCaption ~= 'cave' then
+        sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) ) 
+      end
     elseif api.mouse.isDown(3) then
       print(dx,dy)
       cam.translation.x = cam.translation.x + dx
@@ -91,7 +152,7 @@ if not g_isTesting then
   
   function api.mousepressed(x, y, button,  istouch)
     if button == 1 then 
-      sim.onClick( cam.screenToWorld(x, y) )
+      sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) )
     end
   end
   

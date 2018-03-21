@@ -65,7 +65,8 @@ function map.initCell(xg, yg)
             where = {0,0},  --the non-normalized vector direction of last position remembered.            
           }
       end
-    if math.random()<0.3 then map.grid[xg][yg].cell = TCell.newGrass() end
+    if math.random()<0.002 then map.grid[xg][yg].cell = TCell.newGrass() end
+    if math.random()<0.001 then map.grid[xg][yg].pass = false end
 end
 
 function map.setCell_food(xg, yg)

@@ -5,6 +5,7 @@ local TAnt = require('code.ant')
 local map = require('code.map')
 local TQuickList = require('code.qlist')
 local vec = require('libs.vec2d_arr')
+local TCell = require('code.cell')
 
 local sim = {}
 
@@ -68,7 +69,7 @@ function sim.algorithm_pheromones()
           local antPosiY = math.floor( ant.position[2] / cfg.mapGridSize )
           local pheromInfoSeen
           --TODO: what if ant can see a good phermone close to current cell and go for it? 
-          for i=1,1 do
+          for i=1,9 do
             pheromInfoSeen = map.grid[ antPosiX + cfg.mapGridComScan[i][1]  ]
                                      [ antPosiY + cfg.mapGridComScan[i][2]  ].pheromInfo.seen
             local myInterest = pheromInfoSeen[ ant.lookingFor ]
@@ -126,6 +127,28 @@ end
 function sim.onClick(x, y)
   local xg, yg = map.worldToGrid( x, y)  
   if map.isInsideGrid(xg, yg) then map.grid[xg][yg].pass = false end
+end
+
+function sim.setCell( cellType, xworld, yworld)
+  local xg, yg = map.worldToGrid( xworld, yworld)
+  if map.isInsideGrid(xg, yg) then
+    local grid = map.grid[xg][yg]
+    if (cellType == 'block') or (cellType == 'obstacle') or (cellType == 'donotpass') then
+      grid.pass = false
+    elseif (cellType == 'grass') then
+      grid.pass = true
+      grid.cell = TCell.newGrass()
+    elseif (cellType == 'food') then
+      grid.pass = true
+      grid.cell = TCell.newFood()
+    elseif (cellType == 'cave') then
+      grid.pass = true
+      grid.cell = TCell.newCave()
+    elseif (cellType == 'ground') then
+      grid.pass =true
+      grid.cell = nil
+    end
+  end    
 end
 
 
