@@ -8,14 +8,17 @@ Last screenshots:
 ![](https://raw.githubusercontent.com/piXelicidio/locas-ants/develop/screenshots/nicePath.gif)
 
 (Btw, I'm learning Git/Github so beware of weird things with this my first Open Source"?" project) 
- 
 
-To run&edit the project 
+**To quick run it:**
+- Install Love2D: https://love2d.org/
+- Download the .love file: https://github.com/piXelicidio/locas-ants/releases/latest
+- Double-click .love file.
+
+**To play with the source project:** 
 - Download or clone.
 - install love2d: https://love2d.org/
-- install ZeroBrane Studio: https://studio.zerobrane.com/download?not-this-time
-
-Then open the Main.Lua with ZeroBrane.
-On ZeroBrane go to menu : Project -> Lua Interpreter -> LÖVE.
-And execute with F6 :) ready!
+- install ZeroBrane Studio: https://studio.zerobrane.com/download?not-this-time 
+- Open the Main.Lua with ZeroBrane.
+- On ZeroBrane go to menu : Project -> Lua Interpreter -> LÖVE.
+- And execute with F6 :) ready!
 
