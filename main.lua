@@ -158,8 +158,8 @@ end
   
   function api.wheelmoved( x, y)    
     local inc
-    if y>0 then inc = 1 end
-    if y<0 then inc = -1 end
+    if y>0 then inc = 0.5 end
+    if y<0 then inc = -0.5 end
     cam.scale.x = cam.scale.x + inc
     cam.scale.y = cam.scale.y +  inc
     if cam.scale.x <1 then

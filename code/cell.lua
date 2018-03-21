@@ -36,7 +36,7 @@ function TCell.init()
   grass.type = 'grass'
   grass.pass = true
   grass.img = imgGrass  
-  grass.friction = 0.9
+  grass.friction = 0.8
 end
 
 --- child class food
