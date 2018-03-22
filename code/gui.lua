@@ -10,8 +10,15 @@ ui.selectedColor =  { bg={55, 113, 140}, fg={255,255,255} }
 ui.cc = ui.cnormal
 ui.consumedClick = false
 
+ui.labelStyle =  { normal = { fg={155,200,125} }   }
+
 ui.leftPanelWidth = 110
 ui.leftPanelColor = { 82, 82, 82}
+
+ui.numAnts = 0 -- set this on main.lua to update
+
+
+local btnDims = {w = 85, h = 40}
 
 function ui.onRadioCellsChanged( NewIdx )
   print ( ui.radioBtns_cells.selectedCaption )
@@ -22,33 +29,21 @@ ui.radioBtns_cells = {
   {caption = 'grass'},
   {caption = 'cave'},
   {caption = 'food'},
-  {caption = 'ground'},
-  bWidth = 85,
-  bHeight = 30,
+  {caption = 'remove'},
+  bWidth = btnDims.w,
+  bHeight = btnDims.h,
   selectedIdx = 1,
   selectedCaption = 'block',
   onChanged = ui.onRadioCellsChanged
 }
+
+ui.showPheromones = { checked = false, text = 'phrms'}
   
-function ui.draw()
-  apiG.setColor( ui.leftPanelColor )
-  apiG.rectangle("fill", 0,0, ui.leftPanelWidth, apiG.getHeight() )
-  apiG.setColor(120,180,100)
-  apiG.print(tostring(love.timer.getFPS( ))..' FPS', 10, 10)  
-  apiG.print('F# '..cfg.simFrameNumber, 10, 25)     
-  --apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
-  --apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
-  suit.draw()
-end
 
-function ui.suitRadio( rbtns, x, y )
+function ui.suitRadio( rbtns )
   local grow
-  x = x or 10
-  y = y or 10
-
   --ui.consumedClick = false
-  suit.layout:reset(x, y) 
-  suit.layout:padding(10,2)     
+    
   for i=1,#rbtns do 
     if rbtns.selectedIdx  then
       if rbtns.selectedIdx == i then
@@ -69,6 +64,33 @@ function ui.suitRadio( rbtns, x, y )
       end
     end
   end 
+end
+
+function ui.onZoomInOut( inc ) end --event called onZoomInOut; overrided on main.lua
+
+
+function ui.mainUpdate()
+  suit.layout:reset(10,10) 
+  suit.layout:padding(10,2)   
+  
+  suit.Label(love.timer.getFPS()..' FPS', { color =  ui.labelStyle }, suit.layout:row(btnDims.w, 20 )   )
+  suit.Label(ui.numAnts..' ants', { color =  ui.labelStyle }, suit.layout:row(btnDims.w, 20 )  ) 
+  ui.suitRadio(ui.radioBtns_cells)   
+  suit.layout:row(btnDims.w,10)  
+  if suit.Button('zoom+',suit.layout:row(btnDims.w, btnDims.h)).hit then ui.onZoomInOut(0.5) end 
+  if suit.Button('zoom-',suit.layout:row()).hit then ui.onZoomInOut(-0.5) end 
+  if suit.Checkbox( ui.showPheromones, suit.layout:row() ).hit then cfg.debugPheromones = ui.showPheromones.checked end
+end
+
+function ui.draw()
+  apiG.setColor( ui.leftPanelColor )
+  apiG.rectangle("fill", 0,0, ui.leftPanelWidth, apiG.getHeight() )
+ -- apiG.setColor(120,180,100)
+ -- apiG.print(tostring(love.timer.getFPS( ))..' FPS', 10, 10)  
+ -- apiG.print('F# '..cfg.simFrameNumber, 10, 25)     
+  --apiG.print("DebugCounter 1 = "..cfg.debugCounters[1], 10, 25)
+  --apiG.print("DebugCounter 2 = "..cfg.debugCounters[2], 10, 40)
+  suit.draw()
 end
 
 return ui

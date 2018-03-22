@@ -5,6 +5,7 @@
 local apiG = love.graphics
 local api = love
 local sim = require('code.simulation')
+local map = require('code.map')
 local cam = require('code.camview')
 local cfg = require('code.simconfig') 
 local ui = require('code.gui')
@@ -16,10 +17,9 @@ function api.load()
   print('Initializing...')
   --if arg[#arg] == "-debug" then require("mobdebug").start() end    
   sim.init()  
-  cam.translation.x = 500
-  cam.translation.y = 300
-  cam.scale.x = 1
-  cam.scale.y = 1
+  cam.translation = {x = 500, y = 300 }
+  cam.scale = { x = 2, y = 2 }
+  cam.zoomOrigin = { x = apiG.getWidth() / 2, y = apiG.getHeight() / 2 }
   apiG.setBackgroundColor(cfg.colorBk)
   apiG.setDefaultFilter("nearest", "nearest")
   apiG.setLineStyle( 'rough' )
@@ -27,7 +27,8 @@ end
 
   
 function api.update()
-  ui.suitRadio(ui.radioBtns_cells, 10, 50 )
+  ui.numAnts = map.ants.count
+  ui.mainUpdate()
   sim.update()      
 end  
 
@@ -35,9 +36,9 @@ function api.draw()
   --gameworld  
   if cfg.simFrameNumber == 1 then print( (os.clock() - TIME_start)..'secs' ) end
       
-  apiG.push()
-  apiG.translate( cam.translation.x, cam.translation.y )        
-  apiG.scale( cam.scale.x, cam.scale.y )    
+  apiG.push()      
+  apiG.translate( cam.translation.x, cam.translation.y )          
+  apiG.scale( cam.scale.x, cam.scale.y )            
   sim.draw()
   --ui stuff
   apiG.pop()
@@ -97,15 +98,13 @@ function api.wheelmoved( x, y)
   local inc
   if y>0 then inc = 0.5 end
   if y<0 then inc = -0.5 end
-  cam.scale.x = cam.scale.x + inc
-  cam.scale.y = cam.scale.y +  inc
-  if cam.scale.x <1 then
-    cam.scale.x = 1
-    cam.scale.y = 1
-  elseif cam.scale.x > cfg.zoomMaxScale then
-    cam.scale.x = cfg.zoomMaxScale
-    cam.scale.y = cfg.zoomMaxScale
-  end    
+  cam.zoomOrigin.x, cam.zoomOrigin.y = api.mouse.getX(), api.mouse.getY()
+  cam.zoom(inc)
+end
+
+function ui.onZoomInOut( inc ) 
+  cam.zoomOrigin = { x = apiG.getWidth() / 2, y = apiG.getHeight() / 2 }
+  cam.zoom(inc)
 end
 
 

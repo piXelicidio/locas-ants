@@ -144,7 +144,7 @@ function sim.setCell( cellType, xworld, yworld)
     elseif (cellType == 'cave') then
       grid.pass = true
       grid.cell = TCell.newCave()
-    elseif (cellType == 'ground') then
+    elseif (cellType == 'ground') or (cellType == "remove") then
       grid.pass =true
       grid.cell = nil
     end
