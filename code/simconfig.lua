@@ -3,7 +3,8 @@
 
 local simconfig = {
   
-  numAnts = 2500,
+  numAnts = 3600,
+  numAntsMobile = 1000,
   antMaxSpeed = 1.2,
   antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  

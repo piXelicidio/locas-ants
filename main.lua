@@ -1,14 +1,21 @@
 --- Our main game stuff, 
 -- try to keep it simple... oh well..
   
+  
 --aliases and modules
+--api
 local apiG = love.graphics
 local api = love
+
+if api.system.getOS()=='Android' or api.system.getOS()=='iOS' then CURRENT_PLATFORM = 'mobile' else CURRENT_PLATFORM = 'desktop' end
+
+--application
 local sim = require('code.simulation')
 local map = require('code.map')
 local cam = require('code.camview')
 local cfg = require('code.simconfig') 
 local ui = require('code.gui')
+
 
 
 --- We init the application defining the load event
@@ -73,25 +80,47 @@ function api.keypressed(key)
   elseif key=='0'then
       cfg.debugHideAnts = not cfg.debugHideAnts
       print('cfg.debugHideAnts = ', cfg.debugHideAnts )
+  elseif key=='f11' then
+      api.window.setFullscreen( not api.window.getFullscreen() )
   end
   
 end
 
-function api.mousemoved(x, y, dx, dy, istouch)
-  if api.mouse.isDown(1) and (x > ui.leftPanelWidth) then 
-    if ui.radioBtns_cells.selectedCaption ~= 'cave' then
+local function dragmoved(x, y, dx, dy)    
+  local tool =  ui.radioBtns_cells.selectedCaption
+
+
+  if api.mouse.isDown(1) and (x > ui.leftPanelWidth) then     
+    if (tool ~= 'cave') and (tool~='pan view') then
       sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) ) 
+    end    
+  end 
+
+
+  if (x > ui.leftPanelWidth)   then
+    if api.mouse.isDown(3) or api.mouse.isDown(2) or ( api.mouse.isDown(1) and tool =='pan view' ) then      
+      cam.translation.x = cam.translation.x + dx
+      cam.translation.y = cam.translation.y + dy
     end
-  elseif api.mouse.isDown(3) or api.mouse.isDown(2) then      
-    cam.translation.x = cam.translation.x + dx
-    cam.translation.y = cam.translation.y + dy
+  end  
+end
+
+--needed to do this because mousemoved makes big dx,dy jumps on mobile
+if CURRENT_PLATFORM == 'desktop' then
+  function api.mousemoved(x,y,dx,dy, istouch)
+    dragmoved(x,y,dx,dy)
+  end
+else
+  function api.touchmoved(id, x,y,dx,dy, pressure)
+    dragmoved(x,y,dx,dy)
   end
 end
 
-function api.mousepressed(x, y, button,  istouch)
+
+function api.mousepressed(x, y, button,  istouch)  
   if button == 1 and (x > ui.leftPanelWidth) then 
     sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) )
-  end
+  end  
 end
 
 function api.wheelmoved( x, y)    

@@ -25,15 +25,16 @@ function ui.onRadioCellsChanged( NewIdx )
 end
 
 ui.radioBtns_cells = {
+  {caption = 'pan view'},
   {caption = 'block'},
   {caption = 'grass'},
   {caption = 'cave'},
   {caption = 'food'},
-  {caption = 'remove'},
+  {caption = 'remove'},  
   bWidth = btnDims.w,
   bHeight = btnDims.h,
   selectedIdx = 1,
-  selectedCaption = 'block',
+  selectedCaption = 'pan view',
   onChanged = ui.onRadioCellsChanged
 }
 
@@ -71,14 +72,16 @@ function ui.onZoomInOut( inc ) end --event called onZoomInOut; overrided on main
 
 function ui.mainUpdate()
   suit.layout:reset(10,10) 
-  suit.layout:padding(10,2)   
+  suit.layout:padding(10,5)   
   
   suit.Label(love.timer.getFPS()..' FPS', { color =  ui.labelStyle }, suit.layout:row(btnDims.w, 20 )   )
   suit.Label(ui.numAnts..' ants', { color =  ui.labelStyle }, suit.layout:row(btnDims.w, 20 )  ) 
-  ui.suitRadio(ui.radioBtns_cells)   
-  suit.layout:row(btnDims.w,10)  
+  
   if suit.Button('zoom+',suit.layout:row(btnDims.w, btnDims.h)).hit then ui.onZoomInOut(0.5) end 
   if suit.Button('zoom-',suit.layout:row()).hit then ui.onZoomInOut(-0.5) end 
+  
+  ui.suitRadio(ui.radioBtns_cells)     
+  
   if suit.Checkbox( ui.showPheromones, suit.layout:row() ).hit then cfg.debugPheromones = ui.showPheromones.checked end
 end
 

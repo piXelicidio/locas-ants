@@ -22,7 +22,9 @@ function sim.init()
   
    
   local newAnt
-  for i=1,cfg.numAnts do
+  local numAnts = cfg.numAnts
+  if CURRENT_PLATFORM == 'mobile'then numAnts = cfg.numAntsMobile end
+  for i=1,numAnts do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
