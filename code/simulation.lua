@@ -22,7 +22,9 @@ function sim.init()
   
    
   local newAnt
-  for i=1,cfg.numAnts do
+  local numAnts = cfg.numAnts
+  if CURRENT_PLATFORM == 'mobile'then numAnts = cfg.numAntsMobile end
+  for i=1,numAnts do
     newAnt = TAnt.create() 
     newAnt.init()
     map.addAnt( newAnt )
@@ -144,7 +146,7 @@ function sim.setCell( cellType, xworld, yworld)
     elseif (cellType == 'cave') then
       grid.pass = true
       grid.cell = TCell.newCave()
-    elseif (cellType == 'ground') then
+    elseif (cellType == 'ground') or (cellType == "remove") then
       grid.pass =true
       grid.cell = nil
     end

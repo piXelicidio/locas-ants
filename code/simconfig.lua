@@ -3,7 +3,8 @@
 
 local simconfig = {
   
-  numAnts = 4500,
+  numAnts = 3600,
+  numAntsMobile = 1000,
   antMaxSpeed = 1.2,
   antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  
   antComEveryFrame = false,      -- comunicate every frame? or use values of antComNeedFrameStep below  
@@ -46,12 +47,13 @@ local simconfig = {
   
   zoomMaxScale = 4,
   imgScale = 1/4,  
+  idealContentHeight = 720,
   
   colorAnts = {255,255,255},
   colorObstacle = {200,200,200},
   colorFood = {250, 240, 100},
   colorCave = {40,40,40},
-  colorBk = {180,180,180},  
+  colorBk = {0,0,0},  
   colorBkLimits = {120, 120, 120},  
   
   -- << simFrameNumber is a "global" frame number counter, used to measure Time in the game >>>
