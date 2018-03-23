@@ -96,4 +96,8 @@ function ui.draw()
   suit.draw()
 end
 
+function ui.setContentScale( x, y)
+  suit.setContentScale( x, y )
+end
+
 return ui

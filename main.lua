@@ -1,3 +1,28 @@
+ --[[
+    MIT LICENSE
+
+    Copyright (c) 2018 Denys Almaral
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ]]
+
 --- Our main game stuff, 
 -- try to keep it simple... oh well..
   
@@ -16,6 +41,13 @@ local cam = require('code.camview')
 local cfg = require('code.simconfig') 
 local ui = require('code.gui')
 
+-- doing a global scaling for basic adaptation to different screens/windows sizes
+local contentScaling 
+local function screenSizeUpdated()
+  contentScaling = apiG.getHeight() / cfg.idealContentHeight  
+  ui.setContentScale( contentScaling, contentScaling )
+end
+screenSizeUpdated()
 
 
 --- We init the application defining the load event
@@ -45,12 +77,13 @@ function api.draw()
       
   apiG.push()      
   apiG.translate( cam.translation.x, cam.translation.y )          
-  apiG.scale( cam.scale.x, cam.scale.y )            
+  apiG.scale( cam.scale.x * contentScaling, cam.scale.y * contentScaling )            
   sim.draw()
   --ui stuff
   apiG.pop()
   
   --ui
+  apiG.scale(contentScaling, contentScaling)
   ui.draw()  
 end
 
@@ -82,6 +115,7 @@ function api.keypressed(key)
       print('cfg.debugHideAnts = ', cfg.debugHideAnts )
   elseif key=='f11' then
       api.window.setFullscreen( not api.window.getFullscreen() )
+      screenSizeUpdated()
   end
   
 end

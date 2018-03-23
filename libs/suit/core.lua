@@ -4,6 +4,8 @@ local NONE = {}
 local BASE = (...):match('(.-)[^%.]+$')
 local default_theme = require(BASE..'theme')
 
+local inspect = require('libs.inspect')
+
 local suit = {}
 suit.__index = suit
 
@@ -25,6 +27,9 @@ function suit.new(theme)
 		Slider = require(BASE.."slider"),
 
 		layout = require(BASE.."layout").new(),
+    
+    contentScaleX = 1,  --denysMod
+    contentScaleY = 1
 	}, suit)
 end
 
@@ -175,7 +180,20 @@ function suit:keyPressedOn(id, key)
 	return self:hasKeyboardFocus(id) and self.key_down == key
 end
 
+-- denysMod:
+-- denysMod: support for content scaling.
+local contentScaleX, contentScaleY = 1,1
+function suit:setContentScale( x,y )
+  self.contentScaleX = x
+  self.contentScaleY = y
+  print ('x', x)
+  if type(x)=='table' then
+    print(inspect(x))
+    error('bad') 
+  end
+end
 -- state update
+-- denysMod: support for content scaling.
 function suit:enterFrame()
 	if not self.mouse_button_down then
 		self.active = nil
@@ -184,7 +202,8 @@ function suit:enterFrame()
 	end
 
 	self.hovered_last, self.hovered = self.hovered, nil
-	self:updateMouse(love.mouse.getX() , love.mouse.getY()  , love.mouse.isDown(1))
+	self:updateMouse(love.mouse.getX() / self.contentScaleX , love.mouse.getY() /  self.contentScaleX , love.mouse.isDown(1))
+ 
 	self.key_down, self.textchar = nil, ""
 	self:grabKeyboardFocus(NONE)
 	self.hit = nil

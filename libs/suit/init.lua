@@ -37,6 +37,8 @@ return setmetatable({
 	hasKeyboardFocus = function(...) return instance:hasKeyboardFocus(...) end,
 	keyPressedOn = function(...) return instance:keyPressedOn(...) end,
 
+  setContentScale = function(...) return instance:setContentScale(...) end,  --denysMod
+  
 	enterFrame = function(...) return instance:enterFrame(...) end,
 	exitFrame = function(...) return instance:exitFrame(...) end,
 	registerDraw = function(...) return instance:registerDraw(...) end,

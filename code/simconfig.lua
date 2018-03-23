@@ -47,6 +47,7 @@ local simconfig = {
   
   zoomMaxScale = 4,
   imgScale = 1/4,  
+  idealContentHeight = 720,
   
   colorAnts = {255,255,255},
   colorObstacle = {200,200,200},
