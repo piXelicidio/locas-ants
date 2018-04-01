@@ -4,18 +4,19 @@ local cam = {}
 
 cam.translation = {x=0, y=0}
 cam.zoomOrigin = {x = 0, y = 0}
-cam.scale ={x = 1, y = 1}
+cam.scale ={x = 1, y = 1}        -- this is the scale of world
+cam.contentScale = 1             -- this is the scale of the app due to screen change in resolution
 
 function cam.screenToWorld(x, y)
   return 
-    ( (x - cam.translation.x ) /cam.scale.x), 
-    ( (y - cam.translation.y ) /cam.scale.y)
+    ( (x - cam.translation.x ) /cam.scale.x / cam.contentScale ), 
+    ( (y - cam.translation.y ) /cam.scale.y / cam.contentScale )
 end
 
 function cam.screenToGrid(x, y)
     return 
-    math.floor( ( (x - cam.translation.x ) /cam.scale.x ) / cfg.mapGridSize ), 
-    math.floor( ( (y - cam.translation.y ) /cam.scale.y ) / cfg.mapGridSize )
+    math.floor( ( (x - cam.translation.x ) /cam.scale.x / cam.contentScale ) / cfg.mapGridSize ), 
+    math.floor( ( (y - cam.translation.y ) /cam.scale.y / cam.contentScale ) / cfg.mapGridSize )
 end
 
 -- zoom in out the world

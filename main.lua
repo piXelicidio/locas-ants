@@ -46,6 +46,7 @@ local contentScaling
 local function screenSizeUpdated()
   contentScaling = apiG.getHeight() / cfg.idealContentHeight  
   ui.setContentScale( contentScaling, contentScaling )
+  cam.contentScale = contentScaling
 end
 screenSizeUpdated()
 
