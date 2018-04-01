@@ -30,6 +30,7 @@ ui.radioBtns_cells = {
   {caption = 'grass'},
   {caption = 'cave'},
   {caption = 'food'},
+  {caption = 'portal'},
   {caption = 'remove'},  
   bWidth = btnDims.w,
   bHeight = btnDims.h,

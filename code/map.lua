@@ -302,12 +302,12 @@ function map.draw()
   for i = map.minXg, map.maxXg do
     for j = map.minYg, map.maxYg do
       if map.grid[i][j].pass then
-         apiG.setColor(255,255,255); 
-         apiG.draw(imgGround, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
+         apiG.setColor(255,255,255);          
         local cell = map.grid[i][j].cell
         if cell then
-          --apiG.setColor( cell.color )
-          apiG.draw(cell.img, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale    )   
+          cell.draw( i*cfg.mapGridSize, j*cfg.mapGridSize )    
+        else
+          apiG.draw(imgGround, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
         end
       else
 --        apiG.setColor( cfg.colorObstacle )

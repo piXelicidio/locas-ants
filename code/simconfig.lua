@@ -3,7 +3,7 @@
 
 local simconfig = {
   
-  numAnts = 6600,
+  numAnts = 4600,
   numAntsMobile = 1000,
   antMaxSpeed = 1.2,
   antComAlgorithm = 1,           -- 0 = Nothing; 1 = Pheromones inspiration  

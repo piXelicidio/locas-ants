@@ -8,10 +8,11 @@ TCell.cavesStorage = {}
 local imgCave = {}
 local imgFood = {}
 local imgGrass = {}
+local imgPortals = {}
 
 local grass = {} --singleton class instance
 
---- cell base classs
+--- cell base abstract classs
 function TCell.newCell()
   local cell={} 
   --public properties
@@ -19,6 +20,14 @@ function TCell.newCell()
   cell.pass = false
   cell.color = cfg.colorObstacle 
   cell.posi = {0,0}     --world position
+  
+  function cell.affectAnt( ant )
+    --subclasses should implement this
+  end
+  
+  function cell.draw(x, y)
+    apiG.draw(cell.img, x, y, 0, cfg.imgScale, cfg.imgScale)
+  end
         
   return cell
 end
@@ -31,12 +40,28 @@ function TCell.init()
   imgFood[0] = apiG.newImage('images//food01.png')
   imgGrass = apiG.newImage('images//grass01.png') 
   
+  imgPortals.blue = {
+      apiG.newImage('images/portalBlue_00.png'),
+      apiG.newImage('images/portalBlue_01.png'),
+      apiG.newImage('images/portalBlue_02.png')
+    }
+  
+  imgPortals.orange = {
+      apiG.newImage('images/portalOrange_00.png'),
+      apiG.newImage('images/portalOrange_01.png'),
+      apiG.newImage('images/portalOrange_02.png')
+    }
+  
+  
   -- singletons  
   grass = TCell.newCell()
   grass.type = 'grass'
   grass.pass = true
   grass.img = imgGrass  
   grass.friction = 0.8
+  function grass.affectAnt( ant )
+    ant.friction = grass.friction
+  end  
 end
 
 --- child class food
@@ -91,10 +116,64 @@ end
 
 --- child class grass - singleton
 function TCell.newGrass()
-  function grass.affectAnt( ant )
-    ant.friction = grass.friction
-  end
   return grass
+end
+
+--- Portals O.o
+--
+local lastPortal = nil
+function TCell.newPortal()
+  local portal = TCell.newCell() 
+  portal.type = 'portal'
+  portal.gridPos = {0,0} -- need to set this after creation by caller
+  portal.needUpdate = true --need to update the animation
+  -- every time we create a Portal it alternate colors, started with blue the first one,
+  if lastPortal==nil then 
+    portal.color = "blue"
+    portal.img = imgPortals.blue[1]
+    portal.imgs = imgPortals.blue
+  elseif lastPortal.color == "blue" then 
+    portal.color = "orange" 
+    portal.img = imgPortals.orange[1]
+    portal.imgs = imgPortals.orange
+    -- when the current color is Orange, it will link with the last portal that was Blue.
+    portal.link = lastPortal
+    lastPortal.link = portal
+  else 
+    portal.color = "blue" 
+    portal.img = imgPortals.blue[1]
+    portal.imgs = imgPortals.blue
+  end
+  
+  --handle ant
+  function portal.affectAnt( ant )
+    local teleport = false
+    if ant.teleportedOnFrame then
+      --check when
+      if (cfg.simFrameNumber - ant.teleportedOnFrame) > 30 then
+        --teleport
+        teleport = true
+      end
+    else teleport = true end
+    if teleport and portal.link then
+      ant.position[1] = portal.link.posi[1] + cfg.mapGridSize / 2
+      ant.position[2] = portal.link.posi[2] + cfg.mapGridSize / 2
+      ant.resetPositionMemory( ant.position )
+      ant.teleportedOnFrame = cfg.simFrameNumber
+    end
+  end
+  
+  function portal.draw(x, y)
+    apiG.draw(portal.imgs[ (math.floor(cfg.simFrameNumber/4) % 3) + 1 ], x, y, 0, cfg.imgScale, cfg.imgScale)
+    if portal.link then
+      local mid = cfg.mapGridSize /2
+      apiG.setColor(255, 255, 255, 50)
+      apiG.line(portal.posi[1] + mid, portal.posi[2] + mid, portal.link.posi[1] + mid, portal.link.posi[2] + mid )
+    end
+  end
+    
+  lastPortal = portal
+  return portal    
 end
 
 

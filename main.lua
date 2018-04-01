@@ -69,7 +69,7 @@ end
 function api.update()
   ui.numAnts = map.ants.count
   ui.mainUpdate()
-  sim.update()      
+  sim.update()   
 end  
 
 function api.draw()        
@@ -126,7 +126,7 @@ local function dragmoved(x, y, dx, dy)
 
 
   if api.mouse.isDown(1) and (x > ui.leftPanelWidth) then     
-    if (tool ~= 'cave') and (tool~='pan view') then
+    if (tool ~= 'cave') and (tool ~= 'portal') and (tool~='pan view') then
       sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) ) 
     end    
   end 
