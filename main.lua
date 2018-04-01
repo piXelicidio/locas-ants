@@ -159,9 +159,8 @@ function api.mousepressed(x, y, button,  istouch)
 end
 
 function api.wheelmoved( x, y)    
-  local inc
-  if y>0 then inc = 0.5 end
-  if y<0 then inc = -0.5 end
+  local inc = y * 0.5
+  
   cam.zoomOrigin.x, cam.zoomOrigin.y = api.mouse.getX(), api.mouse.getY()
   cam.zoom(inc)
 end
