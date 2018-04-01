@@ -131,9 +131,30 @@ function sim.onClick(x, y)
   if map.isInsideGrid(xg, yg) then map.grid[xg][yg].pass = false end
 end
 
-function sim.setCell( cellType, xworld, yworld)
-  local xg, yg = map.worldToGrid( xworld, yworld)
+function sim.removeCell(xg, yg)
   if map.isInsideGrid(xg, yg) then
+    local grid = map.grid[xg][yg]
+    if grid.cell then
+        -- be carful with portals, they are linked
+        if grid.cell.type == 'portal' then
+          --remove link too
+          if grid.cell.link then
+            local linkedCell = map.grid[ grid.cell.link.gridPos[1] ][ grid.cell.link.gridPos[2] ]
+            linkedCell.pass = true
+            linkedCell.cell = nil
+          end
+        end        
+        grid.cell = nil
+      end
+      grid.pass = true
+  end
+end
+
+function sim.setCell( cellType, xworld, yworld)
+  local xg, yg = map.worldToGrid( xworld, yworld)  
+  if map.isInsideGrid(xg, yg) then
+    --always remove existing first:
+    sim.removeCell(xg, yg)
     local grid = map.grid[xg][yg]
     if (cellType == 'block') or (cellType == 'obstacle') or (cellType == 'donotpass') then
       grid.pass = false
@@ -147,8 +168,12 @@ function sim.setCell( cellType, xworld, yworld)
       grid.pass = true
       grid.cell = TCell.newCave()
     elseif (cellType == 'ground') or (cellType == "remove") then
-      grid.pass =true
-      grid.cell = nil
+      --sim.removeCell(xg, yg)
+    elseif (cellType == 'portal') then
+      grid.pass = true
+      grid.cell = TCell.newPortal()
+      grid.cell.gridPos = {xg, yg} 
+      grid.cell.posi = {xg * cfg.mapGridSize, yg * cfg.mapGridSize}
     end
   end    
 end

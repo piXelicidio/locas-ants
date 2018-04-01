@@ -46,6 +46,7 @@ local contentScaling
 local function screenSizeUpdated()
   contentScaling = apiG.getHeight() / cfg.idealContentHeight  
   ui.setContentScale( contentScaling, contentScaling )
+  cam.contentScale = contentScaling
 end
 screenSizeUpdated()
 
@@ -68,7 +69,7 @@ end
 function api.update()
   ui.numAnts = map.ants.count
   ui.mainUpdate()
-  sim.update()      
+  sim.update()   
 end  
 
 function api.draw()        
@@ -125,7 +126,7 @@ local function dragmoved(x, y, dx, dy)
 
 
   if api.mouse.isDown(1) and (x > ui.leftPanelWidth) then     
-    if (tool ~= 'cave') and (tool~='pan view') then
+    if (tool ~= 'cave') and (tool ~= 'portal') and (tool~='pan view') then
       sim.setCell(ui.radioBtns_cells.selectedCaption, cam.screenToWorld(x, y) ) 
     end    
   end 
@@ -158,9 +159,8 @@ function api.mousepressed(x, y, button,  istouch)
 end
 
 function api.wheelmoved( x, y)    
-  local inc
-  if y>0 then inc = 0.5 end
-  if y<0 then inc = -0.5 end
+  local inc = y * 0.5
+  
   cam.zoomOrigin.x, cam.zoomOrigin.y = api.mouse.getX(), api.mouse.getY()
   cam.zoom(inc)
 end

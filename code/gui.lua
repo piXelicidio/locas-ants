@@ -30,6 +30,7 @@ ui.radioBtns_cells = {
   {caption = 'grass'},
   {caption = 'cave'},
   {caption = 'food'},
+  {caption = 'portal'},
   {caption = 'remove'},  
   bWidth = btnDims.w,
   bHeight = btnDims.h,
@@ -83,6 +84,7 @@ function ui.mainUpdate()
   ui.suitRadio(ui.radioBtns_cells)     
   
   if suit.Checkbox( ui.showPheromones, suit.layout:row() ).hit then cfg.debugPheromones = ui.showPheromones.checked end
+  
 end
 
 function ui.draw()
