@@ -10,7 +10,7 @@ Last screenshots:
 (Btw, I'm learning Git/Github so beware of weird things with this my first Open Source"?" project) 
 
 **To quick run it:**
-- Install Love2D: https://love2d.org/
+- Install Love2D version 0.10.2: [Windows 64](https://bitbucket.org/rude/love/downloads/love-0.10.2-win64.exe) - [Other OSes](https://bitbucket.org/rude/love/downloads/?tab=downloads)
 - Download the .love file: https://github.com/piXelicidio/locas-ants/releases/latest
 - Double-click .love file.
 
