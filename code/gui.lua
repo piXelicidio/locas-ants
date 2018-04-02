@@ -4,16 +4,23 @@ local cfg = require('code.simconfig')
 local apiG = love.graphics
 
 local ui = {}
+local cmul = cfg.colorMul
+suit.theme.color = {
+	normal   = {bg = { 66*cmul, 66*cmul, 66*cmul}, fg = {188*cmul,188*cmul,188*cmul}},
+	hovered  = {bg = { 50*cmul,153*cmul,187*cmul}, fg = {255*cmul,255*cmul,255*cmul}},
+	active   = {bg = {255*cmul,153*cmul,  0}, fg = {225*cmul,225*cmul,225*cmul}}
+}
+
 
 ui.cnormal = suit.theme.color.normal
-ui.selectedColor =  { bg={55, 113, 140}, fg={255,255,255} } 
+ui.selectedColor =  { bg={55*cmul, 113*cmul, 140*cmul}, fg={255*cmul,255*cmul,255*cmul} } 
 ui.cc = ui.cnormal
 ui.consumedClick = false
 
-ui.labelStyle =  { normal = { fg={155,200,125} }   }
+ui.labelStyle =  { normal = { fg={155*cmul,200*cmul,125*cmul} }   }
 
 ui.leftPanelWidth = 110
-ui.leftPanelColor = { 82, 82, 82}
+ui.leftPanelColor = { 82*cmul, 82*cmul, 82*cmul}
 
 ui.numAnts = 0 -- set this on main.lua to update
 

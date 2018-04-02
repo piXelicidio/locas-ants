@@ -288,8 +288,8 @@ local cellPheromInfo = function(cell, i, j)
     for name,info in pairs(pheromInfo.seen) do      
       local alpha = 255 - (( cfg.simFrameNumber - info.time) / 5);
       if alpha < 30 then alpha = 10 end
-      if name=='food' then apiG.setColor(255,255,200, alpha) 
-      elseif name=='cave' then apiG.setColor(200,200,255, alpha) end
+      if name=='food' then apiG.setColor(255*cfg.colorMul,255*cfg.colorMul,200*cfg.colorMul, alpha*cfg.colorMul) 
+      elseif name=='cave' then apiG.setColor(200*cfg.colorMul,200*cfg.colorMul,255*cfg.colorMul, alpha*cfg.colorMul) end
       if info.where[1]~=0 and info.where[2]~=0 then
         apiG.circle('line', i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, 1 )           
         apiG.line( i * map.gridSize + map.gridSize/2, j * map.gridSize + map.gridSize/2, info.where[1], info.where[2] )
@@ -302,7 +302,7 @@ function map.draw()
   for i = map.minXg, map.maxXg do
     for j = map.minYg, map.maxYg do
       if map.grid[i][j].pass then
-         apiG.setColor(255,255,255);          
+         apiG.setColor(cfg.colorWhite);          
         local cell = map.grid[i][j].cell
         if cell then
           cell.draw( i*cfg.mapGridSize, j*cfg.mapGridSize )    
@@ -312,7 +312,7 @@ function map.draw()
       else
 --        apiG.setColor( cfg.colorObstacle )
 --        apiG.rectangle('fill',i*cfg.mapGridSize, j*cfg.mapGridSize, cfg.mapGridSize , cfg.mapGridSize )   
-         apiG.setColor(255,255,255);
+         apiG.setColor(cfg.colorWhite);
          apiG.draw(imgBlock, i*cfg.mapGridSize, j*cfg.mapGridSize, 0, cfg.imgScale, cfg.imgScale );
       end
     end

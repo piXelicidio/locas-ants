@@ -1,7 +1,14 @@
 ---"Constants", defaults, globals........
 -- "time" units are defined as frames
+local api = love
+local apiVer = api.getVersion()
+print (apiVer)
+local cmul
+if apiVer >= 11 then cmul = 1/255 else cmul = 1 end
 
 local simconfig = {
+  
+  apiVersion = apiVer,
   
   numAnts = 3600,
   numAntsMobile = 1000,
@@ -49,13 +56,18 @@ local simconfig = {
   imgScale = 1/4,  
   idealContentHeight = 720,
   
-  colorAnts = {255,255,255},
-  colorObstacle = {200,200,200},
-  colorFood = {250, 240, 100},
-  colorCave = {40,40,40},
-  colorBk = {0,0,0},  
-  colorBkLimits = {120, 120, 120},  
+  colorMul = cmul,
   
+  colorAnts = {255*cmul, 255*cmul, 255*cmul},
+  colorObstacle = {200*cmul,200*cmul,200*cmul},
+  colorFood = {250*cmul, 240*cmul, 100*cmul},
+  colorCave = {40*cmul,40*cmul,40*cmul},
+  colorBk = {0,0,0},  
+  colorBkLimits = {120*cmul, 120*cmul, 120*cmul},  
+  
+  colorWhite = {255*cmul, 255*cmul, 255*cmul, 255*cmul},
+  colorBlue  = {10*cmul, 100*cmul, 250*cmul, 255*cmul},
+  colorGray = {130*cmul, 130*cmul, 130*cmul, 130*cmul},
   -- << simFrameNumber is a "global" frame number counter, used to measure Time in the game >>>
   simFrameNumber = 0,  
   
