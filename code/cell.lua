@@ -167,7 +167,7 @@ function TCell.newPortal()
     apiG.draw(portal.imgs[ (math.floor(cfg.simFrameNumber/4) % 3) + 1 ], x, y, 0, cfg.imgScale, cfg.imgScale)
     if portal.link then
       local mid = cfg.mapGridSize /2
-      apiG.setColor(255, 255, 255, 50)
+      apiG.setColor(255*cfg.colorMul, 255*cfg.colorMul, 255*cfg.colorMul, 50*cfg.colorMul)
       apiG.line(portal.posi[1] + mid, portal.posi[2] + mid, portal.link.posi[1] + mid, portal.link.posi[2] + mid )
     end
   end

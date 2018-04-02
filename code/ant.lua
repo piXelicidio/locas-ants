@@ -259,10 +259,10 @@ function TAnt.create()
   
   function ant.drawDebug()
     ant.drawNormal()    
-    apiG.setColor(10,100,250)
+    apiG.setColor(cfg.colorBlue)
     apiG.circle("line",ant.oldestPositionRemembered[1], ant.oldestPositionRemembered[2],1);
     --sight and comunication radius
-    apiG.setColor(130,130,130)
+    apiG.setColor(cfg.colorGray)
     apiG.circle( "line", ant.position[1], ant.position[2], cfg.antSightDistance );    
   end
   
