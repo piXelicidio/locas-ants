@@ -22,4 +22,4 @@ Last screenshots:
 - On ZeroBrane go to menu : Project -> Lua Interpreter -> LÖVE.
 - And execute with F6 :) ready!
 
-[Discussion forum](https://talk.denysalmaral.com/index.php?p=/categories/locas-ants-%28lua-%2B-love2d%29)
+[Follow me on Twitter](https://twitter.com/DenysAlmaral)
