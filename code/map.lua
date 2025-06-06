@@ -79,11 +79,11 @@ function map.setCell_food(xg, yg)
 end
 
 function map.setCell_cave(xg, yg)
-  if not map.grid[xg][yg] then  
+  if not map.grid[xg][yg] then
     map.initCell(xg,yg)
-  end  
-  local cell = TCell.newCave() 
-  map.grid[xg][yg].cell = TCell.newCave()
+  end
+  local cell = TCell.newCave()
+  map.grid[xg][yg].cell = cell
   cell.posi = {xg * cfg.mapGridSize, yg * cfg.mapGridSize }
 end
 
